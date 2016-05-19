@@ -3,11 +3,12 @@ cmake_minimum_required(VERSION 2.8)
 project(stepmod)
 
 set(LIB_SOURCE
-    libsource.cpp
+    ${PROJECT_SOURCE_DIR}/source/math/geometry.cpp
 )
 
+# Include dirs that are used and will be exported 
 set(${PROJECT_NAME}_USED_INCDIRS
-    # Add here includes used by library
+    ${PROJECT_SOURCE_DIR}
 )
 
 include_directories(${${PROJECT_NAME}_USED_INCDIRS})

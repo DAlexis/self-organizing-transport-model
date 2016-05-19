@@ -1,5 +1,3 @@
-#include "libheader.hpp"
-
 #include <boost/program_options.hpp>
 #include <iostream>
 
@@ -37,16 +35,6 @@ int main(int argc, char** argv)
     if (argc == 1 || vmOptions.count("help"))
     {
         cout << allOptions << endl;
-        return 0;
-    }
-    if (vmOptions.count("func"))
-    {
-        func();
-        
-    }
-    if (vmOptions.count("square"))
-    {
-        cout << "Square is " << sqr(vmOptions["square"].as<double>()) << endl;
         return 0;
     }
     

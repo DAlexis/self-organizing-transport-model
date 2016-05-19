@@ -5,7 +5,7 @@ set -e
 echo "Usage: ./generate-eclipse-project.sh <debug|release>. Debug is default"
 
 workspace="eclipse-workspace"
-project="project"
+project="stepping-modeller"
 dir=$workspace/$project
 
 mkdir -p $dir
