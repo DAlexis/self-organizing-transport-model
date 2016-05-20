@@ -3,13 +3,34 @@
 
 #include "stepmod/math/geometry.hpp"
 #include "stepmod/utils/memory.hpp"
+#include "stepmod/utils/macros.hpp"
 #include <list>
 #include <memory>
+#include <set>
 
 namespace Stepmod
 {
 
 class Channel;
+class BranchPoint;
+
+/**
+ * This class collects all BranchPoint s in the system and it is entry point to access
+ * any BranchPoint by coords
+ */
+class BranchPointsPool
+{
+public:
+    SINGLETON_IN_CLASS(BranchPointsPool)
+    
+    void registerPoint(BranchPoint* point);
+    void deregisterPoint(BranchPoint* point);
+    
+private:
+    BranchPointsPool();
+    std::set<BranchPoint*> m_allPoints;
+    /// @todo Add here @deleted@ objects caching
+};
 
 class BranchPoint : public SelfMemMgr
 {
@@ -23,7 +44,8 @@ public:
 private:
     BranchPoint();
     std::list<Channel*> m_channels;
-
+    
+    void onDelete() override final;
 protected:
 
 };

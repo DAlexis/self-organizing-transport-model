@@ -2,14 +2,33 @@
 
 using namespace Stepmod;
 
+SINGLETON_IN_CPP(BranchPointsPool)
+
+BranchPointsPool::BranchPointsPool()
+{
+}
+
+void BranchPointsPool::registerPoint(BranchPoint* point)
+{
+    m_allPoints.insert(point);
+}
+
+void BranchPointsPool::deregisterPoint(BranchPoint* point)
+{
+    m_allPoints.erase(point);
+}
+
 BranchPoint::BranchPoint(Point<3> pos) :
     position(pos)
 {
+    
 }
 
 BranchPoint* BranchPoint::create(Point<3> pos)
 {
-    return new BranchPoint(pos);
+    BranchPoint* point = new BranchPoint(pos);
+    BranchPointsPool::instance().registerPoint(point);
+    return point;
 }
 
 void BranchPoint::registerChannel(Channel* channel)
@@ -21,6 +40,11 @@ void BranchPoint::registerChannel(Channel* channel)
     }
 #endif
     m_channels.push_back(channel);
+}
+
+void BranchPoint::onDelete()
+{
+    BranchPointsPool::instance().deregisterPoint(this);
 }
 
 Channel* Channel::create(BranchPoint* p1, Point<3> p2pos)

@@ -13,8 +13,18 @@ public:
     /// @todo Check in destructor ref count and make assertion
     virtual ~SelfMemMgr() {  }
     inline void addRef() { ++m_refCount; }
-    inline void release() { if (--m_refCount == 0) delete this; }
+    inline void release()
+    {
+        if (--m_refCount == 0)
+        {
+            onDelete();
+            delete this;
+        }
+    }
 
+protected:
+    virtual void onDelete() {}
+    
 private:
     size_t m_refCount = 1;
 };
