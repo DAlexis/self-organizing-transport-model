@@ -23,7 +23,10 @@ public:
     }
 
 protected:
-    virtual void onDelete() {}
+    virtual void onDelete()
+    {
+    	// Nothing by default
+    }
     
 private:
     size_t m_refCount = 1;
@@ -45,35 +48,42 @@ public:
         return w;
     }
     
-    PtrWrap(T* pobject) { reset(pobject); }
+    PtrWrap(T* pobject = nullptr) { assign(pobject); }
     
     PtrWrap(PtrWrap<T>& ptr)  { *this = ptr; }
     PtrWrap(PtrWrap<T>&& ptr) { *this = ptr; }
     
-    ~PtrWrap() { m_pobject->release(); }
-    
-    void reset(T* pobject)
+    ~PtrWrap()
+    {
+    	if (m_pobject)
+    		m_pobject->release();
+    }
+
+    /// Assign object and add its reference. Release previous object
+    void assign(T* pobject)
     {
         clearPObject();
-        pobject->addRef();
+        if (pobject)
+        	pobject->addRef();
         m_pobject = pobject;
     }
     
     PtrWrap& operator=(PtrWrap& right)
     {
-        reset(right.m_pobject);
+        assign(right.m_pobject);
         return *this;
     }
+
     /*
     PtrWrap& operator=(PtrWrap&& right)
     {
-        reset(right.m_pobject);
+        assign(right.m_pobject);
         return *this;
     }*/
     
     PtrWrap& operator=(T* pobject)
     {
-        reset(pobject);
+        assign(pobject);
     }   
     
     bool operator==(const PtrWrap& right)

@@ -23,17 +23,25 @@ TEST(SelfMemMgrTest, SelfMemMgrInst)
     ASSERT_EQ(TestSMM::instCount, 0);
 }
 
+TEST(PtrWrapTest, PtrWrapInstEmpty)
+{
+	PtrWrap<TestSMM> *p = nullptr;
+	ASSERT_NO_THROW(p = new PtrWrap<TestSMM>());
+	ASSERT_NO_THROW(delete p);
+}
+
 TEST(PtrWrapTest, PtrWrapInst)
 {
     TestSMM::instCount = 0;
     TestSMM *tempPointer = new TestSMM(); // Ref count = 1
     {
         PtrWrap<TestSMM> p(tempPointer); // Ref count = 2
-        ASSERT_EQ(TestSMM::instCount, 1);
+        ASSERT_EQ(TestSMM::instCount, 1); // Object is alive
     } // Ref count = 1
-    ASSERT_EQ(TestSMM::instCount, 1);
+    ASSERT_EQ(TestSMM::instCount, 1); // object still alive
     tempPointer->release(); // Ref count = 0
-    ASSERT_EQ(TestSMM::instCount, 0);
+    ASSERT_EQ(TestSMM::instCount, 0); // object deleted
+
     
     TestSMM::instCount = 0;
     {

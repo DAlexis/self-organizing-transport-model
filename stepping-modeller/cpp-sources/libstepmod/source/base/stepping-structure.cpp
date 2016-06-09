@@ -2,18 +2,37 @@
 
 using namespace Stepmod;
 
+void Node::addLink(Link* link)
+{
+	m_links.insert(link);
+}
+
+void Node::removeLink(Link* link)
+{
+	size_t count = m_links.erase(link);
+	ASSERT(count != 0, "Removing link that was not connected");
+}
+
+void Link::connect(Node* n1, Node* n2)
+{
+	m_n1.assign(n1);
+	m_n2.assign(n2);
+}
+
+
+/*
 SINGLETON_IN_CPP(BranchPointsPool)
 
 BranchPointsPool::BranchPointsPool()
 {
 }
 
-void BranchPointsPool::registerPoint(BranchPoint* point)
+void BranchPointsPool::registerPoint(std::weak_ptr<BranchPoint> point)
 {
     m_allPoints.insert(point);
 }
 
-void BranchPointsPool::deregisterPoint(BranchPoint* point)
+void BranchPointsPool::deregisterPoint(std::weak_ptr<BranchPoint> point)
 {
     m_allPoints.erase(point);
 }
@@ -69,3 +88,4 @@ void Channel::remove()
 {
     p1->release(); p2->release();
 }
+*/
