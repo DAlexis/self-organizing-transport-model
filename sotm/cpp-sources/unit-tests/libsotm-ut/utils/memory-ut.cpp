@@ -2,13 +2,15 @@
 
 #include "gtest/gtest.h"
 
-using namespace Stepmod;
+using namespace sotm;
 
 class TestSMM : public SelfMemMgr
 {
 public:
+	constexpr static int initialTestValue = 35;
     TestSMM() { instCount++; }
     ~TestSMM() { instCount--; }
+    int testValue = initialTestValue;
     static int instCount;
 };
 
@@ -28,6 +30,24 @@ TEST(PtrWrapTest, PtrWrapInstEmpty)
 	PtrWrap<TestSMM> *p = nullptr;
 	ASSERT_NO_THROW(p = new PtrWrap<TestSMM>());
 	ASSERT_NO_THROW(delete p);
+}
+
+TEST(PtrWrapTest, PtrWrapContainment)
+{
+	PtrWrap<TestSMM> *p = nullptr;
+	int initVal = TestSMM::initialTestValue;
+	p = new PtrWrap<TestSMM>();
+	p->assign(new TestSMM);
+	(*p)->testValue++;
+	ASSERT_EQ((*p)->testValue,      initVal+1);
+	ASSERT_EQ(p->data()->testValue, initVal+1);
+	ASSERT_EQ((**p).testValue,      initVal+1);
+
+	delete p;
+	p = new PtrWrap<TestSMM>();
+	p->assign(new TestSMM);
+	ASSERT_EQ((*p)->testValue, initVal);
+	delete p;
 }
 
 TEST(PtrWrapTest, PtrWrapInst)

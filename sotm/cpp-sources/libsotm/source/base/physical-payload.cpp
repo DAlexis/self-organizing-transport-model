@@ -8,9 +8,7 @@
 #include "sotm/base/physical-payload.hpp"
 #include "sotm/utils/assert.hpp"
 
-using namespace Stepmod;
-
-SINGLETON_IN_CPP(PhysicalPayloadsRegister)
+using namespace sotm;
 
 PhysicalPayloadsRegister::PhysicalPayloadsRegister()
 {
@@ -27,14 +25,21 @@ void PhysicalPayloadsRegister::remove(AnyPhysicalPayloadBase* payload)
 	ASSERT(count == 1, "Removing payload without adding");
 }
 
-AnyPhysicalPayloadBase::AnyPhysicalPayloadBase()
+void PhysicalPayloadsRegister::makeStep(double dt)
 {
-	PhysicalPayloadsRegister::instance().add(this);
+	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
+		(*it)->makeStep(dt);
+}
+
+AnyPhysicalPayloadBase::AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg) :
+		m_payloadsRegister(reg)
+{
+	m_payloadsRegister->add(this);
 }
 
 AnyPhysicalPayloadBase::~AnyPhysicalPayloadBase()
 {
-	PhysicalPayloadsRegister::instance().remove(this);
+	m_payloadsRegister->remove(this);
 }
 
 
@@ -55,7 +60,14 @@ void AnyPhysicalPayloadBase::doStep()
 	}
 }
 
-NodePayloadBase::NodePayloadBase(Node* node) :
+NodePayloadBase::NodePayloadBase(PhysicalPayloadsRegister* reg, Node* node) :
+	AnyPhysicalPayloadBase(reg),
 	node(node)
+{
+}
+
+LinkPayloadBase::LinkPayloadBase(PhysicalPayloadsRegister* reg, Link* link) :
+	AnyPhysicalPayloadBase(reg),
+	link(link)
 {
 }

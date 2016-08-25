@@ -50,21 +50,6 @@
 #define UNUSED_ARG(x)       ( (void) x )
 
 //////////////////////////////////////////////////////////////////////
-// Macros to create singleton class
-//
-// This macro shoud be placed at public section of class
-#define SINGLETON_IN_CLASS(ClassName)   static ClassName& instance(); \
-                                        ClassName(const ClassName&) = delete;
-
-// This macro should be placed in .cpp file containing implementation of singleton class.
-// Instance will be stored in a translation unit containing this macro
-#define SINGLETON_IN_CPP(ClassName)     ClassName& ClassName::instance() \
-                                        { \
-                                                static ClassName singletonInstance; \
-                                                return singletonInstance; \
-                                        }
-
-//////////////////////////////////////////////////////////////////////
 // Macros to add static initializer and deinitializer to class
 //
 // Place it in private section of class

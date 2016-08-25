@@ -6,7 +6,7 @@
 
 #include <initializer_list>
 
-namespace Stepmod
+namespace sotm
 {
 
 template<int dim>

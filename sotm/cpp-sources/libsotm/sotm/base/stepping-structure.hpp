@@ -8,7 +8,7 @@
 #include <memory>
 #include <set>
 
-namespace Stepmod
+namespace sotm
 {
 
 class Node;

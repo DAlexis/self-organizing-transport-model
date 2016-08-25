@@ -8,7 +8,7 @@
 #ifndef LIBSTEPMOD_STEPMOD_BASE_TIME_ITER_HPP_
 #define LIBSTEPMOD_STEPMOD_BASE_TIME_ITER_HPP_
 
-namespace Stepmod
+namespace sotm
 {
 
 class ITimeIterable

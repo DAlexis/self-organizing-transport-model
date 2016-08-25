@@ -1,6 +1,6 @@
 #include "sotm/base/stepping-structure.hpp"
 
-using namespace Stepmod;
+using namespace sotm;
 
 void Node::addLink(Link* link)
 {

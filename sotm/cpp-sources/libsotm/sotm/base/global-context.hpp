@@ -11,10 +11,10 @@
 #include "physical-payload.hpp"
 #include "stepping-structure.hpp"
 
-namespace Stepmod
+namespace sotm
 {
 
-class GlobalContext
+class ModelContext
 {
 public:
 	INodePhysPayload* createNodePayload(Node* node);

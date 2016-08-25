@@ -1,35 +1,35 @@
 #ifndef PHYSICAL_CONTEXT_HPP_INCLUDE
 #define PHYSICAL_CONTEXT_HPP_INCLUDE
 
-#include "time-iter.hpp"
+#include "sotm/base/time-iter.hpp"
 #include "sotm/utils/memory.hpp"
 #include "sotm/base/stepping-structure.hpp"
 
 #include <vector>
 #include <set>
 
-namespace Stepmod
+namespace sotm
 {
 
 class AnyPhysicalPayloadBase;
 
-class PhysicalPayloadsRegister
+class PhysicalPayloadsRegister : public ITimeIterable
 {
 public:
 	void add(AnyPhysicalPayloadBase* payload);
 	void remove(AnyPhysicalPayloadBase* payload);
 
-	SINGLETON_IN_CLASS(PhysicalPayloadsRegister);
+	void makeStep(double dt) override;
 
 private:
 	PhysicalPayloadsRegister();
 	std::set<AnyPhysicalPayloadBase*> m_payloads;
 };
 
-class AnyPhysicalPayloadBase
+class AnyPhysicalPayloadBase : public ITimeIterable
 {
 public:
-	AnyPhysicalPayloadBase();
+	AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg);
 	virtual ~AnyPhysicalPayloadBase();
 	void doStep();
 	void initVariables(size_t count);
@@ -39,15 +39,33 @@ public:
 	std::vector<double> x;
 	std::vector<double> rhs;
 	std::vector<double> xprev;
+
+private:
+	PhysicalPayloadsRegister *m_payloadsRegister;
 };
 
 class NodePayloadBase : public AnyPhysicalPayloadBase
 {
 public:
-	NodePayloadBase(Node* node);
+	NodePayloadBase(PhysicalPayloadsRegister* reg, Node* node);
 
 protected:
 	PtrWrap<Node> node;
+};
+
+class LinkPayloadBase : public AnyPhysicalPayloadBase
+{
+public:
+	LinkPayloadBase(PhysicalPayloadsRegister* reg, Link* link);
+
+protected:
+	PtrWrap<Link> link;
+};
+
+class INodePayloadFactory
+{
+public:
+	virtual ~INodePayloadFactory() {}
 };
 
 /*

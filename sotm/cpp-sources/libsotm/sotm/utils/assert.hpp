@@ -11,7 +11,7 @@
     #define ASSERT(condition, message)
 #endif
 
-namespace Stepmod
+namespace sotm
 {
 
 //void __assert(bool condition, );

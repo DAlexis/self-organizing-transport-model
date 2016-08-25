@@ -4,7 +4,7 @@
 #include "sotm/utils/assert.hpp"
 #include <cstring>
 
-namespace Stepmod
+namespace sotm
 {
 
 class SelfMemMgr
@@ -91,6 +91,21 @@ public:
         return m_pobject == right.m_pobject;
     }
     
+    inline T* operator->()
+    {
+    	return m_pobject;
+    }
+
+    inline T* data()
+    {
+    	return m_pobject;
+    }
+
+    inline T& operator*()
+    {
+    	return *m_pobject;
+    }
+
 private:
     void clearPObject()
     {

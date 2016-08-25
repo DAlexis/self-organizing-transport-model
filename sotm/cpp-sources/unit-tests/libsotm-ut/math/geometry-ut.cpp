@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-using namespace Stepmod;
+using namespace sotm;
 
 TEST(PointTests, PointInstanciation)
 {
