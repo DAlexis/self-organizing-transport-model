@@ -1,8 +1,8 @@
 #ifndef GEOMETRY_HPP_INCLUDED
 #define GEOMETRY_HPP_INCLUDED
 
-#include "stepmod/utils/memory.hpp"
-#include "stepmod/utils/assert.hpp"
+#include "sotm/utils/memory.hpp"
+#include "sotm/utils/assert.hpp"
 
 #include <initializer_list>
 

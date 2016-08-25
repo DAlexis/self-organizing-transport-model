@@ -2,8 +2,8 @@
 #define PHYSICAL_CONTEXT_HPP_INCLUDE
 
 #include "time-iter.hpp"
-#include "stepmod/utils/memory.hpp"
-#include "stepmod/base/stepping-structure.hpp"
+#include "sotm/utils/memory.hpp"
+#include "sotm/base/stepping-structure.hpp"
 
 #include <vector>
 #include <set>

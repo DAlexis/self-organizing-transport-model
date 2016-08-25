@@ -1,5 +1,5 @@
-# Stepping discharge modeller
+# Self-organizing transoprt modeller
 
-This repo will contain lightning discharge modeller based on combined algorythm
+Self-organizing transoprt modeller (SOTM) is a library for modelling different physical processes based on dynamic graphs in space. The project was created to model lightning discharge but may be applied to other physical processes.
 
-Project shouldbe renamed to "self-organizing transport model" with corresponding classes and namespaces renaming
+Currently project is at an early stage of development so it couldn't be used in any production simulations

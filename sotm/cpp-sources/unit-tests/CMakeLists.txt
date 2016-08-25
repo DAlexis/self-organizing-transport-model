@@ -6,4 +6,4 @@ export_include_dirs(
     ${PROJECT_SOURCE_DIR}
 )
 
-add_subdirectory(libstepmod-ut)
+add_subdirectory(libsotm-ut)

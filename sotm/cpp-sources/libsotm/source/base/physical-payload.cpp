@@ -5,8 +5,8 @@
  *      Author: dalexies
  */
 
-#include "stepmod/base/physical-payload.hpp"
-#include "stepmod/utils/assert.hpp"
+#include "sotm/base/physical-payload.hpp"
+#include "sotm/utils/assert.hpp"
 
 using namespace Stepmod;
 

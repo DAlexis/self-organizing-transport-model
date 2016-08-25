@@ -1,4 +1,4 @@
-#include "stepmod/base/stepping-structure.hpp"
+#include "sotm/base/stepping-structure.hpp"
 
 using namespace Stepmod;
 

@@ -1,4 +1,4 @@
-#include "stepmod/math/geometry.hpp"
+#include "sotm/math/geometry.hpp"
 
 #include "gtest/gtest.h"
 

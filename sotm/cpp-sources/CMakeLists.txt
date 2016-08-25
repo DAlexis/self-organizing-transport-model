@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 
-project("Stepping-modeller")
+project("self-organizing-transport-modeller")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -DDEBUG")
@@ -40,7 +40,7 @@ macro(export_libs)
         CACHE INTERNAL "${PROJECT_NAME}: used and exported libs" FORCE)
 endmacro()
 
-add_subdirectory(libstepmod)
+add_subdirectory(libsotm)
 add_subdirectory(lightning-modeller)
 
 # To enable ctest usage

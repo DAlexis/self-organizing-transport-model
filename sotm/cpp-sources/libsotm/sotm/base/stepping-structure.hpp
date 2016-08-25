@@ -1,9 +1,9 @@
 #ifndef BRANCH_POINT_HPP_INCLUDED
 #define BRANCH_POINT_HPP_INCLUDED
 
-#include "stepmod/math/geometry.hpp"
-#include "stepmod/utils/memory.hpp"
-#include "stepmod/utils/macros.hpp"
+#include "sotm/math/geometry.hpp"
+#include "sotm/utils/memory.hpp"
+#include "sotm/utils/macros.hpp"
 #include <list>
 #include <memory>
 #include <set>

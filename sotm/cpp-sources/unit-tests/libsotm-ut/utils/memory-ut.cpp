@@ -1,4 +1,4 @@
-#include "stepmod/utils/memory.hpp"
+#include "sotm/utils/memory.hpp"
 
 #include "gtest/gtest.h"
 

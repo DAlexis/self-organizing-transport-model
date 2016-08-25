@@ -1,7 +1,7 @@
 #ifndef MEMORY_HPP_INCLUDED
 #define MEMORY_HPP_INCLUDED
 
-#include "stepmod/utils/assert.hpp"
+#include "sotm/utils/assert.hpp"
 #include <cstring>
 
 namespace Stepmod
