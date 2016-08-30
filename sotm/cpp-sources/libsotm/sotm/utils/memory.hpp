@@ -81,6 +81,26 @@ public:
         return *this;
     }*/
     
+    operator T*()
+    {
+    	return m_pobject;
+    }
+
+    operator T&()
+    {
+    	return *m_pobject;
+    }
+
+    operator const T*()
+    {
+    	return m_pobject;
+    }
+
+    operator const T&()
+    {
+    	return *m_pobject;
+    }
+
     PtrWrap& operator=(T* pobject)
     {
         assign(pobject);

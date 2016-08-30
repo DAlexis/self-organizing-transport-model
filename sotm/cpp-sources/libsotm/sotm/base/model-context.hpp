@@ -18,14 +18,14 @@ namespace sotm
 class ModelContext
 {
 public:
-	PhysicalPayloadsRegister payloadsRegister;
-
 	void setNodePayloadFactory(std::unique_ptr<INodePayloadFactory> factory);
 	void setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory> factory);
 
 	NodePayloadBase* createNodePayload(Node* node);
 	LinkPayloadBase* createLinkPayload(Link* node);
 
+	PhysicalPayloadsRegister payloadsRegister;
+	GraphRegister graphRegister;
 private:
 	std::unique_ptr<INodePayloadFactory> m_nodePayloadFactory;
 	std::unique_ptr<ILinkPayloadFactory> m_linkPayloadFactory;

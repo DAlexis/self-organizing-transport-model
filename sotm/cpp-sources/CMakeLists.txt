@@ -47,3 +47,4 @@ add_subdirectory(lightning-modeller)
 enable_testing()
 
 add_subdirectory(unit-tests)
+add_subdirectory(functional-tests)

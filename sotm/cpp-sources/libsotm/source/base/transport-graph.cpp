@@ -1,6 +1,46 @@
 #include "sotm/base/transport-graph.hpp"
+#include "sotm/base/model-context.hpp"
+#include "sotm/base/physical-payload.hpp"
 
 using namespace sotm;
+
+void GraphRegister::addLink(Link* link)
+{
+	ASSERT(m_links.find(link) == m_links.end(), "Link already added to graph register");
+	m_links.insert(link);
+}
+
+void GraphRegister::addNode(Node* node)
+{
+	ASSERT(m_nodes.find(node) == m_nodes.end(), "Link already added to graph register");
+	m_nodes.insert(node);
+}
+
+void GraphRegister::rmLink(Link* link)
+{
+	ASSERT(m_links.find(link) != m_links.end(), "Link does not exists in graph register");
+	m_links.erase(link);
+}
+
+void GraphRegister::rmNode(Node* node)
+{
+	ASSERT(m_nodes.find(node) != m_nodes.end(), "Link does not exists in graph register");
+	m_nodes.erase(node);
+}
+
+Node::Node(ModelContext* context) :
+	m_context(context)
+{
+	payload.reset(
+		m_context->createNodePayload(this)
+	);
+	m_context->graphRegister.addNode(this);
+}
+
+Node::~Node()
+{
+	m_context->graphRegister.rmNode(this);
+}
 
 void Node::addLink(Link* link)
 {
@@ -13,6 +53,20 @@ void Node::removeLink(Link* link)
 	ASSERT(count != 0, "Removing link that was not connected");
 }
 
+Link::Link(ModelContext* context) :
+	m_context(context)
+{
+	payload.reset(
+		m_context->createLinkPayload(this)
+	);
+	m_context->graphRegister.addLink(this);
+}
+
+Link::~Link()
+{
+	m_context->graphRegister.rmLink(this);
+}
+
 void Link::connect(Node* n1, Node* n2)
 {
 	m_n1.assign(n1);
@@ -20,72 +74,3 @@ void Link::connect(Node* n1, Node* n2)
 }
 
 
-/*
-SINGLETON_IN_CPP(BranchPointsPool)
-
-BranchPointsPool::BranchPointsPool()
-{
-}
-
-void BranchPointsPool::registerPoint(std::weak_ptr<BranchPoint> point)
-{
-    m_allPoints.insert(point);
-}
-
-void BranchPointsPool::deregisterPoint(std::weak_ptr<BranchPoint> point)
-{
-    m_allPoints.erase(point);
-}
-
-BranchPoint::BranchPoint(Point<3> pos) :
-    position(pos)
-{
-    
-}
-
-BranchPoint* BranchPoint::create(Point<3> pos)
-{
-    BranchPoint* point = new BranchPoint(pos);
-    BranchPointsPool::instance().registerPoint(point);
-    return point;
-}
-
-void BranchPoint::registerChannel(Channel* channel)
-{
-#ifdef DEBUG
-    for (auto pch : m_channels)
-    {
-        ASSERT (pch != channel, "Double channel connection to point");
-    }
-#endif
-    m_channels.push_back(channel);
-}
-
-void BranchPoint::onDelete()
-{
-    BranchPointsPool::instance().deregisterPoint(this);
-}
-
-Channel* Channel::create(BranchPoint* p1, Point<3> p2pos)
-{
-    Channel* newChannel = new Channel;
-    if (p1 != nullptr)
-    {
-        BranchPoint* p2 = BranchPoint::create(p2pos);
-        newChannel->connect(*p1, *p2);
-        p2->release(); // Remove this when memory managements will be improved
-    }
-    return newChannel;
-}
-
-void Channel::connect(BranchPoint& p1, BranchPoint& p2)
-{
-    p1.addRef(); p2.addRef();
-    this->p1 = &p1; this->p2 = &p2;
-}
-
-void Channel::remove()
-{
-    p1->release(); p2->release();
-}
-*/
