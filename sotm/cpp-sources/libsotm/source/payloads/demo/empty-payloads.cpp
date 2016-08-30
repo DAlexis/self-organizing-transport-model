@@ -18,6 +18,10 @@ void EmptyNodePayload::makeStep(double dt)
 {
 }
 
+void EmptyNodePayload::calculateRHS(double time)
+{
+}
+
 EmptyLinkPayload::EmptyLinkPayload(PhysicalPayloadsRegister* reg, Link* link) :
 		LinkPayloadBase(reg, link)
 {
@@ -25,4 +29,19 @@ EmptyLinkPayload::EmptyLinkPayload(PhysicalPayloadsRegister* reg, Link* link) :
 
 void EmptyLinkPayload::makeStep(double dt)
 {
+}
+
+void EmptyLinkPayload::calculateRHS(double time)
+{
+}
+
+NodePayloadBase* EmptyNodePayloadFactory::create(PhysicalPayloadsRegister* reg, Node* node)
+{
+	return new EmptyNodePayload(reg, node);
+}
+
+
+LinkPayloadBase* EmptyLinkPayloadFactory::create(PhysicalPayloadsRegister* reg, Link* link)
+{
+	return new EmptyLinkPayload(reg, link);
 }

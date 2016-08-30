@@ -4,8 +4,9 @@ project(sotm)
 
 set(LIB_SOURCE
     ${PROJECT_SOURCE_DIR}/source/math/geometry.cpp
-    ${PROJECT_SOURCE_DIR}/source/base/stepping-structure.cpp
+    ${PROJECT_SOURCE_DIR}/source/base/transport-graph.cpp
     ${PROJECT_SOURCE_DIR}/source/base/physical-payload.cpp
+    ${PROJECT_SOURCE_DIR}/source/base/model-context.cpp
     ${PROJECT_SOURCE_DIR}/source/payloads/demo/empty-payloads.cpp
 )
 

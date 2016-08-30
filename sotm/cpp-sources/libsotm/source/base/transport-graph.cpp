@@ -1,4 +1,4 @@
-#include "sotm/base/stepping-structure.hpp"
+#include "sotm/base/transport-graph.hpp"
 
 using namespace sotm;
 

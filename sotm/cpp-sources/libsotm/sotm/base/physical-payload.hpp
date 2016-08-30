@@ -1,10 +1,9 @@
 #ifndef PHYSICAL_CONTEXT_HPP_INCLUDE
 #define PHYSICAL_CONTEXT_HPP_INCLUDE
 
+#include "sotm/base/transport-graph.hpp"
 #include "sotm/base/time-iter.hpp"
 #include "sotm/utils/memory.hpp"
-#include "sotm/base/stepping-structure.hpp"
-
 #include <vector>
 #include <set>
 
@@ -16,13 +15,13 @@ class AnyPhysicalPayloadBase;
 class PhysicalPayloadsRegister : public ITimeIterable
 {
 public:
+	PhysicalPayloadsRegister();
 	void add(AnyPhysicalPayloadBase* payload);
 	void remove(AnyPhysicalPayloadBase* payload);
 
 	void makeStep(double dt) override;
 
 private:
-	PhysicalPayloadsRegister();
 	std::set<AnyPhysicalPayloadBase*> m_payloads;
 };
 
@@ -66,6 +65,14 @@ class INodePayloadFactory
 {
 public:
 	virtual ~INodePayloadFactory() {}
+	virtual NodePayloadBase* create(PhysicalPayloadsRegister* reg, Node* node) = 0;
+};
+
+class ILinkPayloadFactory
+{
+public:
+	virtual ~ILinkPayloadFactory() {}
+	virtual LinkPayloadBase* create(PhysicalPayloadsRegister* reg, Link* link) = 0;
 };
 
 /*

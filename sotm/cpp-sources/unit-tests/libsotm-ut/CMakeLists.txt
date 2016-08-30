@@ -12,6 +12,7 @@ include_directories (
 set(EXE_SOURCES
     math/geometry-ut.cpp
     utils/memory-ut.cpp
+    payloads/demo/empty-payload-ut.cpp
 )
 
 add_executable(${PROJECT_NAME} ${EXE_SOURCES})
