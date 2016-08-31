@@ -2,7 +2,16 @@
 #include "sotm/base/model-context.hpp"
 #include "sotm/payloads/demo/empty-payloads.hpp"
 
+#include <iostream>
+
+using namespace std;
 using namespace sotm;
+
+class Test : public SelfMemMgr
+{
+public:
+	char q[100];
+};
 
 int main()
 {
@@ -10,9 +19,9 @@ int main()
 	c.setNodePayloadFactory(std::unique_ptr<INodePayloadFactory>(new EmptyNodePayloadFactory()));
 	c.setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory>(new EmptyLinkPayloadFactory()));
 
-	PtrWrap<Node> n1(new Node(&c));
-/*	PtrWrap<Node> n2(new Node(&c));
-	PtrWrap<Link> l(new Link(&c));
-	l->connect(n1, n2);*/
+	PtrWrap<Node> n1 = PtrWrap<Node>::make(&c);
+	PtrWrap<Node> n2 = PtrWrap<Node>::make(&c);
+	PtrWrap<Link> l = PtrWrap<Link>::make(&c);
+	l->connect(n1, n2);
 	return 0;
 }

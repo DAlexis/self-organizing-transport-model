@@ -12,12 +12,13 @@ class SelfMemMgr
 public:
     /// @todo Check in destructor ref count and make assertion
     virtual ~SelfMemMgr() {  }
+    inline size_t refCount() { return m_refCount; }
     inline void addRef() { ++m_refCount; }
     inline void release()
     {
         if (--m_refCount == 0)
         {
-            onDelete();
+            onDelete(); /// @todo Add possibility to increment refcount in OnDelete
             delete this;
         }
     }
@@ -40,11 +41,11 @@ class PtrWrap
 public:
 
     template <typename ... Types>
-    static PtrWrap<T> MakePtrWrap(Types&& ... args)
+    static PtrWrap<T> make(Types&& ... args)
     {
-        T* pobject = new T(std::forward<Types>(args)...);
-        PtrWrap<T> w(pobject);
-        pobject->release(); // Now ref count = 1
+        T* pobject = new T(std::forward<Types>(args)...); // pobject has refCount == 1
+        PtrWrap<T> w(pobject); // PtrWrap from pobject makes refCount == 2
+        pobject->release(); // Now ref count == 1
         return w;
     }
     
@@ -62,12 +63,22 @@ public:
     /// Assign object and add its reference. Release previous object
     void assign(T* pobject)
     {
-        clearPObject();
+    	clear();
         if (pobject)
         	pobject->addRef();
         m_pobject = pobject;
     }
     
+    /// Release object if contained and became a null-pointer
+    void clear()
+	{
+		if (m_pobject != nullptr)
+		{
+			m_pobject->release();
+			m_pobject = nullptr;
+		}
+	}
+
     PtrWrap& operator=(PtrWrap& right)
     {
         assign(right.m_pobject);
@@ -127,11 +138,7 @@ public:
     }
 
 private:
-    void clearPObject()
-    {
-        if (m_pobject != nullptr)
-            m_pobject->release();
-    }
+
     T* m_pobject = nullptr;
 };
 

@@ -12,6 +12,8 @@ using namespace sotm;
 EmptyNodePayload::EmptyNodePayload(PhysicalPayloadsRegister* reg, Node* node) :
 		NodePayloadBase(reg, node)
 {
+	// Empty payload does not hold node and it may be deleted at any time
+	this->node.clear();
 }
 
 void EmptyNodePayload::makeStep(double dt)
@@ -25,6 +27,8 @@ void EmptyNodePayload::calculateRHS(double time)
 EmptyLinkPayload::EmptyLinkPayload(PhysicalPayloadsRegister* reg, Link* link) :
 		LinkPayloadBase(reg, link)
 {
+	// Empty payload does not hold link and it may be deleted at any time
+	this->link.clear();
 }
 
 void EmptyLinkPayload::makeStep(double dt)

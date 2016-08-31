@@ -65,7 +65,7 @@ TEST(PtrWrapTest, PtrWrapInst)
     
     TestSMM::instCount = 0;
     {
-        PtrWrap<TestSMM> p = PtrWrap<TestSMM>::MakePtrWrap();
+        PtrWrap<TestSMM> p = PtrWrap<TestSMM>::make();
         PtrWrap<TestSMM> q = p;
         ASSERT_EQ(TestSMM::instCount, 1);
     }
