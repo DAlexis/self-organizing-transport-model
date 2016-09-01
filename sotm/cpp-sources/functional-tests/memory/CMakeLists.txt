@@ -6,4 +6,8 @@ export_include_dirs(
     ${PROJECT_SOURCE_DIR}
 )
 
+configure_file(leak-test.sh leak-test.sh COPYONLY)
+
+add_functional_test("leak-test.sh")
+
 add_subdirectory(simple-graph)
