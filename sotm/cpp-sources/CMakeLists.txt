@@ -13,24 +13,27 @@ add_definitions( -DGIT_COMMIT_TAG=${git_commit} )
 # This is to run all tests using 'make run-unit-tests' command.
 # Another way is simply run 'ctest -VV', but output is not colorized by default :(
 # This project may be a part of other cmake project so this trick may be implemented yet
-if (NOT COMMAND run_test)
-	add_custom_target(run-tests)
-	macro(run_test test_target)
-	  add_custom_target(${test_target}_runtest
-	      COMMAND ${test_target}
-	      DEPENDS ${test_target}
-	      WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
-	  add_dependencies(run-tests ${test_target}_runtest)
+if (NOT COMMAND add_unit_test)
+	add_custom_target(run-unit-tests)
+	macro(add_unit_test test_target)
+		add_custom_target(${test_target}_runtest
+	    	COMMAND ${test_target} 
+	    	DEPENDS ${test_target}
+	    	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
+		add_dependencies(run-unit-tests ${test_target}_runtest)
 	endmacro()
 endif()
 
 if (NOT COMMAND add_functional_test)
 	add_custom_target(run-functional-tests)
-	macro(add_functional_test test_target)
-	  add_custom_target(${test_target}_run_func_test
-	      COMMAND ${test_target}
-	      WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
-	  add_dependencies(run-functional-tests ${test_target}_run_func_test)
+	macro(add_functional_test test_script script_argument)
+	    set(command_to_run ./${test_script})
+	    set(target_name ${test_script}_${script_argument}_run_func_test)
+	    string(REPLACE "/" "_" target_name ${target_name})
+	  	add_custom_target(${target_name}
+	    	COMMAND ${command_to_run} ${script_argument}
+	      	WORKING_DIRECTORY "${PROJECT_BINARY_DIR}")
+	  	add_dependencies(run-functional-tests ${target_name})
 	endmacro()
 endif()
 

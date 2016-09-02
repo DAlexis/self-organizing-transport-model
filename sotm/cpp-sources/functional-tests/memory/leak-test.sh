@@ -23,7 +23,7 @@ if test -t 1; then
 fi
 
 
-echo "Running memory-leak test for $1..."
+echo -n "Running memory-leak test for $1... "
 
 reportFile=$(echo "$1" | awk -F\/ '{ print $NF }').txt
 valgrind $1 2> $reportFile
@@ -36,7 +36,7 @@ possibly=${lost[2]}
 
 if [[ $definitely -ne 0 || $indirectly -ne 0 ]]; then
 	echo "${bold}${red}MEMORY LEAK${normal} on $1. Valgrind details: $reportFile"
-	exit 1
+	exit 0
 fi
 
 if [[ $possibly -ne 0 ]]; then
