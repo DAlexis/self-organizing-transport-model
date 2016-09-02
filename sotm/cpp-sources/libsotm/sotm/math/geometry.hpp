@@ -147,6 +147,8 @@ public:
     inline double& operator[](unsigned int i) { return x[i]; }
 };
 
+using Direction = Point<3>;
+
 }
 
 #endif // GEOMETRY_HPP_INCLUDED

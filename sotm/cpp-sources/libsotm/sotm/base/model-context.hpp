@@ -9,6 +9,7 @@
 #define LIBSTEPMOD_STEPMOD_BASE_GLOBAL_CONTEXT_HPP_
 
 #include "sotm/base/transport-graph.hpp"
+#include "sotm/base/time-iter.hpp"
 #include "physical-payload.hpp"
 #include <memory>
 
@@ -24,9 +25,13 @@ public:
 	NodePayloadBase* createNodePayload(Node* node);
 	LinkPayloadBase* createLinkPayload(Link* node);
 
+	void doBranchingIteration(double dt);
+
 	PhysicalPayloadsRegister payloadsRegister;
 	GraphRegister graphRegister;
+
 private:
+	void branchIteration(double dt, Node* node);
 	std::unique_ptr<INodePayloadFactory> m_nodePayloadFactory;
 	std::unique_ptr<ILinkPayloadFactory> m_linkPayloadFactory;
 };

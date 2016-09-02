@@ -66,6 +66,11 @@ NodePayloadBase::NodePayloadBase(PhysicalPayloadsRegister* reg, Node* node) :
 {
 }
 
+void NodePayloadBase::getBranchingParameters(double dt, BranchingParameters& branchingParameters)
+{
+	branchingParameters.needBranching = false;
+}
+
 LinkPayloadBase::LinkPayloadBase(PhysicalPayloadsRegister* reg, Link* link) :
 	AnyPhysicalPayloadBase(reg),
 	link(link)

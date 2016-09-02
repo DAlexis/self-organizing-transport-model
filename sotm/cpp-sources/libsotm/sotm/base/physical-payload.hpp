@@ -49,10 +49,19 @@ public:
 	virtual ~IPhysicalContext() {}
 };
 
+struct BranchingParameters
+{
+	bool needBranching = false;
+	Direction direction;
+	double length = 0.0;
+};
+
 class NodePayloadBase : public AnyPhysicalPayloadBase
 {
 public:
 	NodePayloadBase(PhysicalPayloadsRegister* reg, Node* node);
+
+	virtual void getBranchingParameters(double dt, BranchingParameters& branchingParameters);
 
 protected:
 	PtrWrap<Node> node;

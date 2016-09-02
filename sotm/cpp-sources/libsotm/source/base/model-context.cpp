@@ -23,3 +23,26 @@ LinkPayloadBase* ModelContext::createLinkPayload(Link* link)
 	ASSERT(m_linkPayloadFactory != nullptr, "Link physical payload factory is not set!");
 	return m_linkPayloadFactory->create(&payloadsRegister, link);
 }
+
+void ModelContext::doBranchingIteration(double dt)
+{
+	ASSERT(dt >= 0, "Cannot iterate branching when dt < 0");
+	graphRegister.applyNodeVisitor(
+		[this, dt](Node* n)
+		{
+			branchIteration(dt, n);
+		}
+	);
+}
+
+void ModelContext::branchIteration(double dt, Node* node)
+{
+	BranchingParameters bp;
+	node->payload->getBranchingParameters(dt, bp);
+	if (!bp.needBranching)
+		return;
+
+	// Its time to create new node with link
+	Point<3> newPos = node->pos + bp.direction * bp.length;
+	PtrWrap<Link> newLink = PtrWrap<Link>::make(this, node, newPos);
+}
