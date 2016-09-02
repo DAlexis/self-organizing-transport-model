@@ -43,6 +43,12 @@ private:
 	PhysicalPayloadsRegister *m_payloadsRegister;
 };
 
+class IPhysicalContext
+{
+public:
+	virtual ~IPhysicalContext() {}
+};
+
 class NodePayloadBase : public AnyPhysicalPayloadBase
 {
 public:
@@ -74,29 +80,6 @@ public:
 	virtual ~ILinkPayloadFactory() {}
 	virtual LinkPayloadBase* create(PhysicalPayloadsRegister* reg, Link* link) = 0;
 };
-
-/*
-class INodePhysPayload : public ITimeIterable
-{
-public:
-	virtual ~INodePhysPayload() {}
-
-};
-
-class ILinkPhysPayload : public ITimeIterable
-{
-public:
-	virtual ~ILinkPhysPayload() {}
-};
-
-class IPhysicalPayloadFactory
-{
-public:
-	virtual ~IPhysicalPayloadFactory() {}
-	INodePhysPayload* createNodePayload(Node* node);
-	ILinkPhysPayload* createLinkPayload(Link* node);
-};
-*/
 
 }
 
