@@ -18,6 +18,7 @@ int main()
 	ModelContext c;
 	c.setNodePayloadFactory(std::unique_ptr<INodePayloadFactory>(new EmptyNodePayloadFactory()));
 	c.setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory>(new EmptyLinkPayloadFactory()));
+	c.setPhysicalContext(std::unique_ptr<IPhysicalContext>(new EmptyPhysicalContext()));
 
 	PtrWrap<Node> n1 = PtrWrap<Node>::make(&c);
 	PtrWrap<Node> n2 = PtrWrap<Node>::make(&c);

@@ -41,14 +41,17 @@ private:
 	using NodeSet = std::set<Node*>;
 	using LinkSet = std::set<Link*>;
 
-	/// Switch addLink and addNode to temporary sets when iteration over main set is produced
-	void switchToTempContainers();
+	/// Make iterating over links on nodes safe for add/remove link/node operations
+	void beginIterating();
 
-	/// Switch addLink and addNode to main sets after iteration over main set done
-	/// AND move containment of temporary sets to main
-	void switchToMainContainers();
-	NodeSet m_nodes, m_nodesTemp, *m_nodesToPut = &m_nodes;
-	LinkSet m_links, m_linksTemp, *m_linksToPut = &m_links;
+	/// Apply cached add/remove operations with links/nodes
+	void endIterating();
+
+	/// If true we cannot add/remove directly to/from m_nodes and m_links because we are iterating by them
+	bool m_iteratingNow = false;
+
+	NodeSet m_nodes, m_nodesToAdd, m_nodesToDelete;
+	LinkSet m_links, m_linksToAdd, m_linksToDelete;
 
 };
 
@@ -59,6 +62,7 @@ public:
 	~Node();
 	void addLink(Link* link);
 	void removeLink(Link* link);
+	inline ModelContext* context() { return m_context; }
 
 	std::unique_ptr<NodePayloadBase> payload;
 
@@ -77,6 +81,7 @@ public:
 	Link(ModelContext* context, Node* nodeFrom, Point<3> pointTo);
 	~Link();
 	void connect(Node* n1, Node* n2);
+	inline ModelContext* context() { return m_context; }
 
 	std::unique_ptr<LinkPayloadBase> payload;
 

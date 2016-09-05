@@ -12,6 +12,11 @@ void ModelContext::setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory> fa
 	m_linkPayloadFactory = std::move(factory);
 }
 
+void ModelContext::setPhysicalContext(std::unique_ptr<IPhysicalContext> physicalContext)
+{
+	m_physicalContext = std::move(physicalContext);
+}
+
 NodePayloadBase* ModelContext::createNodePayload(Node* node)
 {
 	ASSERT(m_nodePayloadFactory != nullptr, "Node physical payload factory is not set!");
@@ -34,6 +39,17 @@ void ModelContext::doBranchingIteration(double dt)
 		}
 	);
 }
+/*
+void ModelContext::doBifurcation(double dt)
+{
+	ASSERT(dt >= 0, "Cannot iterate when dt < 0");
+	graphRegister.applyNodeVisitor(
+		[dt](Node* n)
+		{
+			n->payload->doBifurcation(dt);
+		}
+	);
+}*/
 
 void ModelContext::branchIteration(double dt, Node* node)
 {
@@ -46,3 +62,8 @@ void ModelContext::branchIteration(double dt, Node* node)
 	Point<3> newPos = node->pos + bp.direction * bp.length;
 	PtrWrap<Link> newLink = PtrWrap<Link>::make(this, node, newPos);
 }
+/*
+void ModelContext::discreteStep(double dt, Node* node)
+{
+	node->payload->doBifurcation(dt);
+}*/

@@ -6,22 +6,36 @@
  */
 
 #include "sotm/payloads/demo/empty-payloads.hpp"
+#include "sotm/base/model-context.hpp"
 
 using namespace sotm;
+
+void EmptyPhysicalContext::destroyGraph()
+{
+	m_readyToDestroy = true;
+}
+
+bool EmptyPhysicalContext::readyToDestroy()
+{
+	return m_readyToDestroy;
+}
 
 EmptyNodePayload::EmptyNodePayload(PhysicalPayloadsRegister* reg, Node* node) :
 		NodePayloadBase(reg, node)
 {
-	// Empty payload does not hold node and it may be deleted at any time
-	this->node.clear();
 }
 
-void EmptyNodePayload::makeStep(double dt)
-{
-}
+void EmptyNodePayload::calculateRHS(double time) { }
+void EmptyNodePayload::addRHSToDelta(double m) { }
+void EmptyNodePayload::makeSubIteration(double dt) { }
+void EmptyNodePayload::step() { }
 
-void EmptyNodePayload::calculateRHS(double time)
+void EmptyNodePayload::doBifurcation(double dt)
 {
+	// Check if physics tells us we can release parent object
+	EmptyPhysicalContext* context = EmptyPhysicalContext::cast(node->context()->physicalContext());
+	if (context->readyToDestroy())
+		this->node.clear();
 }
 
 EmptyLinkPayload::EmptyLinkPayload(PhysicalPayloadsRegister* reg, Link* link) :
@@ -31,12 +45,17 @@ EmptyLinkPayload::EmptyLinkPayload(PhysicalPayloadsRegister* reg, Link* link) :
 	this->link.clear();
 }
 
-void EmptyLinkPayload::makeStep(double dt)
-{
-}
+void EmptyLinkPayload::calculateRHS(double time) { }
+void EmptyLinkPayload::addRHSToDelta(double m) { }
+void EmptyLinkPayload::makeSubIteration(double dt) { }
+void EmptyLinkPayload::step() { }
 
-void EmptyLinkPayload::calculateRHS(double time)
+void EmptyLinkPayload::doBifurcation(double dt)
 {
+	// Check if physics tells us we can release parent object
+	EmptyPhysicalContext* context = EmptyPhysicalContext::cast(link->context()->physicalContext());
+	if (context->readyToDestroy())
+		this->link.clear();
 }
 
 NodePayloadBase* EmptyNodePayloadFactory::create(PhysicalPayloadsRegister* reg, Node* node)

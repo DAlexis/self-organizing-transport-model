@@ -25,11 +25,42 @@ void PhysicalPayloadsRegister::remove(AnyPhysicalPayloadBase* payload)
 	ASSERT(count == 1, "Removing payload without adding");
 }
 
+void PhysicalPayloadsRegister::calculateRHS(double time)
+{
+	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
+		(*it)->calculateRHS(time);
+}
+
+void PhysicalPayloadsRegister::addRHSToDelta(double m)
+{
+	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
+		(*it)->addRHSToDelta(m);
+}
+
+void PhysicalPayloadsRegister::makeSubIteration(double dt)
+{
+	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
+		(*it)->makeSubIteration(dt);
+}
+
+void PhysicalPayloadsRegister::step()
+{
+	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
+		(*it)->step();
+}
+
+/*
 void PhysicalPayloadsRegister::makeStep(double dt)
 {
 	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
 		(*it)->makeStep(dt);
 }
+
+void PhysicalPayloadsRegister::doBifurcation(double dt)
+{
+	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
+		(*it)->doBifurcation(dt);
+}*/
 
 AnyPhysicalPayloadBase::AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg) :
 		m_payloadsRegister(reg)
@@ -40,24 +71,6 @@ AnyPhysicalPayloadBase::AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg) :
 AnyPhysicalPayloadBase::~AnyPhysicalPayloadBase()
 {
 	m_payloadsRegister->remove(this);
-}
-
-
-void AnyPhysicalPayloadBase::initVariables(size_t count)
-{
-	x.resize(count, 0.0);
-	rhs.resize(count, 0.0);
-	xprev.resize(count, 0.0);
-}
-
-
-void AnyPhysicalPayloadBase::doStep()
-{
-	ASSERT(xprev.size() == x.size(), "xprev.size() != x.size()");
-	for (size_t i=0; i<x.size(); ++i)
-	{
-		x[i] = xprev[i];
-	}
 }
 
 NodePayloadBase::NodePayloadBase(PhysicalPayloadsRegister* reg, Node* node) :

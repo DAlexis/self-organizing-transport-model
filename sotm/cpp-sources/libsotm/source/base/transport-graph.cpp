@@ -1,69 +1,98 @@
 #include "sotm/base/transport-graph.hpp"
 #include "sotm/base/model-context.hpp"
 #include "sotm/base/physical-payload.hpp"
+#include "sotm/utils/utils.hpp"
 
 using namespace sotm;
 
 void GraphRegister::addLink(Link* link)
 {
-	ASSERT(m_links.find(link) == m_links.end() && m_linksTemp.find(link) == m_linksTemp.end(),
+	ASSERT(m_links.find(link) == m_links.end() && m_linksToAdd.find(link) == m_linksToAdd.end(),
 			"Link already added to graph register");
-	m_linksToPut->insert(link);
+	if (m_iteratingNow)
+	{
+		m_linksToAdd.insert(link);
+	} else {
+		m_links.insert(link);
+	}
 }
 
 void GraphRegister::addNode(Node* node)
 {
-	ASSERT(m_nodes.find(node) == m_nodes.end() && m_nodesTemp.find(node) == m_nodesTemp.end(),
+	ASSERT(m_nodes.find(node) == m_nodes.end() && m_nodesToAdd.find(node) == m_nodesToAdd.end(),
 			"Link already added to graph register");
-	m_nodesToPut->insert(node);
+	if (m_iteratingNow)
+	{
+		m_nodesToAdd.insert(node);
+	} else {
+		m_nodes.insert(node);
+	}
 }
 
 void GraphRegister::rmLink(Link* link)
 {
 	ASSERT(m_links.find(link) != m_links.end(), "Link does not exists in graph register");
-	m_links.erase(link);
+	if (m_iteratingNow)
+	{
+		m_linksToDelete.insert(link);
+	} else {
+		m_links.erase(link);
+	}
 }
 
 void GraphRegister::rmNode(Node* node)
 {
 	ASSERT(m_nodes.find(node) != m_nodes.end(), "Link does not exists in graph register");
-	m_nodes.erase(node);
+	if (m_iteratingNow)
+	{
+		m_nodesToDelete.insert(node);
+	} else {
+		m_nodes.erase(node);
+	}
 }
 
 void GraphRegister::applyNodeVisitor(NodeVisitor v)
 {
-	switchToTempContainers();
+	beginIterating();
+	RunOnceOnExit end([this](){ endIterating(); });
 	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
 	{
 		v(*it);
 	}
-	switchToMainContainers();
 }
 
 void GraphRegister::applyLinkVisitor(LinkVisitor v)
 {
-	switchToTempContainers();
+	beginIterating();
+	RunOnceOnExit end([this](){ endIterating(); });
 	for (auto it = m_links.begin(); it != m_links.end(); ++it)
 	{
 		v(*it);
 	}
-	switchToMainContainers();
 }
 
-void GraphRegister::switchToTempContainers()
+void GraphRegister::beginIterating()
 {
-	m_nodesToPut = &m_nodesTemp;
-	m_linksToPut = &m_linksTemp;
+	m_iteratingNow = true;
 }
 
-void GraphRegister::switchToMainContainers()
+void GraphRegister::endIterating()
 {
-	m_nodes.insert(m_nodesTemp.begin(), m_nodesTemp.end());
-	m_nodesTemp.clear();
-	m_links.insert(m_linksTemp.begin(), m_linksTemp.end());
-	m_linksTemp.clear();
-	m_nodesToPut = &m_nodes;
-	m_linksToPut = &m_links;
+	m_iteratingNow = false;
+	m_nodes.insert(m_nodesToAdd.begin(), m_nodesToAdd.end());
+	m_nodesToAdd.clear();
+	m_links.insert(m_linksToAdd.begin(), m_linksToAdd.end());
+	m_linksToAdd.clear();
+	for (auto it = m_nodesToDelete.begin(); it != m_nodesToDelete.end(); ++it)
+	{
+		m_nodes.erase(*it);
+	}
+	m_nodesToDelete.clear();
+	for (auto it = m_linksToDelete.begin(); it != m_linksToDelete.end(); ++it)
+	{
+		m_links.erase(*it);
+	}
+	m_linksToDelete.clear();
 }
 
 ////////////////////////////

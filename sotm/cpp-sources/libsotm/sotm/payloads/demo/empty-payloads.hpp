@@ -14,13 +14,39 @@
 namespace sotm
 {
 
+class EmptyPhysicalContext : public IPhysicalContext
+{
+public:
+	void destroyGraph();
+	bool readyToDestroy();
+
+	static inline EmptyPhysicalContext* cast(IPhysicalContext* context)
+	{
+		return static_cast<EmptyPhysicalContext*>(context);
+	}
+
+	static inline const EmptyPhysicalContext* cast(const IPhysicalContext* context)
+	{
+		return static_cast<const EmptyPhysicalContext*>(context);
+	}
+
+private:
+	bool m_readyToDestroy = false;
+};
+
 class EmptyNodePayload : public NodePayloadBase
 {
 public:
 	EmptyNodePayload(PhysicalPayloadsRegister* reg, Node* node);
 
-	void makeStep(double dt) override final;
+
 	void calculateRHS(double time) override final;
+	void addRHSToDelta(double m) override final;
+	void makeSubIteration(double dt) override final;
+	void step() override final;
+
+	void doBifurcation(double dt);
+
 };
 
 class EmptyLinkPayload : public LinkPayloadBase
@@ -28,8 +54,12 @@ class EmptyLinkPayload : public LinkPayloadBase
 public:
 	EmptyLinkPayload(PhysicalPayloadsRegister* reg, Link* link);
 
-	void makeStep(double dt) override;
 	void calculateRHS(double time) override final;
+	void addRHSToDelta(double m) override final;
+	void makeSubIteration(double dt) override final;
+	void step() override final;
+
+	void doBifurcation(double dt);
 };
 
 class EmptyNodePayloadFactory : public INodePayloadFactory
@@ -43,7 +73,6 @@ class EmptyLinkPayloadFactory : public ILinkPayloadFactory
 public:
 	LinkPayloadBase* create(PhysicalPayloadsRegister* reg, Link* link) override final;
 };
-
 
 }
 

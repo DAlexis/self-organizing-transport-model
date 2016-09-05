@@ -19,7 +19,16 @@ public:
 	void add(AnyPhysicalPayloadBase* payload);
 	void remove(AnyPhysicalPayloadBase* payload);
 
-	void makeStep(double dt) override;
+	void calculateRHS(double time) override final;
+	void addRHSToDelta(double m) override final;
+	void makeSubIteration(double dt) override final;
+	void step() override final;
+
+	/*
+	void makeStep(double dt) {}
+	/// This function may delete/create new nodes in graph and should be called carefully
+	void doBifurcation(double dt) {}
+*/
 
 private:
 	std::set<AnyPhysicalPayloadBase*> m_payloads;
@@ -30,14 +39,7 @@ class AnyPhysicalPayloadBase : public ITimeIterable
 public:
 	AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg);
 	virtual ~AnyPhysicalPayloadBase();
-	void doStep();
-	void initVariables(size_t count);
-
-	virtual void calculateRHS(double time) = 0;
-
-	std::vector<double> x;
-	std::vector<double> rhs;
-	std::vector<double> xprev;
+	void doStep() {}
 
 private:
 	PhysicalPayloadsRegister *m_payloadsRegister;
