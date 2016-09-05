@@ -24,12 +24,6 @@ public:
 	void makeSubIteration(double dt) override final;
 	void step() override final;
 
-	/*
-	void makeStep(double dt) {}
-	/// This function may delete/create new nodes in graph and should be called carefully
-	void doBifurcation(double dt) {}
-*/
-
 private:
 	std::set<AnyPhysicalPayloadBase*> m_payloads;
 };

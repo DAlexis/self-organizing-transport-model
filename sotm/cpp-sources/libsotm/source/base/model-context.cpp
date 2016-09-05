@@ -39,17 +39,17 @@ void ModelContext::doBranchingIteration(double dt)
 		}
 	);
 }
-/*
-void ModelContext::doBifurcation(double dt)
+
+void ModelContext::doBifurcation(double time, double dt)
 {
-	ASSERT(dt >= 0, "Cannot iterate when dt < 0");
+	ASSERT(dt >= 0, "Cannot iterate bifurcations when dt < 0");
 	graphRegister.applyNodeVisitor(
-		[dt](Node* n)
+		[time, dt](Node* n)
 		{
-			n->payload->doBifurcation(dt);
+			n->payload->doBifurcation(time, dt);
 		}
 	);
-}*/
+}
 
 void ModelContext::branchIteration(double dt, Node* node)
 {

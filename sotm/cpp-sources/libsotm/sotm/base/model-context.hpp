@@ -16,7 +16,7 @@
 namespace sotm
 {
 
-class ModelContext
+class ModelContext : public IBifurcatable
 {
 public:
 	void setNodePayloadFactory(std::unique_ptr<INodePayloadFactory> factory);
@@ -27,7 +27,8 @@ public:
 	LinkPayloadBase* createLinkPayload(Link* node);
 
 	void doBranchingIteration(double dt);
-	void doBifurcation(double dt);
+
+	void doBifurcation(double time, double dt) override final;
 
 	inline IPhysicalContext* physicalContext() { return m_physicalContext.get(); }
 

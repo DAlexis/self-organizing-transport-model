@@ -24,5 +24,7 @@ int main()
 	PtrWrap<Node> n2 = PtrWrap<Node>::make(&c);
 	PtrWrap<Link> l = PtrWrap<Link>::make(&c);
 	l->connect(n1, n2);
+	EmptyPhysicalContext::cast(c.physicalContext())->destroyGraph();
+	c.doBifurcation(0.0, 1.0);
 	return 0;
 }

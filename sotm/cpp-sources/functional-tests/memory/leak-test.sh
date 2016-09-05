@@ -26,7 +26,10 @@ fi
 echo -n "Running memory-leak test for $1... "
 
 reportFile=$(echo "$1" | awk -F\/ '{ print $NF }').txt
-valgrind $1 2> $reportFile
+valgrind $1 2> $reportFile || {
+	echo "${bold}${red}Valgring tool not installed,${normal} cannot continue"
+	exit 0
+}
 results=$(cat "$reportFile" | grep "lost:")
 lost=($(echo "$results" | cut -d: -f2 | cut -d' ' -f2))
 
