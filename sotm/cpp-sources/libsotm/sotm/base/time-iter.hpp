@@ -44,6 +44,14 @@ public:
 	virtual void step() = 0;
 };
 
+class IBifurcatable
+{
+public:
+	virtual ~IBifurcatable() {}
+
+	virtual void doBifurcation(double time, double dt) = 0;
+};
+
 }
 
 

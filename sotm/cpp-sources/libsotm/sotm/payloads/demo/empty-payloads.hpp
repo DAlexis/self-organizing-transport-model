@@ -45,7 +45,7 @@ public:
 	void makeSubIteration(double dt) override final;
 	void step() override final;
 
-	void doBifurcation(double dt);
+	void doBifurcation(double time, double dt) override final;
 
 };
 
@@ -59,7 +59,7 @@ public:
 	void makeSubIteration(double dt) override final;
 	void step() override final;
 
-	void doBifurcation(double dt);
+	void doBifurcation(double time, double dt) override final;
 };
 
 class EmptyNodePayloadFactory : public INodePayloadFactory

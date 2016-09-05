@@ -34,7 +34,7 @@ private:
 	std::set<AnyPhysicalPayloadBase*> m_payloads;
 };
 
-class AnyPhysicalPayloadBase : public ITimeIterable
+class AnyPhysicalPayloadBase : public ITimeIterable, public IBifurcatable
 {
 public:
 	AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg);

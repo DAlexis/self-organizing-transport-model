@@ -30,7 +30,7 @@ void EmptyNodePayload::addRHSToDelta(double m) { }
 void EmptyNodePayload::makeSubIteration(double dt) { }
 void EmptyNodePayload::step() { }
 
-void EmptyNodePayload::doBifurcation(double dt)
+void EmptyNodePayload::doBifurcation(double time, double dt)
 {
 	// Check if physics tells us we can release parent object
 	EmptyPhysicalContext* context = EmptyPhysicalContext::cast(node->context()->physicalContext());
@@ -50,7 +50,7 @@ void EmptyLinkPayload::addRHSToDelta(double m) { }
 void EmptyLinkPayload::makeSubIteration(double dt) { }
 void EmptyLinkPayload::step() { }
 
-void EmptyLinkPayload::doBifurcation(double dt)
+void EmptyLinkPayload::doBifurcation(double time, double dt)
 {
 	// Check if physics tells us we can release parent object
 	EmptyPhysicalContext* context = EmptyPhysicalContext::cast(link->context()->physicalContext());
