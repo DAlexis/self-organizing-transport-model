@@ -16,7 +16,7 @@
 namespace sotm
 {
 
-class ModelContext : public IBifurcatable
+class ModelContext : public IBifurcationTimeIterable
 {
 public:
 	void setNodePayloadFactory(std::unique_ptr<INodePayloadFactory> factory);
@@ -26,8 +26,6 @@ public:
 	NodePayloadBase* createNodePayload(Node* node);
 	LinkPayloadBase* createLinkPayload(Link* node);
 
-	void doBranchingIteration(double dt);
-
 	void doBifurcation(double time, double dt) override final;
 
 	inline IPhysicalContext* physicalContext() { return m_physicalContext.get(); }
@@ -36,8 +34,8 @@ public:
 	GraphRegister graphRegister;
 
 private:
-	void branchIteration(double dt, Node* node);
-	void discreteStep(double dt, Node* node);
+	void branchIteration(double time, double dt, Node* node);
+
 	std::unique_ptr<INodePayloadFactory> m_nodePayloadFactory;
 	std::unique_ptr<ILinkPayloadFactory> m_linkPayloadFactory;
 	std::unique_ptr<IPhysicalContext> m_physicalContext;

@@ -29,17 +29,6 @@ LinkPayloadBase* ModelContext::createLinkPayload(Link* link)
 	return m_linkPayloadFactory->create(&payloadsRegister, link);
 }
 
-void ModelContext::doBranchingIteration(double dt)
-{
-	ASSERT(dt >= 0, "Cannot iterate branching when dt < 0");
-	graphRegister.applyNodeVisitor(
-		[this, dt](Node* n)
-		{
-			branchIteration(dt, n);
-		}
-	);
-}
-
 void ModelContext::doBifurcation(double time, double dt)
 {
 	ASSERT(dt >= 0, "Cannot iterate bifurcations when dt < 0");
@@ -49,9 +38,15 @@ void ModelContext::doBifurcation(double time, double dt)
 			n->payload->doBifurcation(time, dt);
 		}
 	);
+	graphRegister.applyNodeVisitor(
+		[this, time, dt](Node* n)
+		{
+			branchIteration(time, dt, n);
+		}
+	);
 }
 
-void ModelContext::branchIteration(double dt, Node* node)
+void ModelContext::branchIteration(double time, double dt, Node* node)
 {
 	BranchingParameters bp;
 	node->payload->getBranchingParameters(dt, bp);

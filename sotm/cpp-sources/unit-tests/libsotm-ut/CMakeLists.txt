@@ -15,7 +15,6 @@ set(EXE_SOURCES
     payloads/demo/empty-payload-ut.cpp
     time-iter/euler-explicit-ut.cpp
     time-iter/exponent-time-iterable.cpp
-    time-iter/time-iterator-tester.cpp
 )
 
 add_executable(${PROJECT_NAME} ${EXE_SOURCES})

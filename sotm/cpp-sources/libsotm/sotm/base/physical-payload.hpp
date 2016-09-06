@@ -12,7 +12,7 @@ namespace sotm
 
 class AnyPhysicalPayloadBase;
 
-class PhysicalPayloadsRegister : public ITimeIterable
+class PhysicalPayloadsRegister : public IContinuousTimeIterable
 {
 public:
 	PhysicalPayloadsRegister();
@@ -28,7 +28,7 @@ private:
 	std::set<AnyPhysicalPayloadBase*> m_payloads;
 };
 
-class AnyPhysicalPayloadBase : public ITimeIterable, public IBifurcatable
+class AnyPhysicalPayloadBase : public IContinuousTimeIterable, public IBifurcationTimeIterable
 {
 public:
 	AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg);

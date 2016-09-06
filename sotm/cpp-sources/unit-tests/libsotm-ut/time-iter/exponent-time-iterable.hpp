@@ -17,7 +17,7 @@
  * with
  * x = 1 at t = 0
  */
-class Exponent : public sotm::ITimeIterable
+class Exponent : public sotm::IContinuousTimeIterable
 {
 public:
 	void calculateRHS(double time) override;

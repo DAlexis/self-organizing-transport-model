@@ -21,10 +21,10 @@ namespace sotm
  *
  * All operations over this interface are system structure-safe
  */
-class ITimeIterable
+class IContinuousTimeIterable
 {
 public:
-	virtual ~ITimeIterable() { }
+	virtual ~IContinuousTimeIterable() { }
 
 	/// Calculate right hand side with falues of f(time, xCurrent, xCurrent of other objects)
 	virtual void calculateRHS(double time) = 0;
@@ -39,40 +39,59 @@ public:
 	virtual void step() = 0;
 };
 
-class IBifurcatable
+class IBifurcationTimeIterable
 {
 public:
-	virtual ~IBifurcatable() {}
+	virtual ~IBifurcationTimeIterable() {}
 
 	virtual void doBifurcation(double time, double dt) = 0;
 };
 
-class ITimeIterator
+class IContinuousTimeIterator
 {
 public:
-	virtual ~ITimeIterator() {}
-	virtual void setIterable(ITimeIterable* target) = 0;
+	virtual ~IContinuousTimeIterator() {}
+	virtual void setIterable(IContinuousTimeIterable* target) = 0;
 	virtual void iterate(double dt) = 0;
 	virtual void setTime(double time) = 0;
+	virtual double time() = 0;
 };
 
-class TimeIteratorBase : public ITimeIterator
+class ContinuousTimeIteratorBase : public IContinuousTimeIterator
 {
 public:
-	void setIterable(ITimeIterable* target) override;
+	void setIterable(IContinuousTimeIterable* target) override;
 	void setTime(double time) override;
+	double time() override;
 
 protected:
 	double m_time = 0;
-	ITimeIterable* m_target = nullptr;
+	IContinuousTimeIterable* m_target = nullptr;
+};
+
+class TimeIterator
+{
+public:
+	TimeIterator(
+		IContinuousTimeIterable* continiousIterable,
+		IContinuousTimeIterator* continiousIterator,
+		IBifurcationTimeIterable* bifurcationIterable = nullptr
+	);
+
+	void setTime(double time);
+	void setBifurcationRunPeriod(double bifurcationPeriod);
+
+	void iterate(double dt);
+	void run(double stopTime, double dt);
+
+private:
+	double m_bifurcationPeriod = 0;
+	double m_lastBifurcationTime = 0;
+	IContinuousTimeIterable* m_continiousIterable;
+	IContinuousTimeIterator* m_continiousIterator;
+	IBifurcationTimeIterable* m_bifurcationIterable;
 };
 
 }
-
-
-
-
-
-
 
 #endif /* LIBSTEPMOD_STEPMOD_BASE_TIME_ITER_HPP_ */

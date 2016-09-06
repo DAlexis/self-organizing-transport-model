@@ -1,6 +1,5 @@
 #include "exponent-time-iterable.hpp"
 #include "sotm/time-iter/euler-explicit.hpp"
-#include "time-iterator-tester.hpp"
 #include <cmath>
 
 #include "gtest/gtest.h"
@@ -10,9 +9,11 @@ using namespace sotm;
 TEST(EulerExplicit, ExponentDiffEq)
 {
 	Exponent e;
-	EulerExplicitIterator iter;
-	TimeIteratorTester tester(&e, &iter);
+	EulerExplicitIterator euler;
+	TimeIterator iter(&e, &euler);
+
 	double timeLimit = 3.0;
-	tester.run(0.0, timeLimit, 0.0001);
+	iter.setTime(0.0);
+	iter.run(timeLimit, 0.0001);
 	ASSERT_NEAR(exp(timeLimit), e.getValue(), 0.01);
 }
