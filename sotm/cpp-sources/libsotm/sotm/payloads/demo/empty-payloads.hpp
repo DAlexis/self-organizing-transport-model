@@ -20,6 +20,11 @@ public:
 	void destroyGraph();
 	bool readyToDestroy();
 
+	virtual void calculateRHS(double time) { }
+	virtual void addRHSToDelta(double m) { }
+	virtual void makeSubIteration(double dt) { }
+	virtual void step() { }
+
 	static inline EmptyPhysicalContext* cast(IPhysicalContext* context)
 	{
 		return static_cast<EmptyPhysicalContext*>(context);

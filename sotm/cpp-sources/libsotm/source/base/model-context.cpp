@@ -29,6 +29,30 @@ LinkPayloadBase* ModelContext::createLinkPayload(Link* link)
 	return m_linkPayloadFactory->create(&payloadsRegister, link);
 }
 
+void ModelContext::calculateRHS(double time)
+{
+	m_physicalContext->calculateRHS(time);
+	payloadsRegister.calculateRHS(time);
+}
+
+void ModelContext::addRHSToDelta(double m)
+{
+	m_physicalContext->addRHSToDelta(m);
+	payloadsRegister.addRHSToDelta(m);
+}
+
+void ModelContext::makeSubIteration(double dt)
+{
+	m_physicalContext->makeSubIteration(dt);
+	payloadsRegister.makeSubIteration(dt);
+}
+
+void ModelContext::step()
+{
+	m_physicalContext->step();
+	payloadsRegister.step();
+}
+
 void ModelContext::doBifurcation(double time, double dt)
 {
 	ASSERT(dt >= 0, "Cannot iterate bifurcations when dt < 0");

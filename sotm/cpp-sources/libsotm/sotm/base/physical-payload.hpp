@@ -39,7 +39,7 @@ private:
 	PhysicalPayloadsRegister *m_payloadsRegister;
 };
 
-class IPhysicalContext
+class IPhysicalContext : public IContinuousTimeIterable
 {
 public:
 	virtual ~IPhysicalContext() {}

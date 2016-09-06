@@ -16,7 +16,7 @@
 namespace sotm
 {
 
-class ModelContext : public IBifurcationTimeIterable
+class ModelContext : public IContinuousTimeIterable, public IBifurcationTimeIterable
 {
 public:
 	void setNodePayloadFactory(std::unique_ptr<INodePayloadFactory> factory);
@@ -25,6 +25,11 @@ public:
 
 	NodePayloadBase* createNodePayload(Node* node);
 	LinkPayloadBase* createLinkPayload(Link* node);
+
+	void calculateRHS(double time) override final;
+	void addRHSToDelta(double m) override final;
+	void makeSubIteration(double dt) override final;
+	void step() override final;
 
 	void doBifurcation(double time, double dt) override final;
 
