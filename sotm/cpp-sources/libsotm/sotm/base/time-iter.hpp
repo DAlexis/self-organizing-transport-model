@@ -26,11 +26,6 @@ class ITimeIterable
 public:
 	virtual ~ITimeIterable() { }
 
-	/*
-	/// Do some jobs that may globally change system structure, e. g. remove objects
-	virtual void doBifurcation(double dt) = 0;
-	 */
-
 	/// Calculate right hand side with falues of f(time, xCurrent, xCurrent of other objects)
 	virtual void calculateRHS(double time) = 0;
 
@@ -50,6 +45,26 @@ public:
 	virtual ~IBifurcatable() {}
 
 	virtual void doBifurcation(double time, double dt) = 0;
+};
+
+class ITimeIterator
+{
+public:
+	virtual ~ITimeIterator() {}
+	virtual void setIterable(ITimeIterable* target) = 0;
+	virtual void iterate(double dt) = 0;
+	virtual void setTime(double time) = 0;
+};
+
+class TimeIteratorBase : public ITimeIterator
+{
+public:
+	void setIterable(ITimeIterable* target) override;
+	void setTime(double time) override;
+
+protected:
+	double m_time = 0;
+	ITimeIterable* m_target = nullptr;
 };
 
 }
