@@ -49,19 +49,6 @@ void PhysicalPayloadsRegister::step()
 		(*it)->step();
 }
 
-/*
-void PhysicalPayloadsRegister::makeStep(double dt)
-{
-	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
-		(*it)->makeStep(dt);
-}
-
-void PhysicalPayloadsRegister::doBifurcation(double dt)
-{
-	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
-		(*it)->doBifurcation(dt);
-}*/
-
 AnyPhysicalPayloadBase::AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg) :
 		m_payloadsRegister(reg)
 {
@@ -70,7 +57,15 @@ AnyPhysicalPayloadBase::AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg) :
 
 AnyPhysicalPayloadBase::~AnyPhysicalPayloadBase()
 {
+	if (m_payloadsRegister)
+		m_payloadsRegister->remove(this);
+}
+
+void AnyPhysicalPayloadBase::onDeletePayload()
+{
+	ASSERT(m_payloadsRegister != nullptr, "AnyPhysicalPayloadBase::onDeletePayload() must be called while m_payloadsRegister != nullptr");
 	m_payloadsRegister->remove(this);
+	m_payloadsRegister = nullptr;
 }
 
 NodePayloadBase::NodePayloadBase(PhysicalPayloadsRegister* reg, Node* node) :
@@ -79,13 +74,25 @@ NodePayloadBase::NodePayloadBase(PhysicalPayloadsRegister* reg, Node* node) :
 {
 }
 
-void NodePayloadBase::getBranchingParameters(double dt, BranchingParameters& branchingParameters)
+void NodePayloadBase::getBranchingParameters(double time, double dt, BranchingParameters& branchingParameters)
 {
 	branchingParameters.needBranching = false;
+}
+
+void NodePayloadBase::onDeletePayload()
+{
+	AnyPhysicalPayloadBase::onDeletePayload();
+	node.clear();
 }
 
 LinkPayloadBase::LinkPayloadBase(PhysicalPayloadsRegister* reg, Link* link) :
 	AnyPhysicalPayloadBase(reg),
 	link(link)
 {
+}
+
+void LinkPayloadBase::onDeletePayload()
+{
+	AnyPhysicalPayloadBase::onDeletePayload();
+	link.clear();
 }

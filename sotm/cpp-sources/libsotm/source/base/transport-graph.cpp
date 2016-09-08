@@ -20,7 +20,7 @@ void GraphRegister::addLink(Link* link)
 void GraphRegister::addNode(Node* node)
 {
 	ASSERT(m_nodes.find(node) == m_nodes.end() && m_nodesToAdd.find(node) == m_nodesToAdd.end(),
-			"Link already added to graph register");
+			"Node already added to graph register");
 	if (m_iteratingNow)
 	{
 		m_nodesToAdd.insert(node);
@@ -42,7 +42,7 @@ void GraphRegister::rmLink(Link* link)
 
 void GraphRegister::rmNode(Node* node)
 {
-	ASSERT(m_nodes.find(node) != m_nodes.end(), "Link does not exists in graph register");
+	ASSERT(m_nodes.find(node) != m_nodes.end(), "Node does not exists in graph register");
 	if (m_iteratingNow)
 	{
 		m_nodesToDelete.insert(node);
@@ -96,10 +96,26 @@ void GraphRegister::endIterating()
 }
 
 ////////////////////////////
+// ModelContextDependent
+ModelContextDependent::ModelContextDependent(ModelContext* context) :
+	m_context(context)
+{ }
+
+ModelContext* ModelContextDependent::context()
+{
+	return m_context;
+}
+
+IPhysicalContext* ModelContextDependent::physicalContext()
+{
+	return m_context->physicalContext();
+}
+
+////////////////////////////
 // Node
 Node::Node(ModelContext* context, Point<3> pos) :
-	pos(pos),
-	m_context(context)
+	ModelContextDependent(context),
+	pos(pos)
 {
 	payload.reset(
 		m_context->createNodePayload(this)
@@ -124,7 +140,7 @@ void Node::removeLink(Link* link)
 }
 
 Link::Link(ModelContext* context) :
-	m_context(context)
+	ModelContextDependent(context)
 {
 	/// @todo Should we do this before connecting link to nodes?
 	payload.reset(
@@ -134,15 +150,16 @@ Link::Link(ModelContext* context) :
 }
 
 Link::Link(ModelContext* context, Node* nodeFrom, Point<3> pointTo) :
-	m_context(context)
+	ModelContextDependent(context)
 {
 	ASSERT(nodeFrom != nullptr, "Cannot create link with nullptr node");
 	m_context->graphRegister.addLink(this);
 	PtrWrap<Node> newNode = PtrWrap<Node>::make(context, pointTo);
+	connect(nodeFrom, newNode);
 	payload.reset(
 		m_context->createLinkPayload(this)
 	);
-	connect(nodeFrom, newNode);
+
 }
 
 Link::~Link()
@@ -154,6 +171,8 @@ void Link::connect(Node* n1, Node* n2)
 {
 	m_n1.assign(n1);
 	m_n2.assign(n2);
+	n1->addLink(this);
+	n2->addLink(this);
 }
 
 

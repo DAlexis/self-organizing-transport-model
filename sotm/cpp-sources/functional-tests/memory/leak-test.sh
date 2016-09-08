@@ -26,6 +26,7 @@ fi
 echo -n "Running memory-leak test for $1... "
 
 reportFile=$(echo "$1" | awk -F\/ '{ print $NF }').txt
+rm $reportFile
 valgrind $1 2> $reportFile || {
 	echo "${bold}${red}Valgring tool not installed,${normal} cannot continue"
 	exit 0

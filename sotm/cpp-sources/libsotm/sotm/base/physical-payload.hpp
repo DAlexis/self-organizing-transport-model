@@ -35,6 +35,12 @@ public:
 	virtual ~AnyPhysicalPayloadBase();
 	void doStep() {}
 
+protected:
+	/// This function should be called by physical payload
+	/// when physics things that object holding this payload should die.
+	/// derived classes must call this func BEFORE calling their own version of this func
+	virtual void onDeletePayload();
+
 private:
 	PhysicalPayloadsRegister *m_payloadsRegister;
 };
@@ -56,8 +62,9 @@ class NodePayloadBase : public AnyPhysicalPayloadBase
 {
 public:
 	NodePayloadBase(PhysicalPayloadsRegister* reg, Node* node);
+	void onDeletePayload() override;
 
-	virtual void getBranchingParameters(double dt, BranchingParameters& branchingParameters);
+	virtual void getBranchingParameters(double time, double dt, BranchingParameters& branchingParameters);
 
 protected:
 	PtrWrap<Node> node;
@@ -67,6 +74,7 @@ class LinkPayloadBase : public AnyPhysicalPayloadBase
 {
 public:
 	LinkPayloadBase(PhysicalPayloadsRegister* reg, Link* link);
+	void onDeletePayload() override;
 
 protected:
 	PtrWrap<Link> link;
@@ -85,6 +93,23 @@ public:
 	virtual ~ILinkPayloadFactory() {}
 	virtual LinkPayloadBase* create(PhysicalPayloadsRegister* reg, Link* link) = 0;
 };
+
+#define SOTM_QUICK_NPF(Classname, FactoryName) \
+	class FactoryName : public INodePayloadFactory \
+	{ \
+	public: \
+		Classname* create(PhysicalPayloadsRegister* reg, Node* node) override final \
+		{ return new Classname(reg, node); } \
+	};
+
+#define SOTM_QUICK_LPF(Classname, FactoryName) \
+	class FactoryName : public ILinkPayloadFactory \
+	{ \
+	public: \
+		Classname* create(PhysicalPayloadsRegister* reg, Link* link) override final \
+		{ return new Classname(reg, link); } \
+	};
+
 
 }
 

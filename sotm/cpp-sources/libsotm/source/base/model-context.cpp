@@ -56,12 +56,21 @@ void ModelContext::step()
 void ModelContext::doBifurcation(double time, double dt)
 {
 	ASSERT(dt >= 0, "Cannot iterate bifurcations when dt < 0");
+
+	graphRegister.applyLinkVisitor(
+		[time, dt](Link* l)
+		{
+			l->payload->doBifurcation(time, dt);
+		}
+	);
+
 	graphRegister.applyNodeVisitor(
 		[time, dt](Node* n)
 		{
 			n->payload->doBifurcation(time, dt);
 		}
 	);
+
 	graphRegister.applyNodeVisitor(
 		[this, time, dt](Node* n)
 		{
@@ -73,7 +82,7 @@ void ModelContext::doBifurcation(double time, double dt)
 void ModelContext::branchIteration(double time, double dt, Node* node)
 {
 	BranchingParameters bp;
-	node->payload->getBranchingParameters(dt, bp);
+	node->payload->getBranchingParameters(time, dt, bp);
 	if (!bp.needBranching)
 		return;
 
@@ -81,8 +90,3 @@ void ModelContext::branchIteration(double time, double dt, Node* node)
 	Point<3> newPos = node->pos + bp.direction * bp.length;
 	PtrWrap<Link> newLink = PtrWrap<Link>::make(this, node, newPos);
 }
-/*
-void ModelContext::discreteStep(double dt, Node* node)
-{
-	node->payload->doBifurcation(dt);
-}*/

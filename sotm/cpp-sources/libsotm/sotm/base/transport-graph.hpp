@@ -17,6 +17,7 @@ class Link;
 class NodePayloadBase;
 class LinkPayloadBase;
 class ModelContext;
+class IPhysicalContext;
 
 class GraphRegister
 {
@@ -55,14 +56,25 @@ private:
 
 };
 
-class Node : public SelfMemMgr
+class ModelContextDependent
+{
+public:
+	ModelContextDependent(ModelContext* context);
+	ModelContext* context();
+	IPhysicalContext* physicalContext();
+
+
+protected:
+	ModelContext* m_context;
+};
+
+class Node : public ModelContextDependent, public SelfMemMgr
 {
 public:
 	Node(ModelContext* context, Point<3> pos = Point<3>());
 	~Node();
 	void addLink(Link* link);
 	void removeLink(Link* link);
-	inline ModelContext* context() { return m_context; }
 
 	std::unique_ptr<NodePayloadBase> payload;
 
@@ -70,24 +82,21 @@ public:
 
 private:
 	std::set<Link*> m_links;
-	ModelContext* m_context;
 };
 
 
-class Link : public SelfMemMgr
+class Link : public ModelContextDependent, public SelfMemMgr
 {
 public:
 	Link(ModelContext* context);
 	Link(ModelContext* context, Node* nodeFrom, Point<3> pointTo);
 	~Link();
 	void connect(Node* n1, Node* n2);
-	inline ModelContext* context() { return m_context; }
 
 	std::unique_ptr<LinkPayloadBase> payload;
 
 private:
 	PtrWrap<Node> m_n1, m_n2;
-	ModelContext* m_context;
 };
 
 }

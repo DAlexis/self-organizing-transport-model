@@ -15,14 +15,21 @@ TEST(EmptyPayload, ModelContextInitialization)
 		c.setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory>(new EmptyLinkPayloadFactory()))
 	);
 	ASSERT_NO_THROW(
-		PtrWrap<Node> n1(new Node(&c));
-		PtrWrap<Node> n2(new Node(&c));
-		PtrWrap<Link> l(new Link(&c));
+		c.setPhysicalContext(std::unique_ptr<IPhysicalContext>(new EmptyPhysicalContext()));
+	);
+	ASSERT_NO_THROW(
+		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c);
+		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c);
+		PtrWrap<Link> l = PtrWrap<Link>::make(&c);
 	) << "Building simpliest graph";
 
 	// We had no assertion so we can create nodes and link without ASSERT_NO_THROW environment
-	PtrWrap<Node> n1(new Node(&c));
-	PtrWrap<Node> n2(new Node(&c));
-	PtrWrap<Link> l(new Link(&c));
+	PtrWrap<Node> n1 = PtrWrap<Node>::make(&c);
+	PtrWrap<Node> n2 = PtrWrap<Node>::make(&c);
+	PtrWrap<Link> l = PtrWrap<Link>::make(&c);
 	ASSERT_NO_THROW(l->connect(n1, n2));
+	ASSERT_NO_THROW(EmptyPhysicalContext::cast(c.physicalContext())->destroyGraph());
+	ASSERT_NO_THROW(c.doBifurcation(0.0, 1.0));
+
 }
+

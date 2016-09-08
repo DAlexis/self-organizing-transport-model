@@ -20,10 +20,10 @@ public:
 	void destroyGraph();
 	bool readyToDestroy();
 
-	virtual void calculateRHS(double time) { }
-	virtual void addRHSToDelta(double m) { }
-	virtual void makeSubIteration(double dt) { }
-	virtual void step() { }
+	virtual void calculateRHS(double time) override { }
+	virtual void addRHSToDelta(double m) override { }
+	virtual void makeSubIteration(double dt) override { }
+	virtual void step() override { }
 
 	static inline EmptyPhysicalContext* cast(IPhysicalContext* context)
 	{
@@ -44,13 +44,12 @@ class EmptyNodePayload : public NodePayloadBase
 public:
 	EmptyNodePayload(PhysicalPayloadsRegister* reg, Node* node);
 
+	void calculateRHS(double time) override;
+	void addRHSToDelta(double m) override;
+	void makeSubIteration(double dt) override;
+	void step() override;
 
-	void calculateRHS(double time) override final;
-	void addRHSToDelta(double m) override final;
-	void makeSubIteration(double dt) override final;
-	void step() override final;
-
-	void doBifurcation(double time, double dt) override final;
+	void doBifurcation(double time, double dt) override;
 
 };
 
@@ -59,12 +58,12 @@ class EmptyLinkPayload : public LinkPayloadBase
 public:
 	EmptyLinkPayload(PhysicalPayloadsRegister* reg, Link* link);
 
-	void calculateRHS(double time) override final;
-	void addRHSToDelta(double m) override final;
-	void makeSubIteration(double dt) override final;
-	void step() override final;
+	void calculateRHS(double time) override;
+	void addRHSToDelta(double m) override;
+	void makeSubIteration(double dt) override;
+	void step() override;
 
-	void doBifurcation(double time, double dt) override final;
+	void doBifurcation(double time, double dt) override;
 };
 
 class EmptyNodePayloadFactory : public INodePayloadFactory

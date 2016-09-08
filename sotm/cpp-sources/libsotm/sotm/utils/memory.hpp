@@ -94,21 +94,25 @@ public:
     
     operator T*()
     {
+    	ASSERT(m_pobject != nullptr, "Invalid usage of operator T*(): pointer is nullptr");
     	return m_pobject;
     }
 
     operator T&()
     {
+    	ASSERT(m_pobject != nullptr, "Invalid usage of operator T&(): pointer is nullptr");
     	return *m_pobject;
     }
 
     operator const T*()
     {
+    	ASSERT(m_pobject != nullptr, "Invalid usage of const operator T*(): pointer is nullptr");
     	return m_pobject;
     }
 
     operator const T&()
     {
+    	ASSERT(m_pobject != nullptr, "Invalid usage of const operator T&(): pointer is nullptr");
     	return *m_pobject;
     }
 
@@ -124,11 +128,13 @@ public:
     
     inline T* operator->()
     {
+    	ASSERT(m_pobject != nullptr, "Invalid usage of operator->(): pointer is nullptr");
     	return m_pobject;
     }
 
     inline T* data()
     {
+    	ASSERT(m_pobject != nullptr, "Invalid usage of data(): pointer is nullptr");
     	return m_pobject;
     }
 
