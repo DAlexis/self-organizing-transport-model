@@ -7,12 +7,6 @@
 using namespace std;
 using namespace sotm;
 
-class Test : public SelfMemMgr
-{
-public:
-	char q[100];
-};
-
 int main()
 {
 	ModelContext c;

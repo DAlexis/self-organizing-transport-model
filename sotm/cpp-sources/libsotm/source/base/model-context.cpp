@@ -57,6 +57,8 @@ void ModelContext::doBifurcation(double time, double dt)
 {
 	ASSERT(dt >= 0, "Cannot iterate bifurcations when dt < 0");
 
+	m_physicalContext->doBifurcation(time, dt);
+
 	graphRegister.applyLinkVisitor(
 		[time, dt](Link* l)
 		{

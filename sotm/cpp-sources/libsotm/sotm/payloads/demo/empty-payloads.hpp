@@ -20,10 +20,12 @@ public:
 	void destroyGraph();
 	bool readyToDestroy();
 
-	virtual void calculateRHS(double time) override { }
-	virtual void addRHSToDelta(double m) override { }
-	virtual void makeSubIteration(double dt) override { }
+	virtual void calculateRHS(double time) override { UNUSED_ARG(time); }
+	virtual void addRHSToDelta(double m) override { UNUSED_ARG(m); }
+	virtual void makeSubIteration(double dt) override { UNUSED_ARG(dt); }
 	virtual void step() override { }
+
+	void doBifurcation(double time, double dt) { UNUSED_ARG(time); UNUSED_ARG(dt); }
 
 	static inline EmptyPhysicalContext* cast(IPhysicalContext* context)
 	{

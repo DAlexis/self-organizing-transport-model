@@ -26,6 +26,11 @@ target_link_libraries (${PROJECT_NAME}
     ${sotm_LIBRARY}
 )
 
+export_include_dirs(
+    ${PROJECT_SOURCE_DIR}
+)
+
+
 add_test(NAME Library_testing
          COMMAND ${PROJECT_NAME})
 
