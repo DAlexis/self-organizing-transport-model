@@ -8,7 +8,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -g -DNDEBUG")
 
 # For using define GIT_COMMIT_TAG in code
 execute_process(COMMAND git log -1 --format="%H" OUTPUT_VARIABLE git_commit)
-add_definitions( -DGIT_COMMIT_TAG=${git_commit} )
+# The line above brokes QT visualization compilation. This need some investigation
+#add_definitions( -DGIT_COMMIT_TAG=${git_commit} )
 
 # This is to run all tests using 'make run-unit-tests' command.
 # Another way is simply run 'ctest -VV', but output is not colorized by default :(
@@ -55,6 +56,7 @@ endmacro()
 
 add_subdirectory(libsotm)
 add_subdirectory(lightning-modeller)
+add_subdirectory(visualizer)
 
 # To enable ctest usage
 enable_testing()
