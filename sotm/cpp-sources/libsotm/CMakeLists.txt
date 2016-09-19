@@ -12,6 +12,22 @@ set(LIB_SOURCE
     ${PROJECT_SOURCE_DIR}/source/payloads/demo/empty-payloads.cpp
 )
 
+set(LIB_HPP
+    ${PROJECT_SOURCE_DIR}/sotm/payloads/demo/empty-payloads.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/time-iter/euler-explicit.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/math/geometry.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/utils/memory.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/utils/assert.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/utils/macros.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/utils/utils.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/base/model-context.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/base/time-iter.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/base/physical-payload.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/base/transport-graph.hpp
+)
+
+file(GLOB UI_FILES *.ui)
+
 # Include dirs that are used and will be exported 
 set(${PROJECT_NAME}_USED_INCDIRS
     ${PROJECT_SOURCE_DIR}
@@ -19,7 +35,7 @@ set(${PROJECT_NAME}_USED_INCDIRS
 
 include_directories(${${PROJECT_NAME}_USED_INCDIRS})
 
-add_library(${PROJECT_NAME} STATIC ${LIB_SOURCE})
+add_library(${PROJECT_NAME} STATIC ${LIB_SOURCE} ${LIB_HPP})
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_rvalue_references)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_lambdas)

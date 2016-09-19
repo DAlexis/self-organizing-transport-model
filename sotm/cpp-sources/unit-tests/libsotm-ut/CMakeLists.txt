@@ -18,7 +18,12 @@ set(EXE_SOURCES
     complex/branching-ut.cpp
 )
 
-add_executable(${PROJECT_NAME} ${EXE_SOURCES})
+set(LIB_HPP
+    complex/branching-trivial-physics.hpp
+    time-iter/exponent-time-iterable.hpp
+)
+
+add_executable(${PROJECT_NAME} ${EXE_SOURCES} ${LIB_HPP})
 
 target_link_libraries (${PROJECT_NAME}
     gtest
