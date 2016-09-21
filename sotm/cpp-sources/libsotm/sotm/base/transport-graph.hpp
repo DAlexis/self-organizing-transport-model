@@ -93,8 +93,11 @@ public:
 	~Link();
 	void connect(Node* n1, Node* n2);
 
-	std::unique_ptr<LinkPayloadBase> payload;
+	PtrWrap<Node> getNode1();
+	PtrWrap<Node> getNode2();
+	PtrWrap<Node> getNode(unsigned int index);
 
+	std::unique_ptr<LinkPayloadBase> payload;
 private:
 	PtrWrap<Node> m_n1, m_n2;
 };

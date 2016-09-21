@@ -175,4 +175,18 @@ void Link::connect(Node* n1, Node* n2)
 	n2->addLink(this);
 }
 
+PtrWrap<Node> Link::getNode1()
+{
+	return m_n1;
+}
+
+PtrWrap<Node> Link::getNode2()
+{
+	return m_n1;
+}
+
+PtrWrap<Node> Link::getNode(unsigned int index)
+{
+	return index == 0 ? m_n1 : m_n2;
+}
 
