@@ -25,10 +25,4 @@ cmake -G"Eclipse CDT4 - Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug ../../cpp-sour
 sed -i s/199711L/201103L/ .cproject
 )
 
-echo "Unpacking archive with metadata.tar.gz with .metadata directory if presented"
-echo "Error here is normal if you have not metadata.tar.gz with eclipse settings"
-
-tar -xvf metadata.tar.gz
-mv .metadata $workspace
-echo "done."
 

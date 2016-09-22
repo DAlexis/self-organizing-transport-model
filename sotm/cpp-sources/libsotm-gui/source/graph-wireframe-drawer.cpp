@@ -5,7 +5,7 @@
  *      Author: dalexies
  */
 
-#include "graph-wireframe-drawer.hpp"
+#include "sotm-gui-internal/graph-wireframe-drawer.hpp"
 
 GraphWireframeDrawer::GraphWireframeDrawer(sotm::ModelContext* modelContext) :
 	m_modelContext(modelContext)

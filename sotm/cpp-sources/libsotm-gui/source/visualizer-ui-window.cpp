@@ -1,3 +1,5 @@
+#include "sotm-gui-internal/visualizer-ui-window.hpp"
+
 #include <vtkPolyDataMapper.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
@@ -6,7 +8,6 @@
 #include <vtkCellArray.h>
 #include <vtkLine.h>
 #include <vtkSmartPointer.h>
-#include "visualizer-ui-window.hpp"
 
 // Constructor
 VisualizerUIWindow::VisualizerUIWindow()

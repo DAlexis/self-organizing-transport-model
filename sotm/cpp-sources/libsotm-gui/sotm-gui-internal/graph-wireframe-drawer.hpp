@@ -5,8 +5,8 @@
  *      Author: dalexies
  */
 
-#ifndef VISUALIZER_GRAPH_WIREFRAME_DRAWER_HPP_
-#define VISUALIZER_GRAPH_WIREFRAME_DRAWER_HPP_
+#ifndef LIBSOTM_GUI_GRAPH_WIREFRAME_DRAWER_HPP_
+#define LIBSOTM_GUI_GRAPH_WIREFRAME_DRAWER_HPP_
 
 #include "sotm/base/model-context.hpp"
 
@@ -40,4 +40,4 @@ private:
 };
 
 
-#endif /* VISUALIZER_GRAPH_WIREFRAME_DRAWER_HPP_ */
+#endif /* LIBSOTM_GUI_GRAPH_WIREFRAME_DRAWER_HPP_ */

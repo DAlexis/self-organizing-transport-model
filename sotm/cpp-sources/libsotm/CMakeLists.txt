@@ -26,8 +26,6 @@ set(LIB_HPP
     ${PROJECT_SOURCE_DIR}/sotm/base/transport-graph.hpp
 )
 
-file(GLOB UI_FILES *.ui)
-
 # Include dirs that are used and will be exported 
 set(${PROJECT_NAME}_USED_INCDIRS
     ${PROJECT_SOURCE_DIR}

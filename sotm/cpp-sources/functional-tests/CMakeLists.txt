@@ -9,3 +9,4 @@ export_include_dirs(
 configure_file(run-function-tests.sh run-function-tests.sh COPYONLY)
 
 add_subdirectory(memory)
+add_subdirectory(gui)
