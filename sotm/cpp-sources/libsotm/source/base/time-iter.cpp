@@ -47,10 +47,30 @@ void TimeIterator::setBifurcationRunPeriod(double bifurcationPeriod)
 	m_bifurcationPeriod = bifurcationPeriod;
 }
 
-void TimeIterator::iterate(double dt)
+void TimeIterator::setStep(double dt)
+{
+	m_dt = dt;
+}
+
+void TimeIterator::setStopTime(double stopTime)
+{
+	m_stopTime = stopTime;
+}
+
+double TimeIterator::getStep()
+{
+	return m_dt;
+}
+
+double TimeIterator::getStopTime()
+{
+	return m_stopTime;
+}
+
+void TimeIterator::iterate()
 {
 	double time = m_continiousIterator->time();
-	m_continiousIterator->iterate(dt);
+	m_continiousIterator->iterate(m_dt);
 
 	if (
 			(m_bifurcationPeriod == 0.0 || time - m_lastBifurcationTime >= m_bifurcationPeriod) &&
@@ -62,8 +82,8 @@ void TimeIterator::iterate(double dt)
 	}
 }
 
-void TimeIterator::run(double stopTime, double dt)
+void TimeIterator::run()
 {
-	while (m_continiousIterator->time() < stopTime)
-		iterate(dt);
+	while (m_continiousIterator->time() < m_stopTime)
+		iterate();
 }

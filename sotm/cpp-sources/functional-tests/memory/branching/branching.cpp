@@ -28,11 +28,13 @@ int main()
 	EulerExplicitIterator euler;
 	TimeIterator iter(&c, &euler, &c);
 	iter.setTime(0.0);
-	iter.run(1.0, 0.1);
+	iter.setStep(0.1);
+	iter.setStopTime(1.0);
+	iter.run();
 
 	// Tell physical context to enable branching now
 	EmptyPhysicalContextWithBranching::cast(c.physicalContext())->doBranching = true;
-	iter.iterate(0.1); // This should do bifurcation and enlarge graph
+	iter.iterate(); // This should do bifurcation and enlarge graph
 
 	// Disable branching
 	EmptyPhysicalContextWithBranching::cast(c.physicalContext())->doBranching = false;

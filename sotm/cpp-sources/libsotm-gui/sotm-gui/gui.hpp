@@ -11,7 +11,16 @@
 #include "sotm/base/model-context.hpp"
 #include "sotm/base/time-iter.hpp"
 
+#include <memory>
+
 namespace sotm {
+
+class IGUIDriver
+{
+public:
+	virtual ~IGUIDriver() { }
+	virtual int run(int argc, char** argv) = 0;
+};
 
 /**
  * This class should not have any explicit QT dependencies on it's header to prevent
@@ -26,6 +35,8 @@ public:
 private:
 	ModelContext* m_modelContext;
     TimeIterator* m_timeIterator;
+
+    std::unique_ptr<IGUIDriver> m_guiDriver;
 };
 
 

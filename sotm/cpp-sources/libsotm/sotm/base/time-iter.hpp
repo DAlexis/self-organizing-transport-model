@@ -80,11 +80,18 @@ public:
 
 	void setTime(double time);
 	void setBifurcationRunPeriod(double bifurcationPeriod);
+	void setStep(double dt);
+	void setStopTime(double stopTime);
 
-	void iterate(double dt);
-	void run(double stopTime, double dt);
+	double getStep();
+	double getStopTime();
+
+	void iterate();
+	void run();
 
 private:
+	double m_stopTime = 1.0;
+	double m_dt = 0.01;
 	double m_bifurcationPeriod = 0;
 	double m_lastBifurcationTime = 0;
 	IContinuousTimeIterable* m_continiousIterable;

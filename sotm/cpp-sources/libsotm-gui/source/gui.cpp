@@ -1,4 +1,5 @@
 #include "sotm-gui/gui.hpp"
+#include "sotm-gui-internal/gui-internal.hpp"
 
 #include "sotm-gui-internal/visualizer-ui-window.hpp"
 #include "sotm-gui-internal/graph-wireframe-drawer.hpp"
@@ -7,24 +8,36 @@
 
 #include <QApplication>
 
+#include <memory>
+
 using namespace sotm;
 
 GUI::GUI(ModelContext* modelContext, TimeIterator* timeIterator) :
     m_modelContext(modelContext),
-    m_timeIterator(timeIterator)
+    m_timeIterator(timeIterator),
+	m_guiDriver(new QtGUI(modelContext, timeIterator))
 {
-
 }
 
 int GUI::run(int argc, char** argv)
 {
+	return m_guiDriver->run(argc, argv);
+}
+
+QtGUI::QtGUI(ModelContext* modelContext, TimeIterator* timeIterator) :
+	m_modelContext(modelContext),
+	m_timeIterator(timeIterator),
+	m_frameMaker(modelContext)
+{
+
+}
+
+int QtGUI::run(int argc, char** argv)
+{
 	QApplication app(argc, argv);
 
-	VisualizerUIWindow renderWindowUIMultipleInheritance;
-	GraphWireframeDrawer wfd(m_modelContext);
-
-	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	mapper->SetInputData(wfd.getDataSet());
+    VisualizerUIWindow renderWindowUIMultipleInheritance(this);
+	//GraphWireframeDrawer wfd(m_modelContext);
 
 	/*
 	//create two points, P0 and P1
@@ -75,11 +88,14 @@ int GUI::run(int argc, char** argv)
 		mapper->SetInputData(pdata);
 */
 
-	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-	actor->SetMapper(mapper);
 
-	renderWindowUIMultipleInheritance.renderer()->AddActor(actor);
+	m_frameMaker.addActors(renderWindowUIMultipleInheritance.renderer());
 	renderWindowUIMultipleInheritance.show();
 
 	return app.exec();
+}
+
+TimeIterator* QtGUI::timeIterator()
+{
+	return m_timeIterator;
 }

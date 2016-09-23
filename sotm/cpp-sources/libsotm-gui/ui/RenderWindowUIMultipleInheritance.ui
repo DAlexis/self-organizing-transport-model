@@ -25,7 +25,7 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QGroupBox" name="groupBox">
+       <widget class="QGroupBox" name="groupBoxIterating">
         <property name="title">
          <string>Iterating</string>
         </property>
@@ -188,8 +188,8 @@
           </widget>
          </item>
         </layout>
-        <zorder>groupBox</zorder>
-        <zorder>groupBox</zorder>
+        <zorder>groupBoxIterating</zorder>
+        <zorder>groupBoxIterating</zorder>
         <zorder>gridLayoutWidget_2</zorder>
         <zorder>pushButton_3</zorder>
        </widget>

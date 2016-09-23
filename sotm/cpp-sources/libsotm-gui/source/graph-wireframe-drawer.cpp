@@ -14,9 +14,10 @@ GraphWireframeDrawer::GraphWireframeDrawer(sotm::ModelContext* modelContext) :
 {
 }
 
-vtkSmartPointer<vtkPolyData> GraphWireframeDrawer::getDataSet()
+vtkSmartPointer<vtkActor> GraphWireframeDrawer::getActor()
 {
-	m_lines.clear();
+	clear();
+
 	m_modelContext->graphRegister.applyLinkVisitor(
 		[this] (sotm::Link* link)
 		{
@@ -25,7 +26,21 @@ vtkSmartPointer<vtkPolyData> GraphWireframeDrawer::getDataSet()
 	);
 	m_polyData->SetPoints(m_points);
 	m_polyData->SetLines(m_linesCellArray);
-	return m_polyData;
+
+	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	mapper->SetInputData(m_polyData);
+
+	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+	actor->SetMapper(mapper);
+	return actor;
+}
+
+void GraphWireframeDrawer::clear()
+{
+	m_points->Reset();
+	m_linesCellArray->Reset();
+	m_polyData->Reset();
+	m_lines.clear();
 }
 
 void GraphWireframeDrawer::linkVisitor(sotm::Link* link)

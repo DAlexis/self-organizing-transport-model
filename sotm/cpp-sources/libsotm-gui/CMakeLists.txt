@@ -35,6 +35,8 @@ set(EXE_QT_HPP
 # Headers without Q_OBJECT  
 set(EXE_HPP
     ${PROJECT_SOURCE_DIR}/sotm-gui-internal/graph-wireframe-drawer.hpp
+    ${PROJECT_SOURCE_DIR}/sotm-gui-internal/frame-maker.hpp
+    ${PROJECT_SOURCE_DIR}/sotm-gui-internal/gui-internal.hpp
     ${PROJECT_SOURCE_DIR}/sotm-gui/gui.hpp 
 )
 
@@ -43,6 +45,7 @@ set(EXE_SOURCE
     ${PROJECT_SOURCE_DIR}/source/visualizer-ui-window.cpp
     ${PROJECT_SOURCE_DIR}/source/graph-wireframe-drawer.cpp
     ${PROJECT_SOURCE_DIR}/source/gui.cpp
+    ${PROJECT_SOURCE_DIR}/source/frame-maker.cpp
 )
 
 if(${VTK_VERSION} VERSION_GREATER "6" AND VTK_QT_VERSION VERSION_GREATER "4")

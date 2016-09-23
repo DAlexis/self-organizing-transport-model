@@ -14,6 +14,8 @@ TEST(EulerExplicit, ExponentDiffEq)
 
 	double timeLimit = 3.0;
 	iter.setTime(0.0);
-	iter.run(timeLimit, 0.0001);
+	iter.setStep(0.0001);
+	iter.setStopTime(timeLimit);
+	iter.run();
 	ASSERT_NEAR(exp(timeLimit), e.getValue(), 0.01);
 }

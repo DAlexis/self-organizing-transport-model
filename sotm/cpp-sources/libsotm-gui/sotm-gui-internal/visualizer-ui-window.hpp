@@ -8,12 +8,16 @@
 
 #include <QMainWindow>
 
+namespace sotm {
+    class QtGUI;
+}
+
 class VisualizerUIWindow : public QMainWindow, private Ui::RenderWindowUIMultipleInheritance
 {
   Q_OBJECT
 public:
 
-  VisualizerUIWindow();
+  VisualizerUIWindow(sotm::QtGUI *gui);
   vtkSmartPointer<vtkRenderer> renderer();
 
 public slots:
@@ -25,8 +29,14 @@ private slots:
 
   void on_pushButtonIterateToLimit_clicked();
 
+  void on_doubleSpinBoxTimestep_valueChanged(double arg1);
+
+  void on_doubleSpinBoxIterateTo_valueChanged(double arg1);
+
 private:
 	vtkSmartPointer<vtkRenderer> m_renderer{ vtkSmartPointer<vtkRenderer>::New() };
+
+    sotm::QtGUI *m_gui;
 };
 
 #endif

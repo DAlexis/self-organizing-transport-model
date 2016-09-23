@@ -63,14 +63,16 @@ TEST(ComplexBranchingGraph, Branching)
 	EulerExplicitIterator euler;
 	TimeIterator iter(&c, &euler, &c);
 	iter.setTime(0.0);
-	iter.run(1.0, 0.1);
+	iter.setStep(0.1);
+	iter.setStopTime(1.0);
+	iter.run();
 	// Now nothing should be changed
 	ASSERT_EQ(EmptyNodePayloadWithBranching::count, 2);
 	ASSERT_EQ(EmptyLinkPayloadWithBranching::count, 1);
 
 	// Tell physical context to enable branching now
 	EmptyPhysicalContextWithBranching::cast(c.physicalContext())->doBranching = true;
-	iter.iterate(0.1); // This should do bifurcation and enlarge graph
+	iter.iterate(); // This should do bifurcation and enlarge graph
 
 	ASSERT_EQ(EmptyNodePayloadWithBranching::count, 4);
 	ASSERT_EQ(EmptyLinkPayloadWithBranching::count, 3);

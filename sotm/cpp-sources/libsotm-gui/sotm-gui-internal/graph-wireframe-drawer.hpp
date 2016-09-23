@@ -18,6 +18,7 @@
 #include <vtkLineSource.h>
 #include <vtkCellArray.h>
 #include <vtkLine.h>
+#include <vtkActor.h>
 #include <vtkSmartPointer.h>
 
 #include <vector>
@@ -26,10 +27,11 @@ class GraphWireframeDrawer
 {
 public:
 	GraphWireframeDrawer(sotm::ModelContext* modelContext);
-	vtkSmartPointer<vtkPolyData> getDataSet();
+	vtkSmartPointer<vtkActor> getActor();
 
 private:
 	void linkVisitor(sotm::Link* link);
+	void clear();
 
 	sotm::ModelContext* m_modelContext;
 	vtkSmartPointer<vtkPoints> m_points{ vtkSmartPointer<vtkPoints>::New() };
