@@ -1,10 +1,3 @@
-/*
- * gui.cpp
- *
- *  Created on: 22 сент. 2016 г.
- *      Author: dalexies
- */
-
 #include "sotm-gui/gui.hpp"
 
 #include "sotm-gui-internal/visualizer-ui-window.hpp"
@@ -16,8 +9,9 @@
 
 using namespace sotm;
 
-GUI::GUI(ModelContext* modelContext) :
-		m_modelContext(modelContext)
+GUI::GUI(ModelContext* modelContext, TimeIterator* timeIterator) :
+    m_modelContext(modelContext),
+    m_timeIterator(timeIterator)
 {
 
 }

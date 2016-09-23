@@ -20,6 +20,11 @@ public slots:
 
   virtual void slotExit();
 
+private slots:
+  void on_pushButtonOneIteration_clicked();
+
+  void on_pushButtonIterateToLimit_clicked();
+
 private:
 	vtkSmartPointer<vtkRenderer> m_renderer{ vtkSmartPointer<vtkRenderer>::New() };
 };

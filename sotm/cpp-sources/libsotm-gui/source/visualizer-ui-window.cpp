@@ -9,6 +9,10 @@
 #include <vtkLine.h>
 #include <vtkSmartPointer.h>
 
+#include <iostream>
+
+using namespace std;
+
 // Constructor
 VisualizerUIWindow::VisualizerUIWindow()
 {
@@ -28,4 +32,14 @@ vtkSmartPointer<vtkRenderer> VisualizerUIWindow::renderer()
 void VisualizerUIWindow::slotExit()
 {
     qApp->exit();
+}
+
+void VisualizerUIWindow::on_pushButtonOneIteration_clicked()
+{
+    cout << "One iteration clicked" << endl;
+}
+
+void VisualizerUIWindow::on_pushButtonIterateToLimit_clicked()
+{
+    cout << "Iterate to limit clicked" << endl;
 }

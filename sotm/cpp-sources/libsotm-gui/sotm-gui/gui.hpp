@@ -9,6 +9,7 @@
 #define LIBSOTM_GUI_SOTM_GUI_GUI_HPP_
 
 #include "sotm/base/model-context.hpp"
+#include "sotm/base/time-iter.hpp"
 
 namespace sotm {
 
@@ -19,11 +20,12 @@ namespace sotm {
 class GUI
 {
 public:
-	GUI(ModelContext* modelContext);
+    GUI(ModelContext* modelContext, TimeIterator* timeIterator = nullptr);
 	int run(int argc, char** argv);
 
 private:
 	ModelContext* m_modelContext;
+    TimeIterator* m_timeIterator;
 };
 
 
