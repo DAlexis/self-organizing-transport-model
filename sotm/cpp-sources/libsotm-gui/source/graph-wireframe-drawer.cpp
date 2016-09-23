@@ -7,6 +7,8 @@
 
 #include "sotm-gui-internal/graph-wireframe-drawer.hpp"
 
+using namespace sotm;
+
 GraphWireframeDrawer::GraphWireframeDrawer(sotm::ModelContext* modelContext) :
 	m_modelContext(modelContext)
 {
@@ -33,7 +35,7 @@ void GraphWireframeDrawer::linkVisitor(sotm::Link* link)
 
 	vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
 	line->GetPointIds()->SetId(0, id1);
-	line->GetPointIds()->SetId(0, id2);
+	line->GetPointIds()->SetId(1, id2);
 
 	m_lines.push_back(line);
 

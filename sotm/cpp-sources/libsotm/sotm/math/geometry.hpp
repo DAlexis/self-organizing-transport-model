@@ -4,6 +4,7 @@
 #include "sotm/utils/memory.hpp"
 #include "sotm/utils/assert.hpp"
 
+#include <string>
 #include <initializer_list>
 
 namespace sotm
@@ -144,6 +145,14 @@ public:
         return result;
     }
     
+    std::string str()
+    {
+    	return std::string("(") +
+    			std::to_string(x[0]) + "; " +
+				std::to_string(x[1]) + "; " +
+				std::to_string(x[2]) + ")";
+    }
+
     inline double& operator[](unsigned int i) { return x[i]; }
 };
 

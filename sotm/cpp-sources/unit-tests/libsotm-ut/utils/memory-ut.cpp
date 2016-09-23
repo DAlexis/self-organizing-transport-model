@@ -71,3 +71,29 @@ TEST(PtrWrapTest, PtrWrapInst)
     }
     ASSERT_EQ(TestSMM::instCount, 0);
 }
+
+TEST(PtrWrapTest, AssignmentTest)
+{
+	TestSMM::instCount = 0;
+	{
+		PtrWrap<TestSMM> p1;
+		p1 = PtrWrap<TestSMM>::make();
+		ASSERT_EQ(TestSMM::instCount, 1); // Object is alive
+	}
+	ASSERT_EQ(TestSMM::instCount, 0); // Object is destroyed
+
+	TestSMM::instCount = 0;
+	PtrWrap<TestSMM> p2;
+	{
+		PtrWrap<TestSMM> p1;
+		p1 = PtrWrap<TestSMM>::make();
+		ASSERT_EQ(TestSMM::instCount, 1); // Object is alive
+
+		ASSERT_NO_THROW(p2 = p1);
+
+		ASSERT_EQ(TestSMM::instCount, 1); // Object is alive
+	}
+	ASSERT_EQ(TestSMM::instCount, 1); // Object is alive
+	p2.clear();
+	ASSERT_EQ(TestSMM::instCount, 0); // Object is destroyed
+}

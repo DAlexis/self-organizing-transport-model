@@ -85,12 +85,12 @@ public:
         return *this;
     }
 
-    /*
     PtrWrap& operator=(PtrWrap&& right)
     {
-        assign(right.m_pobject);
+        m_pobject = right.m_pobject;
+        right.m_pobject = nullptr;
         return *this;
-    }*/
+    }
     
     operator T*()
     {
@@ -115,11 +115,12 @@ public:
     	ASSERT(m_pobject != nullptr, "Invalid usage of const operator T&(): pointer is nullptr");
     	return *m_pobject;
     }
-
+/*
     PtrWrap& operator=(T* pobject)
     {
         assign(pobject);
-    }   
+        //return *this;
+    }   */
     
     bool operator==(const PtrWrap& right)
     {

@@ -12,8 +12,10 @@
 
 namespace sotm {
 
-void test();
-
+/**
+ * This class should not have any explicit QT dependencies on it's header to prevent
+ * adding QT include directories to project using it
+ */
 class GUI
 {
 public:

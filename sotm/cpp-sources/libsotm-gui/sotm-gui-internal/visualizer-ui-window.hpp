@@ -3,6 +3,9 @@
 
 #include "ui_RenderWindowUIMultipleInheritance.h"
 
+#include <vtkRenderer.h>
+#include <vtkSmartPointer.h>
+
 #include <QMainWindow>
 
 class VisualizerUIWindow : public QMainWindow, private Ui::RenderWindowUIMultipleInheritance
@@ -11,11 +14,14 @@ class VisualizerUIWindow : public QMainWindow, private Ui::RenderWindowUIMultipl
 public:
 
   VisualizerUIWindow();
+  vtkSmartPointer<vtkRenderer> renderer();
 
 public slots:
 
   virtual void slotExit();
 
+private:
+	vtkSmartPointer<vtkRenderer> m_renderer{ vtkSmartPointer<vtkRenderer>::New() };
 };
 
 #endif

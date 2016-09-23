@@ -182,7 +182,7 @@ PtrWrap<Node> Link::getNode1()
 
 PtrWrap<Node> Link::getNode2()
 {
-	return m_n1;
+	return m_n2;
 }
 
 PtrWrap<Node> Link::getNode(unsigned int index)
