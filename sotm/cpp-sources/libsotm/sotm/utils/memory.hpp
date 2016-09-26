@@ -79,6 +79,8 @@ public:
 		}
 	}
 
+    bool assigned() { return m_pobject != nullptr; }
+
     PtrWrap& operator=(PtrWrap& right)
     {
         assign(right.m_pobject);

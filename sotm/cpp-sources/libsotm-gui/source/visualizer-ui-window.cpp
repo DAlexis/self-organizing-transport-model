@@ -22,10 +22,15 @@ VisualizerUIWindow::VisualizerUIWindow(sotm::QtGUI *gui) :
 
     this->qvtkWidget->GetRenderWindow()->AddRenderer(m_renderer);
 
-    if (m_gui->timeIterator() == nullptr)
+    if (m_gui->isStaticGraph())
     {
         groupBoxIterating->setEnabled(false);
         //groupBoxIterating->setWhatsThis("Iterating not avaliable when GUI initialized without TimeIterator object");
+    } else {
+        groupBoxIterating->setEnabled(true);
+        doubleSpinBoxTimestep->setValue(m_gui->timeIterator()->getStep());
+        doubleSpinBoxTime->setValue(m_gui->timeIterator()->getTime());
+        doubleSpinBoxIterateTo->setValue(m_gui->timeIterator()->getStopTime());
     }
 
     /// @todo: read values from TimeIterator and put it to UI controls if applicable
@@ -47,6 +52,11 @@ void VisualizerUIWindow::slotExit()
 void VisualizerUIWindow::on_pushButtonOneIteration_clicked()
 {
     cout << "One iteration clicked" << endl;
+    if (!m_gui->isStaticGraph())
+    {
+    	m_gui->animationMaker()->doIteration();
+        this->qvtkWidget->repaint();
+    }
 }
 
 void VisualizerUIWindow::on_pushButtonIterateToLimit_clicked()

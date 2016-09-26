@@ -85,6 +85,7 @@ public:
 
 	double getStep();
 	double getStopTime();
+	double getTime();
 
 	void iterate();
 	void run();

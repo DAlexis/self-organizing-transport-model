@@ -94,6 +94,7 @@ public:
 	virtual LinkPayloadBase* create(PhysicalPayloadsRegister* reg, Link* link) = 0;
 };
 
+// Quickly define typical factory for node payload
 #define SOTM_QUICK_NPF(Classname, FactoryName) \
 	class FactoryName : public INodePayloadFactory \
 	{ \
@@ -102,6 +103,7 @@ public:
 		{ return new Classname(reg, node); } \
 	};
 
+// Quickly define typical factory for link payload
 #define SOTM_QUICK_LPF(Classname, FactoryName) \
 	class FactoryName : public ILinkPayloadFactory \
 	{ \
@@ -110,6 +112,17 @@ public:
 		{ return new Classname(reg, link); } \
 	};
 
+// Quickly add cast() method for physical context. There is no real need in this method, but it simplify casting
+#define SOTM_QUICK_PHYS_CONT_CASTS(Classname) \
+	static inline Classname* cast(IPhysicalContext* context) \
+	{ \
+		return static_cast<Classname*>(context); \
+	} \
+	 \
+	static inline const Classname* cast(const IPhysicalContext* context) \
+	{ \
+		return static_cast<const Classname*>(context); \
+	} \
 
 }
 

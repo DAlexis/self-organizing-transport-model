@@ -67,6 +67,11 @@ double TimeIterator::getStopTime()
 	return m_stopTime;
 }
 
+double TimeIterator::getTime()
+{
+	return m_continiousIterator->time();
+}
+
 void TimeIterator::iterate()
 {
 	double time = m_continiousIterator->time();

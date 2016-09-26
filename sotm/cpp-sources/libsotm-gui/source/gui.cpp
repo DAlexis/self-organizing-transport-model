@@ -25,9 +25,9 @@ int GUI::run(int argc, char** argv)
 }
 
 QtGUI::QtGUI(ModelContext* modelContext, TimeIterator* timeIterator) :
-	m_modelContext(modelContext),
-	m_timeIterator(timeIterator),
-	m_frameMaker(modelContext)
+    m_modelContext(modelContext),
+    m_timeIterator(timeIterator),
+    m_frameMaker(modelContext)
 {
 
 }
@@ -87,9 +87,13 @@ int QtGUI::run(int argc, char** argv)
 		vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 		mapper->SetInputData(pdata);
 */
-
-
+    if (m_timeIterator != nullptr)
+    {
+        m_animationMaker.reset(new AnimationMaker(&m_frameMaker, m_timeIterator, renderWindowUIMultipleInheritance.renderer()));
+    }
+    // Drawing first frame
 	m_frameMaker.addActors(renderWindowUIMultipleInheritance.renderer());
+
 	renderWindowUIMultipleInheritance.show();
 
 	return app.exec();
@@ -98,4 +102,14 @@ int QtGUI::run(int argc, char** argv)
 TimeIterator* QtGUI::timeIterator()
 {
 	return m_timeIterator;
+}
+
+AnimationMaker* QtGUI::animationMaker()
+{
+	return &(*m_animationMaker);
+}
+
+bool QtGUI::isStaticGraph()
+{
+	return m_timeIterator == nullptr;
 }

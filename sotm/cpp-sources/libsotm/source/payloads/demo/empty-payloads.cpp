@@ -35,7 +35,9 @@ void EmptyNodePayload::doBifurcation(double time, double dt)
 	// Check if physics tells us we can release parent object
 	EmptyPhysicalContext* context = EmptyPhysicalContext::cast(node->context()->physicalContext());
 	if (context->readyToDestroy())
+	{
 		onDeletePayload();
+	}
 }
 
 EmptyLinkPayload::EmptyLinkPayload(PhysicalPayloadsRegister* reg, Link* link) :
@@ -53,7 +55,9 @@ void EmptyLinkPayload::doBifurcation(double time, double dt)
 	// Check if physics tells us we can release parent object
 	EmptyPhysicalContext* context = EmptyPhysicalContext::cast(link->context()->physicalContext());
 	if (context->readyToDestroy())
+	{
 		onDeletePayload();
+	}
 }
 
 NodePayloadBase* EmptyNodePayloadFactory::create(PhysicalPayloadsRegister* reg, Node* node)

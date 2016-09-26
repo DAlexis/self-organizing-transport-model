@@ -3,6 +3,9 @@
 
 #include "sotm-gui/gui.hpp"
 #include "sotm-gui-internal/frame-maker.hpp"
+#include "sotm-gui-internal/animation-maker.hpp"
+
+#include <memory>
 
 namespace sotm {
 
@@ -13,12 +16,15 @@ public:
 	int run(int argc, char** argv) override;
 
 	TimeIterator* timeIterator();
+	AnimationMaker* animationMaker();
+	bool isStaticGraph();
 
 private:
 	ModelContext* m_modelContext = nullptr;
 	TimeIterator* m_timeIterator = nullptr;
 
-	FrameMaker m_frameMaker;
+    FrameMaker m_frameMaker;
+    std::unique_ptr<AnimationMaker> m_animationMaker;
 };
 
 }  // namespace sotm

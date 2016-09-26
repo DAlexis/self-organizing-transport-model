@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>687</width>
-    <height>581</height>
+    <width>685</width>
+    <height>579</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -188,10 +188,6 @@
           </widget>
          </item>
         </layout>
-        <zorder>groupBoxIterating</zorder>
-        <zorder>groupBoxIterating</zorder>
-        <zorder>gridLayoutWidget_2</zorder>
-        <zorder>pushButton_3</zorder>
        </widget>
       </item>
       <item>

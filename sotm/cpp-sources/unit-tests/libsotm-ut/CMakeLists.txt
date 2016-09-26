@@ -22,6 +22,7 @@ set(EXE_SOURCES
 set(EXE_HPP
     complex/branching-trivial-physics.hpp
     time-iter/exponent-time-iterable.hpp
+    complex/branching-trivial-physics.hpp
 )
 
 add_executable(${PROJECT_NAME} ${EXE_SOURCES} ${EXE_HPP})

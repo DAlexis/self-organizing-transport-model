@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 	GUI gui(&c);
 	gui.run(argc, argv);
 
-	cout << "Destroing graph" << endl;
+	cout << "Destroying graph" << endl;
 	EmptyPhysicalContext::cast(c.physicalContext())->destroyGraph();
 	c.doBifurcation(0.0, 1.0);
 
