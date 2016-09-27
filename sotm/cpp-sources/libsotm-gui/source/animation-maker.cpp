@@ -14,9 +14,36 @@ AnimationMaker::AnimationMaker(FrameMaker* frameMaker, TimeIterator* timeIterato
 void AnimationMaker::doIteration()
 {
 	m_timeIterator->iterate();
-	m_frameMaker->addActors(m_renderer);
+	drawNextFrame();
 }
 
-void AnimationMaker::nextFrame()
+
+void AnimationMaker::iterateToNextFrame()
 {
+	m_timeIterator->setStopTime(m_timeIterator->getTime() + m_frameDuration);
+	m_timeIterator->run();
 }
+
+void AnimationMaker::drawNextFrame()
+{
+	m_frameMaker->draw(m_renderer);
+}
+
+double sotm::AnimationMaker::getFrameDuration() const
+{
+	return m_frameDuration;
+}
+
+double sotm::AnimationMaker::getFps() const {
+	return m_fps;
+}
+
+void sotm::AnimationMaker::setFps(double fps = defaultFPS) {
+	m_fps = fps;
+}
+
+void sotm::AnimationMaker::setFrameDuration(double frameDuration)
+{
+	m_frameDuration = frameDuration;
+}
+

@@ -92,8 +92,9 @@ int QtGUI::run(int argc, char** argv)
         m_animationMaker.reset(new AnimationMaker(&m_frameMaker, m_timeIterator, renderWindowUIMultipleInheritance.renderer()));
     }
     // Drawing first frame
-	m_frameMaker.addActors(renderWindowUIMultipleInheritance.renderer());
+	m_frameMaker.draw(renderWindowUIMultipleInheritance.renderer());
 
+	renderWindowUIMultipleInheritance.prepareUIToRun();
 	renderWindowUIMultipleInheritance.show();
 
 	return app.exec();
@@ -112,4 +113,9 @@ AnimationMaker* QtGUI::animationMaker()
 bool QtGUI::isStaticGraph()
 {
 	return m_timeIterator == nullptr;
+}
+
+ModelContext* QtGUI::context()
+{
+	return m_modelContext;
 }

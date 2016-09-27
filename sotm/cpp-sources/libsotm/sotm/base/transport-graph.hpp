@@ -38,6 +38,8 @@ public:
 	/// Safely iterate by all links. New links may be added during iteration
 	void applyLinkVisitor(LinkVisitor v);
 
+	size_t nodesCount();
+	size_t linksCount();
 private:
 	using NodeSet = std::set<Node*>;
 	using LinkSet = std::set<Link*>;

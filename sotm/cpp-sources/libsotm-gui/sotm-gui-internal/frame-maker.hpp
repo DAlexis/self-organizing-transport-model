@@ -18,7 +18,7 @@ class FrameMaker
 public:
 	FrameMaker(ModelContext *modelContext);
 
-	void addActors(vtkRenderer *renderer);
+	void draw(vtkRenderer *renderer);
 
 private:
 	GraphWireframeDrawer m_wireframeDrawer;

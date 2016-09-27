@@ -18,6 +18,7 @@ public:
 	TimeIterator* timeIterator();
 	AnimationMaker* animationMaker();
 	bool isStaticGraph();
+	ModelContext* context();
 
 private:
 	ModelContext* m_modelContext = nullptr;

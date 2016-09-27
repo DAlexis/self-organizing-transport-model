@@ -71,6 +71,16 @@ void GraphRegister::applyLinkVisitor(LinkVisitor v)
 	}
 }
 
+size_t GraphRegister::nodesCount()
+{
+	return m_nodes.size();
+}
+
+size_t GraphRegister::linksCount()
+{
+	return m_links.size();
+}
+
 void GraphRegister::beginIterating()
 {
 	m_iteratingNow = true;

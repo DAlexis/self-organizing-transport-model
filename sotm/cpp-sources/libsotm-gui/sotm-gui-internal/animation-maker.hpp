@@ -8,14 +8,27 @@ namespace sotm {
 class AnimationMaker
 {
 public:
+	constexpr static double defaultFPS = 10;
+	constexpr static double defaultFrameDuration = 0.1;
+
     AnimationMaker(FrameMaker *frameMaker, TimeIterator *timeIterator, vtkRenderer *renderer);
 
 	void doIteration();
-	void nextFrame();
+	void iterateToNextFrame();
+	void drawNextFrame();
+
+	double getFrameDuration() const;
+	void setFrameDuration(double frameDuration);
+
+	double getFps() const;
+	void setFps(double fps);
 
 private:
-	FrameMaker* m_frameMaker;
-	TimeIterator* m_timeIterator;
+	double m_fps = defaultFPS;
+	double m_frameDuration = defaultFrameDuration;
+
+	FrameMaker *m_frameMaker;
+	TimeIterator *m_timeIterator;
 	vtkRenderer *m_renderer;
 };
 

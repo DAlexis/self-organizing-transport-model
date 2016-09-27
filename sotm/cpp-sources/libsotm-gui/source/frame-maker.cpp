@@ -7,7 +7,7 @@ FrameMaker::FrameMaker(ModelContext *modelContext) :
 {
 }
 
-void FrameMaker::addActors(vtkRenderer *renderer)
+void FrameMaker::draw(vtkRenderer *renderer)
 {
 	renderer->RemoveAllViewProps();
 	renderer->AddActor(m_wireframeDrawer.getActor());
