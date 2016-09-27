@@ -31,8 +31,6 @@ public slots:
 private slots:
   void on_pushButtonOneIteration_clicked();
 
-  void on_pushButtonIterateToLimit_clicked();
-
   void on_doubleSpinBoxTimestep_valueChanged(double arg1);
 
   void on_doubleSpinBoxIterateTo_valueChanged(double arg1);

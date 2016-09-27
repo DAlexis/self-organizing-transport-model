@@ -7,6 +7,8 @@
 
 #include "sotm-gui-internal/graph-wireframe-drawer.hpp"
 
+#include <vtkCellData.h>
+
 using namespace sotm;
 
 GraphWireframeDrawer::GraphWireframeDrawer(sotm::ModelContext* modelContext) :
@@ -24,11 +26,7 @@ void GraphWireframeDrawer::prepareNextActor()
 			linkVisitor(link);
 		}
 	);
-	m_nextBuffer->m_polyData->SetPoints(m_nextBuffer->m_points);
-	m_nextBuffer->m_polyData->SetLines(m_nextBuffer->m_linesCellArray);
-
-	m_nextBuffer->mapper->SetInputData(m_nextBuffer->m_polyData);
-	m_nextBuffer->actor->SetMapper(m_nextBuffer->mapper);
+	m_nextBuffer->prepareActor();
 }
 
 vtkSmartPointer<vtkActor> GraphWireframeDrawer::getCurrentActor()
@@ -36,12 +34,29 @@ vtkSmartPointer<vtkActor> GraphWireframeDrawer::getCurrentActor()
 	return m_currentBuffer->actor;
 }
 
+GraphWireframeDrawer::WireframeBuffer::WireframeBuffer()
+{
+	clear();
+}
+
 void GraphWireframeDrawer::WireframeBuffer::clear()
 {
-	m_points->Reset();
-	m_linesCellArray->Reset();
-	m_polyData->Reset();
-	m_lines.clear();
+	points->Reset();
+	linesCellArray->Reset();
+	polyData->Reset();
+	colors->Reset();
+	colors->SetNumberOfComponents(3);
+	lines.clear();
+}
+
+void GraphWireframeDrawer::WireframeBuffer::prepareActor()
+{
+	polyData->SetPoints(points);
+	polyData->SetLines(linesCellArray);
+	polyData->GetCellData()->SetScalars(colors);
+
+	mapper->SetInputData(polyData);
+	actor->SetMapper(mapper);
 }
 
 void GraphWireframeDrawer::swapBuffers()
@@ -51,14 +66,21 @@ void GraphWireframeDrawer::swapBuffers()
 
 void GraphWireframeDrawer::linkVisitor(sotm::Link* link)
 {
-	vtkIdType id1 = m_nextBuffer->m_points->InsertNextPoint( link->getNode1()->pos.x );
-	vtkIdType id2 = m_nextBuffer->m_points->InsertNextPoint( link->getNode2()->pos.x );
+	vtkIdType id1 = m_nextBuffer->points->InsertNextPoint( link->getNode1()->pos.x );
+	vtkIdType id2 = m_nextBuffer->points->InsertNextPoint( link->getNode2()->pos.x );
 
 	vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
 	line->GetPointIds()->SetId(0, id1);
 	line->GetPointIds()->SetId(1, id2);
 
-	m_nextBuffer->m_lines.push_back(line);
+	m_nextBuffer->lines.push_back(line);
 
-	m_nextBuffer->m_linesCellArray->InsertNextCell(line);
+	// Color source stub
+
+	double rgb[3] = {1.0, 1.0, 1.0};
+	link->payload->getColor(rgb);
+	unsigned char color_uchar[3] = { rgb[0]*255, rgb[1]*255, rgb[2]*255 };
+	m_nextBuffer->colors->InsertNextTupleValue(color_uchar);
+
+	m_nextBuffer->linesCellArray->InsertNextCell(line);
 }

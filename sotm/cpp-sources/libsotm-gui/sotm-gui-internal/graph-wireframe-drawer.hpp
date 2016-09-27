@@ -37,13 +37,19 @@ private:
 	sotm::ModelContext* m_modelContext;
 
 	struct WireframeBuffer {
+		WireframeBuffer();
 		void clear();
-		vtkSmartPointer<vtkPoints> m_points{ vtkSmartPointer<vtkPoints>::New() };
-		vtkSmartPointer<vtkCellArray> m_linesCellArray{ vtkSmartPointer<vtkCellArray>::New() };
-		vtkSmartPointer<vtkPolyData> m_polyData{ vtkSmartPointer<vtkPolyData>::New() };
+		void prepareActor();
+
+		vtkSmartPointer<vtkPoints> points{ vtkSmartPointer<vtkPoints>::New() };
+		vtkSmartPointer<vtkCellArray> linesCellArray{ vtkSmartPointer<vtkCellArray>::New() };
+		vtkSmartPointer<vtkPolyData> polyData{ vtkSmartPointer<vtkPolyData>::New() };
 		vtkSmartPointer<vtkPolyDataMapper> mapper{ vtkSmartPointer<vtkPolyDataMapper>::New() };
 		vtkSmartPointer<vtkActor> actor{ vtkSmartPointer<vtkActor>::New() };
-		std::vector< vtkSmartPointer<vtkLine> > m_lines;
+		vtkSmartPointer<vtkUnsignedCharArray> colors{ vtkSmartPointer<vtkUnsignedCharArray>::New() };
+
+		std::vector< vtkSmartPointer<vtkLine> > lines;
+
 	};
 
 	WireframeBuffer m_buffer[2];

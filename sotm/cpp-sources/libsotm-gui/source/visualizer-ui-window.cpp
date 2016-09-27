@@ -131,24 +131,12 @@ void VisualizerUIWindow::on_animationTimerTimeout()
 
 void VisualizerUIWindow::on_pushButtonOneIteration_clicked()
 {
-    cout << "One iteration clicked" << endl;
     if (!m_gui->isStaticGraph())
     {
     	m_gui->animationMaker()->doIteration();
         this->qvtkWidget->repaint();
         updateModelInfo();
     }
-}
-
-void VisualizerUIWindow::on_pushButtonIterateToLimit_clicked()
-{
-    if (m_gui->isStaticGraph())
-    {
-        cout << "Graph is static, iterating impossible" << endl;
-        return;
-    }
-    m_animationTimer->start(1000 / m_gui->animationMaker()->getFps());
-    m_gui->animationMaker()->iterateToNextFrame();
 }
 
 void VisualizerUIWindow::on_doubleSpinBoxTimestep_valueChanged(double arg1)

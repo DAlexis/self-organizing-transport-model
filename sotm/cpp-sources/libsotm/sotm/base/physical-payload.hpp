@@ -33,9 +33,12 @@ class AnyPhysicalPayloadBase : public IContinuousTimeIterable, public IBifurcati
 public:
 	AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg);
 	virtual ~AnyPhysicalPayloadBase();
-	void doStep() {}
+
+	/// Get object color for visualization purpose. Color is RGB array. Each color is from interval [0.0; 1.0]
+	virtual void getColor(double* rgb);
 
 protected:
+	constexpr static double defaultColor[3] = {1.0, 0.8, 0.3};
 	/// This function should be called by physical payload
 	/// when physics things that object holding this payload should die.
 	/// derived classes must call this func BEFORE calling their own version of this func
