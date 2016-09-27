@@ -37,6 +37,14 @@ public:
 	RandomGraphLinkPayload(PhysicalPayloadsRegister* reg, Link* link);
 
 	void doBifurcation(double time, double dt) override;
+	void getColor(double* rgb) override;
+
+private:
+	constexpr static double timeToLiveMax = 8.0;
+	constexpr static double timeToLiveMin = 7.0;
+	double m_timeToLive;
+	double m_creationTime = 0.0;
+	double m_color[3];
 };
 
 SOTM_QUICK_NPF(RandomGraphNodePayload, RandomGraphNodePayloadFactory);
