@@ -14,9 +14,9 @@ GraphWireframeDrawer::GraphWireframeDrawer(sotm::ModelContext* modelContext) :
 {
 }
 
-vtkSmartPointer<vtkActor> GraphWireframeDrawer::getActor()
+void GraphWireframeDrawer::prepareNextActor()
 {
-	clear();
+	m_nextBuffer->clear();
 
 	m_modelContext->graphRegister.applyLinkVisitor(
 		[this] (sotm::Link* link)
@@ -24,18 +24,19 @@ vtkSmartPointer<vtkActor> GraphWireframeDrawer::getActor()
 			linkVisitor(link);
 		}
 	);
-	m_polyData->SetPoints(m_points);
-	m_polyData->SetLines(m_linesCellArray);
+	m_nextBuffer->m_polyData->SetPoints(m_nextBuffer->m_points);
+	m_nextBuffer->m_polyData->SetLines(m_nextBuffer->m_linesCellArray);
 
-	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	mapper->SetInputData(m_polyData);
-
-	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-	actor->SetMapper(mapper);
-	return actor;
+	m_nextBuffer->mapper->SetInputData(m_nextBuffer->m_polyData);
+	m_nextBuffer->actor->SetMapper(m_nextBuffer->mapper);
 }
 
-void GraphWireframeDrawer::clear()
+vtkSmartPointer<vtkActor> GraphWireframeDrawer::getCurrentActor()
+{
+	return m_currentBuffer->actor;
+}
+
+void GraphWireframeDrawer::WireframeBuffer::clear()
 {
 	m_points->Reset();
 	m_linesCellArray->Reset();
@@ -43,16 +44,21 @@ void GraphWireframeDrawer::clear()
 	m_lines.clear();
 }
 
+void GraphWireframeDrawer::swapBuffers()
+{
+	std::swap(m_nextBuffer, m_currentBuffer);
+}
+
 void GraphWireframeDrawer::linkVisitor(sotm::Link* link)
 {
-	vtkIdType id1 = m_points->InsertNextPoint( link->getNode1()->pos.x );
-	vtkIdType id2 = m_points->InsertNextPoint( link->getNode2()->pos.x );
+	vtkIdType id1 = m_nextBuffer->m_points->InsertNextPoint( link->getNode1()->pos.x );
+	vtkIdType id2 = m_nextBuffer->m_points->InsertNextPoint( link->getNode2()->pos.x );
 
 	vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
 	line->GetPointIds()->SetId(0, id1);
 	line->GetPointIds()->SetId(1, id2);
 
-	m_lines.push_back(line);
+	m_nextBuffer->m_lines.push_back(line);
 
-	m_linesCellArray->InsertNextCell(line);
+	m_nextBuffer->m_linesCellArray->InsertNextCell(line);
 }

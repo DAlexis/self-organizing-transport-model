@@ -201,54 +201,54 @@
            </property>
           </widget>
          </item>
-         <item>
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
+         <string>Model info</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="1">
+          <widget class="QLabel" name="labelNodesCount">
+           <property name="text">
+            <string>0</string>
            </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
+          </widget>
          </item>
-         <item>
-          <widget class="QGroupBox" name="groupBox">
-           <property name="title">
-            <string>Model info</string>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>Links count:</string>
            </property>
-           <layout class="QGridLayout" name="gridLayout_3">
-            <item row="0" column="1">
-             <widget class="QLabel" name="labelNodesCount">
-              <property name="text">
-               <string>0</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_10">
-              <property name="text">
-               <string>Nodes count:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_11">
-              <property name="text">
-               <string>Links count:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="labelLinksCount">
-              <property name="text">
-               <string>0</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="labelLinksCount">
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Nodes count:</string>
+           </property>
           </widget>
          </item>
         </layout>

@@ -7,8 +7,14 @@ FrameMaker::FrameMaker(ModelContext *modelContext) :
 {
 }
 
+void FrameMaker::prepareNextFrame()
+{
+	m_wireframeDrawer.prepareNextActor();
+	m_wireframeDrawer.swapBuffers();
+}
+
 void FrameMaker::draw(vtkRenderer *renderer)
 {
 	renderer->RemoveAllViewProps();
-	renderer->AddActor(m_wireframeDrawer.getActor());
+	renderer->AddActor(m_wireframeDrawer.getCurrentActor());
 }

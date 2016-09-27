@@ -18,6 +18,7 @@ class FrameMaker
 public:
 	FrameMaker(ModelContext *modelContext);
 
+	void prepareNextFrame();
 	void draw(vtkRenderer *renderer);
 
 private:

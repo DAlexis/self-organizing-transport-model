@@ -27,18 +27,27 @@ class GraphWireframeDrawer
 {
 public:
 	GraphWireframeDrawer(sotm::ModelContext* modelContext);
-	vtkSmartPointer<vtkActor> getActor();
+	void prepareNextActor();
+	vtkSmartPointer<vtkActor> getCurrentActor();
+	void swapBuffers();
 
 private:
 	void linkVisitor(sotm::Link* link);
-	void clear();
 
 	sotm::ModelContext* m_modelContext;
-	vtkSmartPointer<vtkPoints> m_points{ vtkSmartPointer<vtkPoints>::New() };
-	vtkSmartPointer<vtkCellArray> m_linesCellArray{ vtkSmartPointer<vtkCellArray>::New() };
-	vtkSmartPointer<vtkPolyData> m_polyData{ vtkSmartPointer<vtkPolyData>::New() };
 
-	std::vector< vtkSmartPointer<vtkLine> > m_lines;
+	struct WireframeBuffer {
+		void clear();
+		vtkSmartPointer<vtkPoints> m_points{ vtkSmartPointer<vtkPoints>::New() };
+		vtkSmartPointer<vtkCellArray> m_linesCellArray{ vtkSmartPointer<vtkCellArray>::New() };
+		vtkSmartPointer<vtkPolyData> m_polyData{ vtkSmartPointer<vtkPolyData>::New() };
+		vtkSmartPointer<vtkPolyDataMapper> mapper{ vtkSmartPointer<vtkPolyDataMapper>::New() };
+		vtkSmartPointer<vtkActor> actor{ vtkSmartPointer<vtkActor>::New() };
+		std::vector< vtkSmartPointer<vtkLine> > m_lines;
+	};
+
+	WireframeBuffer m_buffer[2];
+	WireframeBuffer *m_nextBuffer = &(m_buffer[0]), *m_currentBuffer = &(m_buffer[1]);
 };
 
 

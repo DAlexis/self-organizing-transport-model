@@ -3,6 +3,9 @@
 
 #include "sotm-gui-internal/frame-maker.hpp"
 
+#include <memory>
+#include <thread>
+
 namespace sotm {
 
 class AnimationMaker
@@ -30,6 +33,8 @@ private:
 	FrameMaker *m_frameMaker;
 	TimeIterator *m_timeIterator;
 	vtkRenderer *m_renderer;
+
+	std::unique_ptr<std::thread> m_thread;
 };
 
 

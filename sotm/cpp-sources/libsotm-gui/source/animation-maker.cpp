@@ -20,12 +20,21 @@ void AnimationMaker::doIteration()
 
 void AnimationMaker::iterateToNextFrame()
 {
-	m_timeIterator->setStopTime(m_timeIterator->getTime() + m_frameDuration);
-	m_timeIterator->run();
+	m_thread.reset(new std::thread([this]() {
+		m_timeIterator->setStopTime(m_timeIterator->getTime() + m_frameDuration);
+		m_timeIterator->run();
+		m_frameMaker->prepareNextFrame();
+	}));
 }
 
 void AnimationMaker::drawNextFrame()
 {
+	if (m_thread)
+    {
+		m_thread->join();
+        m_thread.release();
+    }
+
 	m_frameMaker->draw(m_renderer);
 }
 

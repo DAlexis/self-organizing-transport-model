@@ -91,7 +91,9 @@ int QtGUI::run(int argc, char** argv)
     {
         m_animationMaker.reset(new AnimationMaker(&m_frameMaker, m_timeIterator, renderWindowUIMultipleInheritance.renderer()));
     }
+
     // Drawing first frame
+    m_frameMaker.prepareNextFrame();
 	m_frameMaker.draw(renderWindowUIMultipleInheritance.renderer());
 
 	renderWindowUIMultipleInheritance.prepareUIToRun();
