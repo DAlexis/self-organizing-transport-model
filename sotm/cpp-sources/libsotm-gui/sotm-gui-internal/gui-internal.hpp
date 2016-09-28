@@ -17,6 +17,7 @@ public:
 
 	TimeIterator* timeIterator();
 	AnimationMaker* animationMaker();
+    FrameMaker* frameMaker();
 	bool isStaticGraph();
 	ModelContext* context();
 

@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -38,11 +39,11 @@ void VisualizerUIWindow::prepareUIToRun()
 {
     updateEdiableFields();
     updateModelInfo();
-
 }
 
 void VisualizerUIWindow::updateEdiableFields()
 {
+    horizontalSlider->setValue((m_gui->frameMaker()->renderPreferences()->gamma - 0.2) / 2.0 * 100);
     if (m_gui->isStaticGraph())
     {
         groupBoxIterating->setEnabled(false);
@@ -115,6 +116,14 @@ void VisualizerUIWindow::slotExit()
     qApp->exit();
 }
 
+void VisualizerUIWindow::reRenderCurrentFrame()
+{
+    updateModelInfo();
+    m_gui->frameMaker()->recreateCurrentFrame();
+    m_gui->frameMaker()->draw(renderer());
+    this->qvtkWidget->repaint();
+}
+
 void VisualizerUIWindow::on_animationTimerTimeout()
 {
     cout << "Timer event" << endl;
@@ -180,4 +189,15 @@ void VisualizerUIWindow::on_pushButtonStartAnimation_clicked()
 void VisualizerUIWindow::on_pushButtonPauseAnimation_clicked()
 {
     stopAnimation();
+}
+
+void VisualizerUIWindow::on_horizontalSlider_valueChanged(int value)
+{
+    double gammaValue = 0.2 + 2.0 / 100 * value;
+    std::stringstream ss;
+    ss << fixed << setprecision(2) << gammaValue;
+    labelGamma->setText(ss.str().c_str());
+
+    m_gui->frameMaker()->renderPreferences()->gamma = gammaValue;
+    reRenderCurrentFrame();
 }

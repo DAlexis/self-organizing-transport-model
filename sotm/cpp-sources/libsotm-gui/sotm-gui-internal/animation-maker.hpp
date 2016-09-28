@@ -13,12 +13,20 @@ class AnimationMaker
 public:
 	constexpr static double defaultFPS = 10;
 	constexpr static double defaultFrameDuration = 0.1;
+	constexpr static double defaultGamma = 1;
 
     AnimationMaker(FrameMaker *frameMaker, TimeIterator *timeIterator, vtkRenderer *renderer);
 
 	void doIteration();
+	/**
+	 * Prepare next frame to draw. Async operation
+	 */
 	void iterateToNextFrame();
+	/**
+	 * Draw prepared frame. Waints while async iterateToNextFrame() done
+	 */
 	void drawNextFrame();
+	void redrawCurrentFrame();
 
 	double getFrameDuration() const;
 	void setFrameDuration(double frameDuration);
@@ -26,7 +34,13 @@ public:
 	double getFps() const;
 	void setFps(double fps);
 
+	double getGamma() const;
+	void setGamma(double gamma);
+
+	RenderPreferences* renderPreferences();
+
 private:
+	double m_gamma = defaultGamma;
 	double m_fps = defaultFPS;
 	double m_frameDuration = defaultFrameDuration;
 

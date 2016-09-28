@@ -23,7 +23,7 @@ void AnimationMaker::iterateToNextFrame()
 	m_thread.reset(new std::thread([this]() {
 		m_timeIterator->setStopTime(m_timeIterator->getTime() + m_frameDuration);
 		m_timeIterator->run();
-		m_frameMaker->prepareNextFrame();
+		m_frameMaker->prepareNextFrameAndSwapBuffers();
 	}));
 }
 
@@ -38,21 +38,39 @@ void AnimationMaker::drawNextFrame()
 	m_frameMaker->draw(m_renderer);
 }
 
-double sotm::AnimationMaker::getFrameDuration() const
+void AnimationMaker::redrawCurrentFrame()
+{
+	m_frameMaker->recreateCurrentFrame();
+	m_frameMaker->draw(m_renderer);
+}
+
+double AnimationMaker::getFrameDuration() const
 {
 	return m_frameDuration;
 }
 
-double sotm::AnimationMaker::getFps() const {
+double AnimationMaker::getFps() const {
 	return m_fps;
 }
 
-void sotm::AnimationMaker::setFps(double fps = defaultFPS) {
+double sotm::AnimationMaker::getGamma() const {
+	return m_gamma;
+}
+
+void sotm::AnimationMaker::setGamma(double gamma = defaultGamma) {
+	m_gamma = gamma;
+}
+
+void AnimationMaker::setFps(double fps = defaultFPS) {
 	m_fps = fps;
 }
 
-void sotm::AnimationMaker::setFrameDuration(double frameDuration)
+void AnimationMaker::setFrameDuration(double frameDuration)
 {
 	m_frameDuration = frameDuration;
 }
 
+RenderPreferences* AnimationMaker::renderPreferences()
+{
+	return m_frameMaker->renderPreferences();
+}

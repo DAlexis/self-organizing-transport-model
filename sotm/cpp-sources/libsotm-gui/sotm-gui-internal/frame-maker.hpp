@@ -5,8 +5,9 @@
 #include "sotm-gui-internal/graph-wireframe-drawer.hpp"
 
 #include "sotm/base/model-context.hpp"
-#include <vtkRenderer.h>
+#include "sotm-gui-internal/render-preferences.hpp"
 
+#include <vtkRenderer.h>
 
 namespace sotm {
 
@@ -18,10 +19,22 @@ class FrameMaker
 public:
 	FrameMaker(ModelContext *modelContext);
 
-	void prepareNextFrame();
+	/**
+	 * Start next frame creation and swap buffers,
+	 * so next call of draw() cause drawing next frame
+	 */
+	void prepareNextFrameAndSwapBuffers();
+	/**
+	 * Redraw current frame without swapping buffers
+	 * so next call of draw() cause drawing current frame
+	 */
+	void recreateCurrentFrame();
 	void draw(vtkRenderer *renderer);
 
+	RenderPreferences* renderPreferences();
+
 private:
+	RenderPreferences m_renderPreferences;
 	GraphWireframeDrawer m_wireframeDrawer;
 };
 

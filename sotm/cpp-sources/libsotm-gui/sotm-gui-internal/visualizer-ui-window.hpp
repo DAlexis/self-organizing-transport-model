@@ -45,6 +45,8 @@ private slots:
 
   void on_pushButtonPauseAnimation_clicked();
 
+  void on_horizontalSlider_valueChanged(int value);
+
 private:
     void updateEdiableFields();
     void stopFrameWaiting();
@@ -53,6 +55,7 @@ private:
     void startAnimation();
     void stopAnimation();
     void updateModelInfo();
+    void reRenderCurrentFrame();
 
 	vtkSmartPointer<vtkRenderer> m_renderer{ vtkSmartPointer<vtkRenderer>::New() };
 

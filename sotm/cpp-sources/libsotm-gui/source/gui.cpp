@@ -93,7 +93,7 @@ int QtGUI::run(int argc, char** argv)
     }
 
     // Drawing first frame
-    m_frameMaker.prepareNextFrame();
+    m_frameMaker.prepareNextFrameAndSwapBuffers();
 	m_frameMaker.draw(renderWindowUIMultipleInheritance.renderer());
 
 	renderWindowUIMultipleInheritance.prepareUIToRun();
@@ -110,6 +110,11 @@ TimeIterator* QtGUI::timeIterator()
 AnimationMaker* QtGUI::animationMaker()
 {
 	return &(*m_animationMaker);
+}
+
+FrameMaker* QtGUI::frameMaker()
+{
+    return &m_frameMaker;
 }
 
 bool QtGUI::isStaticGraph()

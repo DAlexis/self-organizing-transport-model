@@ -9,10 +9,13 @@
 
 #include <vtkCellData.h>
 
+#include <cmath>
+
 using namespace sotm;
 
-GraphWireframeDrawer::GraphWireframeDrawer(sotm::ModelContext* modelContext) :
-	m_modelContext(modelContext)
+GraphWireframeDrawer::GraphWireframeDrawer(sotm::ModelContext* modelContext, RenderPreferences* renderPreferences) :
+	m_modelContext(modelContext),
+	m_renderPreferences(renderPreferences)
 {
 }
 
@@ -79,7 +82,12 @@ void GraphWireframeDrawer::linkVisitor(sotm::Link* link)
 
 	double rgb[3] = {1.0, 1.0, 1.0};
 	link->payload->getColor(rgb);
-	unsigned char color_uchar[3] = { rgb[0]*255, rgb[1]*255, rgb[2]*255 };
+	unsigned char color_uchar[3] =
+		{
+			(unsigned char) ( pow(rgb[0], m_renderPreferences->gamma)*255 ),
+			(unsigned char) ( pow(rgb[1], m_renderPreferences->gamma)*255 ),
+			(unsigned char) ( pow(rgb[2], m_renderPreferences->gamma)*255 )
+		};
 	m_nextBuffer->colors->InsertNextTupleValue(color_uchar);
 
 	m_nextBuffer->linesCellArray->InsertNextCell(line);

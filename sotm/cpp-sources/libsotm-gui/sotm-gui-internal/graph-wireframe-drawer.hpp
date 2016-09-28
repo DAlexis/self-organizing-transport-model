@@ -9,8 +9,10 @@
 #define LIBSOTM_GUI_GRAPH_WIREFRAME_DRAWER_HPP_
 
 #include "sotm/base/model-context.hpp"
+#include "sotm-gui-internal/render-preferences.hpp"
 
-#include "vtkDataSet.h"
+
+#include <vtkDataSet.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
@@ -22,19 +24,18 @@
 #include <vtkSmartPointer.h>
 
 #include <vector>
+namespace sotm {
 
 class GraphWireframeDrawer
 {
 public:
-	GraphWireframeDrawer(sotm::ModelContext* modelContext);
+	GraphWireframeDrawer(ModelContext* modelContext, RenderPreferences* renderPreferences);
 	void prepareNextActor();
 	vtkSmartPointer<vtkActor> getCurrentActor();
 	void swapBuffers();
 
 private:
 	void linkVisitor(sotm::Link* link);
-
-	sotm::ModelContext* m_modelContext;
 
 	struct WireframeBuffer {
 		WireframeBuffer();
@@ -52,9 +53,13 @@ private:
 
 	};
 
+	sotm::ModelContext* m_modelContext;
+	RenderPreferences* m_renderPreferences;
+
 	WireframeBuffer m_buffer[2];
 	WireframeBuffer *m_nextBuffer = &(m_buffer[0]), *m_currentBuffer = &(m_buffer[1]);
 };
 
+}
 
 #endif /* LIBSOTM_GUI_GRAPH_WIREFRAME_DRAWER_HPP_ */
