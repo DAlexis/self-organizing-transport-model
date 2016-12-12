@@ -23,7 +23,7 @@ void FrameMaker::recreateCurrentFrame()
 void FrameMaker::draw(vtkRenderer *renderer)
 {
 	renderer->RemoveAllViewProps();
-	renderer->AddActor(m_wireframeDrawer.getCurrentActor());
+	m_wireframeDrawer.addCurrentActors(renderer);
 }
 
 RenderPreferences* FrameMaker::renderPreferences()

@@ -37,6 +37,10 @@ public:
 	/// Get object color for visualization purpose. Color is RGB array. Each color is from interval [0.0; 1.0]
 	virtual void getColor(double* rgb);
 
+	/// Get object size for visualization purpose. Normal size if 1.0
+	virtual double getSize();
+
+
 protected:
 	constexpr static double defaultColor[3] = {1.0, 0.8, 0.3};
 	/// This function should be called by physical payload

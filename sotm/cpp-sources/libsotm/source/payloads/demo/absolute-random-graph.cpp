@@ -24,7 +24,8 @@ void RandomGraphNodePayload::getBranchingParameters(double time, double dt, Bran
 
 		dir.x[0] = Random::uniform(-1.0, 1.0);
 		dir.x[1] = Random::uniform(-1.0, 1.0);
-		dir.x[2] = sqrt(1 - sqr(dir.x[0]) - sqr(dir.x[1]));
+		double tmp = 1 - sqr(dir.x[0]) - sqr(dir.x[1]);
+		dir.x[2] = tmp > 0 ? sqr(tmp) : 0.0;
 		branchingParameters.direction = dir;
 		branchingParameters.length = 0.1 + Random::uniform(0.0, 1.0);
 	} else {

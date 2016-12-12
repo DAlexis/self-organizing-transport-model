@@ -70,10 +70,14 @@ bool VisualizerUIWindow::shouldAnimationContinued()
     return m_gui->timeIterator()->getTime() < doubleSpinBoxIterateTo->value();
 }
 
-void VisualizerUIWindow::prepareAndWaitNextFrame()
+void VisualizerUIWindow::startFrameTimer()
 {
-    // Starting timer while frame is generating
-    m_animationTimer->start(1000 / m_gui->animationMaker()->getFps());
+	// Starting timer while frame is generating
+	m_animationTimer->start(1000 / m_gui->animationMaker()->getFps());
+}
+
+void VisualizerUIWindow::prepareNextFrame()
+{
     updateModelInfo();
     m_gui->animationMaker()->drawNextFrame();
     m_gui->animationMaker()->iterateToNextFrame();
@@ -82,7 +86,8 @@ void VisualizerUIWindow::prepareAndWaitNextFrame()
 
 void VisualizerUIWindow::startAnimation()
 {
-    prepareAndWaitNextFrame();
+	startFrameTimer();
+    prepareNextFrame();
 
     pushButtonOneIteration->setEnabled(false);
     pushButtonStartAnimation->setEnabled(false);
@@ -130,7 +135,8 @@ void VisualizerUIWindow::on_animationTimerTimeout()
     stopFrameWaiting();
     if (shouldAnimationContinued())
     {
-        prepareAndWaitNextFrame();
+    	startFrameTimer();
+        prepareNextFrame();
     } else {
         m_gui->animationMaker()->drawNextFrame();
         this->qvtkWidget->repaint();
@@ -143,6 +149,7 @@ void VisualizerUIWindow::on_pushButtonOneIteration_clicked()
     if (!m_gui->isStaticGraph())
     {
     	m_gui->animationMaker()->doIteration();
+    	prepareNextFrame();
         this->qvtkWidget->repaint();
         updateModelInfo();
     }

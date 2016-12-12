@@ -66,6 +66,11 @@ void AnyPhysicalPayloadBase::getColor(double* rgb)
 	rgb[0] = defaultColor[0]; rgb[1] = defaultColor[1]; rgb[2] = defaultColor[2];
 }
 
+double AnyPhysicalPayloadBase::getSize()
+{
+	return 1.0;
+}
+
 void AnyPhysicalPayloadBase::onDeletePayload()
 {
 	ASSERT(m_payloadsRegister != nullptr, "AnyPhysicalPayloadBase::onDeletePayload() must be called while m_payloadsRegister != nullptr");

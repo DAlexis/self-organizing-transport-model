@@ -51,7 +51,8 @@ private:
     void updateEdiableFields();
     void stopFrameWaiting();
     bool shouldAnimationContinued();
-    void prepareAndWaitNextFrame();
+    void startFrameTimer();
+    void prepareNextFrame();
     void startAnimation();
     void stopAnimation();
     void updateModelInfo();
