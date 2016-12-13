@@ -26,7 +26,15 @@ class IContinuousTimeIterable
 public:
 	virtual ~IContinuousTimeIterable() { }
 
-	/// Calculate right hand side with falues of f(time, xCurrent, xCurrent of other objects)
+	/** Calculate secondary values thats are trivial function of quantities and does not
+	 * contain any differential operators. This function should be called for all objects
+	 * before calling calculateRHS
+	 */
+	virtual void calculateSecondaryValues() = 0;
+
+	/** Calculate right hand side with values of
+	 * f(time, xCurrent, xCurrent of other objects, secondaryValues of other objects)
+	 */
 	virtual void calculateRHS(double time) = 0;
 
 	/// Adds rhs multiplied by m to xDelta

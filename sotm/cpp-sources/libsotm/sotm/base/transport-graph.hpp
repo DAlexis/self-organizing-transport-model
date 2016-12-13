@@ -19,6 +19,12 @@ class LinkPayloadBase;
 class ModelContext;
 class IPhysicalContext;
 
+enum class LinkDirection
+{
+	in = 1,
+	out = -1
+};
+
 class GraphRegister
 {
 public:
@@ -73,10 +79,13 @@ protected:
 class Node : public ModelContextDependent, public SelfMemMgr
 {
 public:
+	using LinkVisitor = std::function<void(Link*, LinkDirection)>;
+
 	Node(ModelContext* context, Point<3> pos = Point<3>());
 	~Node();
 	void addLink(Link* link);
 	void removeLink(Link* link);
+	void applyLinkVisitor(LinkVisitor visitor);
 
 	std::unique_ptr<NodePayloadBase> payload;
 

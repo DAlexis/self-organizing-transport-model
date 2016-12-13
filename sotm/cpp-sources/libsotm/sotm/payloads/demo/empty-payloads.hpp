@@ -20,6 +20,7 @@ public:
 	void destroyGraph();
 	bool readyToDestroy();
 
+	virtual void calculateSecondaryValues() override {}
 	virtual void calculateRHS(double time) override { UNUSED_ARG(time); }
 	virtual void addRHSToDelta(double m) override { UNUSED_ARG(m); }
 	virtual void makeSubIteration(double dt) override { UNUSED_ARG(dt); }

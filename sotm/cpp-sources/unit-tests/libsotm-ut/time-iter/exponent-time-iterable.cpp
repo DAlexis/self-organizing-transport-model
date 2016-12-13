@@ -8,10 +8,15 @@
 #include "exponent-time-iterable.hpp"
 #include "sotm/utils/macros.hpp"
 
+void Exponent::calculateSecondaryValues()
+{
+	tmp = xCurrent;
+}
+
 void Exponent::calculateRHS(double time)
 {
 	UNUSED_ARG(time);
-	rhs = xCurrent;
+	rhs = tmp;
 }
 
 void Exponent::addRHSToDelta(double m)

@@ -3,8 +3,10 @@
 
 #include "sotm/utils/memory.hpp"
 #include "sotm/utils/assert.hpp"
+#include "sotm/math/generic.hpp"
 
 #include <string>
+#include <cmath>
 #include <initializer_list>
 
 namespace sotm
@@ -48,8 +50,17 @@ public:
     
     
     Point() { }
-    double x[dim];
     
+    double len()
+    {
+    	double result = 0;
+    	for (int i=0; i<dim; i++)
+    	{
+    		result += sqr(x[i]);
+    	}
+    	return sqrt(result);
+    }
+
     Point<dim> operator=(std::initializer_list<double> initList)
     {
         ASSERT(dim == initList.size(),
@@ -154,6 +165,8 @@ public:
     }
 
     inline double& operator[](unsigned int i) { return x[i]; }
+
+    double x[dim];
 };
 
 using Direction = Point<3>;

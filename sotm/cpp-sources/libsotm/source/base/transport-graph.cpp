@@ -149,6 +149,17 @@ void Node::removeLink(Link* link)
 	ASSERT(count != 0, "Removing link that was not connected");
 }
 
+void Node::applyLinkVisitor(LinkVisitor visitor)
+{
+	for (auto it = m_links.begin(); it != m_links.end(); it++)
+	{
+		LinkDirection dir = LinkDirection::in;
+		if ((*it)->getNode1().data() == this)
+			dir = LinkDirection::out;
+		visitor(*it, dir);
+	}
+}
+
 Link::Link(ModelContext* context) :
 	ModelContextDependent(context)
 {

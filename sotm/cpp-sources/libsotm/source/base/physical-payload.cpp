@@ -25,6 +25,12 @@ void PhysicalPayloadsRegister::remove(AnyPhysicalPayloadBase* payload)
 	ASSERT(count == 1, "Removing payload without adding");
 }
 
+void PhysicalPayloadsRegister::calculateSecondaryValues()
+{
+	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
+		(*it)->calculateSecondaryValues();
+}
+
 void PhysicalPayloadsRegister::calculateRHS(double time)
 {
 	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)

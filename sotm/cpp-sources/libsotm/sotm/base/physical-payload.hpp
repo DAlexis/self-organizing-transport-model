@@ -19,6 +19,7 @@ public:
 	void add(AnyPhysicalPayloadBase* payload);
 	void remove(AnyPhysicalPayloadBase* payload);
 
+	void calculateSecondaryValues() override final;
 	void calculateRHS(double time) override final;
 	void addRHSToDelta(double m) override final;
 	void makeSubIteration(double dt) override final;
@@ -33,6 +34,8 @@ class AnyPhysicalPayloadBase : public IContinuousTimeIterable, public IBifurcati
 public:
 	AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg);
 	virtual ~AnyPhysicalPayloadBase();
+
+	virtual void calculateSecondaryValues() { }
 
 	/// Get object color for visualization purpose. Color is RGB array. Each color is from interval [0.0; 1.0]
 	virtual void getColor(double* rgb);

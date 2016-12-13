@@ -26,6 +26,7 @@ public:
 	NodePayloadBase* createNodePayload(Node* node);
 	LinkPayloadBase* createLinkPayload(Link* node);
 
+	void calculateSecondaryValues() override final;
 	void calculateRHS(double time) override final;
 	void addRHSToDelta(double m) override final;
 	void makeSubIteration(double dt) override final;

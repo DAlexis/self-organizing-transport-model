@@ -12,6 +12,7 @@ set(LIB_SOURCE
     ${PROJECT_SOURCE_DIR}/source/time-iter/euler-explicit.cpp
     ${PROJECT_SOURCE_DIR}/source/payloads/demo/empty-payloads.cpp
     ${PROJECT_SOURCE_DIR}/source/payloads/demo/absolute-random-graph.cpp
+    ${PROJECT_SOURCE_DIR}/source/payloads/electrostatics/electrostatics-simple.cpp
 )
 
 set(LIB_HPP
