@@ -77,6 +77,11 @@ double AnyPhysicalPayloadBase::getSize()
 	return 1.0;
 }
 
+std::string AnyPhysicalPayloadBase::getFollowerText()
+{
+	return std::string();
+}
+
 void AnyPhysicalPayloadBase::onDeletePayload()
 {
 	ASSERT(m_payloadsRegister != nullptr, "AnyPhysicalPayloadBase::onDeletePayload() must be called while m_payloadsRegister != nullptr");

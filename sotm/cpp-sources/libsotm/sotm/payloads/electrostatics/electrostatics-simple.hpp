@@ -57,6 +57,8 @@ public:
 
 	void getColor(double* rgb) override;
 
+	std::string getFollowerText() override;
+
 	void setCharge(double charge);
 
 	static void setChargeColorLimits(double chargeMin, double chargeMax);

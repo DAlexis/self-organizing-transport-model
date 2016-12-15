@@ -4,6 +4,10 @@
 
 #include <iostream>
 
+#include <ios>
+#include <iomanip>
+#include <sstream>
+
 using namespace std;
 
 using namespace sotm;
@@ -126,10 +130,16 @@ void ElectrostaticNodePayload::getColor(double* rgb)
 	if (v < 0.0) v = 0.0;
 	if (v > 1.0) v = 1.0;
 
-//	cout << "v = " << v << endl;
 	rgb[0] = v;
 	rgb[1] = 0;
 	rgb[2] = 1.0-v;
+}
+
+std::string ElectrostaticNodePayload::getFollowerText()
+{
+	std::ostringstream ss;
+	ss << "  q = " << std::scientific << std::setprecision(2) << charge;
+	return ss.str();
 }
 
 void ElectrostaticNodePayload::setCharge(double charge)

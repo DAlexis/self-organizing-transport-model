@@ -22,6 +22,7 @@
 #include <vtkLine.h>
 #include <vtkActor.h>
 #include <vtkSmartPointer.h>
+#include <vtkFollower.h>
 
 #include <vector>
 
@@ -31,14 +32,13 @@ class SphereDrawer
 {
 public:
 	SphereDrawer();
-	SphereDrawer(Point<3> pos, double radius, double color[3]);
-	void create(Point<3> pos, double radius, double color[3]);
-	vtkSmartPointer<vtkActor> actor();
+	SphereDrawer(Point<3> pos, double radius, double color[3], const std::string& follower = std::string());
+	void create(Point<3> pos, double radius, double color[3], const std::string& follower = std::string());
+	void addActors(vtkRenderer* renderer);
 
 private:
-	vtkSmartPointer<vtkSphereSource> m_source;
-	vtkSmartPointer<vtkPolyDataMapper> m_mapper;
-	vtkSmartPointer<vtkActor> m_actor;
+	vtkSmartPointer<vtkActor> m_actor = nullptr;
+	vtkSmartPointer<vtkFollower> m_label = nullptr;
 };
 
 class GraphWireframeDrawer
@@ -58,6 +58,7 @@ private:
 		void clear();
 		void prepareWireframeActor();
 
+		// @todo Remove most of this objects from class: smart pointers do its job successfully without this
 		vtkSmartPointer<vtkPoints>            points{ vtkSmartPointer<vtkPoints>::New() };
 		vtkSmartPointer<vtkCellArray>         linesCellArray{ vtkSmartPointer<vtkCellArray>::New() };
 		vtkSmartPointer<vtkPolyData>          polyData{ vtkSmartPointer<vtkPolyData>::New() };

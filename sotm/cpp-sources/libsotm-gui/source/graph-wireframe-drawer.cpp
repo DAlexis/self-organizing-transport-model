@@ -9,6 +9,7 @@
 
 #include <vtkCellData.h>
 #include <vtkProperty.h>
+#include <vtkVectorText.h>
 
 #include <cmath>
 
@@ -18,28 +19,51 @@ SphereDrawer::SphereDrawer()
 {
 }
 
-SphereDrawer::SphereDrawer(Point<3> pos, double radius, double color[3])
+SphereDrawer::SphereDrawer(Point<3> pos, double radius, double color[3], const std::string& follower)
 {
-	create(pos, radius, color);
+	create(pos, radius, color, follower);
 }
 
-void SphereDrawer::create(Point<3> pos, double radius, double color[3])
+void SphereDrawer::create(Point<3> pos, double radius, double color[3], const std::string& follower)
 {
-	m_source = vtkSmartPointer<vtkSphereSource>::New();
+	vtkSmartPointer<vtkSphereSource> m_source = vtkSmartPointer<vtkSphereSource>::New();
 	m_source->SetCenter(pos.x);
 	m_source->SetRadius(radius);
 
-	m_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	vtkSmartPointer<vtkPolyDataMapper> m_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 	m_mapper->SetInputConnection(m_source->GetOutputPort());
+
+	if (!follower.empty())
+	{
+		vtkSmartPointer<vtkVectorText> textSource = vtkSmartPointer<vtkVectorText>::New();
+		textSource->SetText(follower.c_str());
+
+		// Create a mapper
+		vtkSmartPointer<vtkPolyDataMapper> textMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+		textMapper->SetInputConnection( textSource->GetOutputPort() );
+
+		m_label = vtkSmartPointer<vtkFollower>::New();
+		m_label->SetMapper( textMapper );
+		m_label->GetProperty()->SetColor( 1, 0, 0 ); // red
+		m_label->SetPosition(pos.x);
+		m_label->PickableOff();
+		m_label->SetScale(0.1);
+	}
 
 	m_actor = vtkSmartPointer<vtkActor>::New();
 	m_actor->GetProperty()->SetColor(color);
 	m_actor->SetMapper(m_mapper);
 }
 
-vtkSmartPointer<vtkActor> SphereDrawer::actor()
+void SphereDrawer::addActors(vtkRenderer* renderer)
 {
-	return m_actor;
+	renderer->AddActor(m_actor);
+	if (m_label)
+	{
+		m_label->SetCamera(renderer->GetActiveCamera());
+		renderer->AddActor(m_label);
+	}
+
 }
 
 GraphWireframeDrawer::GraphWireframeDrawer(sotm::ModelContext* modelContext, RenderPreferences* renderPreferences) :
@@ -73,7 +97,7 @@ void GraphWireframeDrawer::addCurrentActors(vtkRenderer* renderer)
 	renderer->AddActor(m_currentBuffer->actor);
 
 	for (auto& sd : m_currentBuffer->sphereDrawers)
-		renderer->AddActor(sd.actor());
+		sd.addActors(renderer);
 }
 
 GraphWireframeDrawer::WireframeBuffer::WireframeBuffer()
@@ -137,5 +161,5 @@ void GraphWireframeDrawer::nodeVisitor(sotm::Node* node)
 {
 	double rgb[3];
 	node->payload->getColor(rgb);
-	m_nextBuffer->sphereDrawers.push_back(SphereDrawer(node->pos, node->payload->getSize() * 0.1, rgb));
+	m_nextBuffer->sphereDrawers.push_back(SphereDrawer(node->pos, node->payload->getSize() * 0.1, rgb, node->payload->getFollowerText()));
 }

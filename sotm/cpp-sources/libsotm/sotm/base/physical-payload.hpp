@@ -6,6 +6,7 @@
 #include "sotm/utils/memory.hpp"
 #include <vector>
 #include <set>
+#include <string>
 
 namespace sotm
 {
@@ -42,6 +43,8 @@ public:
 
 	/// Get object size for visualization purpose. Normal size if 1.0
 	virtual double getSize();
+
+	virtual std::string getFollowerText();
 
 
 protected:
