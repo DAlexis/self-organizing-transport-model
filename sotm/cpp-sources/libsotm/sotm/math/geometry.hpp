@@ -12,6 +12,11 @@
 namespace sotm
 {
 
+struct SphericalPoint
+{
+	double theta, phi;
+};
+
 template<int dim>
 class Point
 {

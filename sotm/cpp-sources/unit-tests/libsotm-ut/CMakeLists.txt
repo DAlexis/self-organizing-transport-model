@@ -11,6 +11,7 @@ include_directories (
 
 set(EXE_SOURCES
     math/geometry-ut.cpp
+    math/integration-ut.cpp
     base/transport-graph-ut.cpp
     utils/memory-ut.cpp
     payloads/demo/empty-payload-ut.cpp
