@@ -3,9 +3,11 @@ cmake_minimum_required(VERSION 2.8)
 project(sotm)
 
 set(LIB_SOURCE
+    ${PROJECT_SOURCE_DIR}/source/math/generic.cpp
     ${PROJECT_SOURCE_DIR}/source/math/geometry.cpp
     ${PROJECT_SOURCE_DIR}/source/math/random.cpp
     ${PROJECT_SOURCE_DIR}/source/math/integration.cpp
+    ${PROJECT_SOURCE_DIR}/source/math/distrib-gen.cpp
     ${PROJECT_SOURCE_DIR}/source/base/transport-graph.cpp
     ${PROJECT_SOURCE_DIR}/source/base/physical-payload.cpp
     ${PROJECT_SOURCE_DIR}/source/base/model-context.cpp
@@ -24,6 +26,7 @@ set(LIB_HPP
     ${PROJECT_SOURCE_DIR}/sotm/math/random.hpp
     ${PROJECT_SOURCE_DIR}/sotm/math/generic.hpp
     ${PROJECT_SOURCE_DIR}/sotm/math/integration.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/math/distrib-gen.hpp
     ${PROJECT_SOURCE_DIR}/sotm/utils/memory.hpp
     ${PROJECT_SOURCE_DIR}/sotm/utils/assert.hpp
     ${PROJECT_SOURCE_DIR}/sotm/utils/macros.hpp

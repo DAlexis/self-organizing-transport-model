@@ -11,7 +11,7 @@
 
 using namespace sotm;
 
-DefinedIntegral::DefinedIntegral(Function target, double from, double to, size_t pointsCount) :
+DefinedIntegral::DefinedIntegral(Function1D target, double from, double to, size_t pointsCount) :
 		m_from(from),
 		m_to(to)
 {

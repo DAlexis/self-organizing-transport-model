@@ -10,6 +10,7 @@ include_directories (
 )
 
 set(EXE_SOURCES
+    math/generic-ut.cpp
     math/geometry-ut.cpp
     math/integration-ut.cpp
     base/transport-graph-ut.cpp

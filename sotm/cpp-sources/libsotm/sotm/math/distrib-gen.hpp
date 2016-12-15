@@ -9,7 +9,8 @@
 #define LIBSOTM_SOTM_DISTRIB_DISTRIB_GEN_HPP_
 
 #include "sotm/math/geometry.hpp"
-#include "sotm/math/geometry.hpp"
+#include "sotm/math/generic.hpp"
+
 
 namespace sotm
 {
@@ -17,11 +18,14 @@ namespace sotm
 /**
  * Result of throw with not normed distribution
  */
+template<typename T>
 struct DistributionResult
 {
-	double value = 0.0;
+	T value;
 	bool isHappened = false;
 };
+
+DistributionResult<SphericalPoint> generateDischargeDirection(double E0, double E1, Function1D integralDistribution);
 
 }
 

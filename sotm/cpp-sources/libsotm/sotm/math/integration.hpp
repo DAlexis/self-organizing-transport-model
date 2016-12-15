@@ -8,7 +8,8 @@
 #ifndef LIBSOTM_SOTM_MATH_INTEGRATION_HPP_
 #define LIBSOTM_SOTM_MATH_INTEGRATION_HPP_
 
-#include <functional>
+#include "sotm/math/generic.hpp"
+
 #include <vector>
 
 namespace sotm {
@@ -16,9 +17,7 @@ namespace sotm {
 class DefinedIntegral
 {
 public:
-	using Function = std::function<double(double)>;
-
-	DefinedIntegral(Function target, double from, double to, size_t pointsCount);
+	DefinedIntegral(Function1D target, double from, double to, size_t pointsCount);
 	double operator()(double arg);
 
 private:
