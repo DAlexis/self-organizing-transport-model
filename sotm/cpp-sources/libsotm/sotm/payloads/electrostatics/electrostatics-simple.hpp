@@ -57,6 +57,9 @@ public:
 
 	void getColor(double* rgb) override;
 
+	void setCharge(double charge);
+
+	static void setChargeColorLimits(double chargeMin, double chargeMax);
 	// Parameters
 	double radius = 0.01;
 
@@ -75,6 +78,10 @@ public:
 
 	// Delta
 	double charge_delta = 0;
+
+private:
+	static double chargeMin;
+	static double chargeMax;
 };
 
 class ElectrostaticLinkPayload : public LinkPayloadBase
@@ -91,7 +98,7 @@ public:
 	void doBifurcation(double time, double dt) override;
 
 	// Parameters
-	double conductivity = 0;
+	double conductivity = 1e-13;
 
 	// Primary
 

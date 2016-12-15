@@ -149,7 +149,7 @@ void Node::removeLink(Link* link)
 	ASSERT(count != 0, "Removing link that was not connected");
 }
 
-void Node::applyLinkVisitor(LinkVisitor visitor)
+void Node::applyConnectedLinksVisitor(LinkVisitor visitor)
 {
 	for (auto it = m_links.begin(); it != m_links.end(); it++)
 	{

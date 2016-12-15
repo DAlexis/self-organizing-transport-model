@@ -19,6 +19,8 @@ int main(int argc, char** argv)
 	c.setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory>(new ElectrostaticLinkPayloadFactory()));
 	c.setPhysicalContext(std::unique_ptr<IPhysicalContext>(new ElectrostaticPhysicalContext()));
 
+	ElectrostaticNodePayload::setChargeColorLimits(0.0, 10e-9);
+
 	{ // Scope to remove pointers
 
 		/// Building initial tree
@@ -38,13 +40,15 @@ int main(int argc, char** argv)
 		l1->connect(n2, n3);
 		l2->connect(n2, n4);
 		l3->connect(n2, n5);
+
+		static_cast<ElectrostaticNodePayload*>(n1->payload.get())->setCharge(10e-9);
 	}
 
 	// Time iteration
 	EulerExplicitIterator euler;
 	TimeIterator iter(&c, &euler, &c);
 	iter.setTime(0.0);
-	iter.setStep(0.1);
+	iter.setStep(0.001);
 	iter.setStopTime(1.0);
 
 	// Running GUI

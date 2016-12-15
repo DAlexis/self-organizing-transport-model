@@ -85,7 +85,7 @@ public:
 	~Node();
 	void addLink(Link* link);
 	void removeLink(Link* link);
-	void applyLinkVisitor(LinkVisitor visitor);
+	void applyConnectedLinksVisitor(LinkVisitor visitor);
 
 	std::unique_ptr<NodePayloadBase> payload;
 

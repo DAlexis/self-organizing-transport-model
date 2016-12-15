@@ -8,6 +8,7 @@
 #include "sotm-gui-internal/graph-wireframe-drawer.hpp"
 
 #include <vtkCellData.h>
+#include <vtkProperty.h>
 
 #include <cmath>
 
@@ -32,6 +33,7 @@ void SphereDrawer::create(Point<3> pos, double radius, double color[3])
 	m_mapper->SetInputConnection(m_source->GetOutputPort());
 
 	m_actor = vtkSmartPointer<vtkActor>::New();
+	m_actor->GetProperty()->SetColor(color);
 	m_actor->SetMapper(m_mapper);
 }
 

@@ -2,7 +2,14 @@
 #include "sotm/base/model-context.hpp"
 #include "sotm/utils/const.hpp"
 
+#include <iostream>
+
+using namespace std;
+
 using namespace sotm;
+
+double ElectrostaticNodePayload::chargeMin = 0.0;
+double ElectrostaticNodePayload::chargeMax = 10e-9;
 
 void ElectrostaticPhysicalContext::destroyGraph()
 {
@@ -57,6 +64,9 @@ void ElectrostaticNodePayload::calculateSecondaryValues()
 	Point<3> r0 = node->pos;
 
 	auto nodeVisitor = [this, &r0](Node* node) {
+		// Skip this node
+		if (node == this->node.data())
+			return;
 		Point<3> r1 = node->pos;
 
 		double dist = (r0 - r1).len();
@@ -64,11 +74,11 @@ void ElectrostaticNodePayload::calculateSecondaryValues()
 
 		double charge = static_cast<ElectrostaticNodePayload*>(node->payload.get())->charge;
 
-		phi += charge / dist;
+		phi += Const::Si::k * charge / dist;
 
-		externalField[0] += charge * (r0[0]-r1[0]) / dist3;
-		externalField[1] += charge * (r0[1]-r1[1]) / dist3;
-		externalField[2] += charge * (r0[2]-r1[2]) / dist3;
+		externalField[0] += Const::Si::k * charge * (r0[0]-r1[0]) / dist3;
+		externalField[1] += Const::Si::k * charge * (r0[1]-r1[1]) / dist3;
+		externalField[2] += Const::Si::k * charge * (r0[2]-r1[2]) / dist3;
 	};
 
 	node->context()->graphRegister.applyNodeVisitor(nodeVisitor);
@@ -78,10 +88,10 @@ void ElectrostaticNodePayload::calculateRHS(double time)
 {
 	charge_rhs = 0;
 	auto linkVisitor = [this](Link* link, LinkDirection dir){
-		charge_rhs += static_cast<ElectrostaticLinkPayload*>(link->payload.get())->current
-				* (dir == LinkDirection::in ? 1 : -1);
+		double current = static_cast<ElectrostaticLinkPayload*>(link->payload.get())->current;
+		charge_rhs += current * (dir == LinkDirection::in ? 1.0 : -1.0);
 	};
-	node->applyLinkVisitor(linkVisitor);
+	node->applyConnectedLinksVisitor(linkVisitor);
 }
 
 void ElectrostaticNodePayload::addRHSToDelta(double m)
@@ -97,6 +107,7 @@ void ElectrostaticNodePayload::makeSubIteration(double dt)
 void ElectrostaticNodePayload::step()
 {
 	charge = charge_prev = charge_prev + charge_delta;
+	charge_delta = 0.0;
 }
 
 void ElectrostaticNodePayload::doBifurcation(double time, double dt)
@@ -111,15 +122,26 @@ void ElectrostaticNodePayload::doBifurcation(double time, double dt)
 
 void ElectrostaticNodePayload::getColor(double* rgb)
 {
-	double v = charge_prev * 10e-6;
+	double v = (charge_prev - chargeMin) / (chargeMax - chargeMin);
 	if (v < 0.0) v = 0.0;
 	if (v > 1.0) v = 1.0;
 
-	rgb[0] = 0;
-	rgb[1] = v;
+//	cout << "v = " << v << endl;
+	rgb[0] = v;
+	rgb[1] = 0;
 	rgb[2] = 1.0-v;
 }
 
+void ElectrostaticNodePayload::setCharge(double charge)
+{
+	charge_prev = this->charge = charge;
+}
+
+void ElectrostaticNodePayload::setChargeColorLimits(double chargeMin, double chargeMax)
+{
+	ElectrostaticNodePayload::chargeMin = chargeMin;
+	ElectrostaticNodePayload::chargeMax = chargeMax;
+}
 
 ////////////////////////////////////
 ////////////////////////////////////
@@ -139,7 +161,7 @@ void ElectrostaticLinkPayload::calculateSecondaryValues()
 	Node* n2 = link->getNode2();
 	ElectrostaticNodePayload* p2 = static_cast<ElectrostaticNodePayload*>(n2->payload.get());
 
-	current = (p2->phi - p1->phi) * conductivity;
+	current = (p1->phi - p2->phi) * conductivity;
 }
 
 void ElectrostaticLinkPayload::calculateRHS(double time) { }
