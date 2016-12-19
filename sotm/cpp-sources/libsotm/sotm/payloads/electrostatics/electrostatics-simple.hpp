@@ -27,6 +27,9 @@ public:
 
 	void doBifurcation(double time, double dt) { UNUSED_ARG(time); UNUSED_ARG(dt); }
 
+	void setDischargeFunc(Function1D func);
+
+
 	static inline ElectrostaticPhysicalContext* cast(IPhysicalContext* context)
 	{
 		return static_cast<ElectrostaticPhysicalContext*>(context);
@@ -39,6 +42,7 @@ public:
 
 private:
 	bool m_readyToDestroy = false;
+	Function1D m_dischargeProb{zero};
 };
 
 class ElectrostaticNodePayload : public NodePayloadBase

@@ -9,6 +9,11 @@
 
 using namespace sotm;
 
+double sotm::zero(double)
+{
+	return 0.0;
+}
+
 MonotonicFunctionSolver::MonotonicFunctionSolver(Function1D func, double from, double to, double precision) :
 		m_func(func),
 		m_from(from),

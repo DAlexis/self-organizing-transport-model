@@ -25,7 +25,7 @@ TEST(generateDischargeDirection, E1zero)
 
 	for (int i=0; i<50000; i++)
 	{
-		DistributionResult<SphericalPoint> res = generateDischargeDirection(1, 1, 1.0, 0.0, intF);
+		DistributionResult<SphericalPoint> res = generateDischargeDirection(1, 1, 1.0, 0.0, f, intF);
 		if (res.isHappened) {
 			if (res.value.theta < Const::pi / 2.0)
 				countFrom0ToPi_2++;
@@ -43,7 +43,7 @@ TEST(generateDischargeDirection, E1zero)
 
 }
 
-TEST(generateDischargeDirection, E1E0)
+TEST(generateDischargeDirection, E1E0eq)
 {
 	auto f = [](double E) { return fabs(E) * 0.01; };
 	DefinedIntegral intF(f, -10, 10, 10000);
@@ -54,7 +54,7 @@ TEST(generateDischargeDirection, E1E0)
 	//ofstream fl("points.txt", fstream::out);
 	for (int i=0; i<50000; i++)
 	{
-		DistributionResult<SphericalPoint> res = generateDischargeDirection(1.0, 1.0, 1.0, 1.0, intF);
+		DistributionResult<SphericalPoint> res = generateDischargeDirection(1.0, 1.0, 1.0, 1.0, f, intF);
 		if (res.isHappened) {
 			if (res.value.theta > 1.0 && res.value.theta < 1.5)
 				countFrom10to15++;
@@ -66,7 +66,7 @@ TEST(generateDischargeDirection, E1E0)
 	ASSERT_NEAR((double)countFrom10to15 / countFrom20to25, 4.22, 0.8);
 }
 
-TEST(generateDischargeDirection, E1E0other)
+TEST(generateDischargeDirection, E1E0eqOther)
 {
 	auto f = [](double E) { return fabs(E) * 0.1; };
 	DefinedIntegral intF(f, -10, 10, 10000);
@@ -77,7 +77,7 @@ TEST(generateDischargeDirection, E1E0other)
 	//ofstream fl("points.txt", fstream::out);
 	for (int i=0; i<50000; i++)
 	{
-		DistributionResult<SphericalPoint> res = generateDischargeDirection(0.1, 1.0, 1.0, 1.0, intF);
+		DistributionResult<SphericalPoint> res = generateDischargeDirection(0.1, 1.0, 1.0, 1.0, f, intF);
 		if (res.isHappened) {
 			if (res.value.theta > 1.0 && res.value.theta < 1.5)
 				countFrom10to15++;
@@ -87,5 +87,55 @@ TEST(generateDischargeDirection, E1E0other)
 		}
 	}
 	ASSERT_NEAR((double)countFrom10to15 / countFrom20to25, 4.22, 0.8);
+}
+
+TEST(generateDischargeDirection, E0zero)
+{
+	auto f = [](double E) { return fabs(E) * 0.1; };
+	DefinedIntegral intF(f, -10, 10, 10000);
+
+	size_t countFrom0ToPi_2 = 0;
+	size_t countFromPi_2ToPi = 0;
+
+
+	//fstream fl("points.txt", fstream::out);
+	for (int i=0; i<50000; i++)
+	{
+		DistributionResult<SphericalPoint> res = generateDischargeDirection(0.1, 1.0, 0.0, 1.0, f, intF);
+		if (res.isHappened) {
+			if (res.value.theta < Const::pi / 2.0)
+				countFrom0ToPi_2++;
+			else
+				countFromPi_2ToPi++;
+			//fl << res.value.theta << " ";
+		}
+	}
+	ASSERT_NEAR(((double) countFrom0ToPi_2) / countFromPi_2ToPi, 1.0, 0.05);
+}
+
+TEST(generateDischargeDirection, E0moreThanE1)
+{
+	auto f = [](double E) { return E * E * 0.1; };
+	DefinedIntegral intF(f, -10, 10, 10000);
+
+	size_t countFrom00To21 = 0;
+	size_t countFrom21ToPi = 0;
+
+
+	//fstream fl("points.txt", fstream::out);
+	for (int i=0; i<50000; i++)
+	{
+		DistributionResult<SphericalPoint> res = generateDischargeDirection(0.1, 1.0, 2.0, 1.0, f, intF);
+		if (res.isHappened) {
+			if (res.value.theta < 2.1)
+				countFrom00To21++;
+			else
+				countFrom21ToPi++;
+			//fl << res.value.theta << " ";
+		}
+	}
+	cout << "countFrom00To21 = " << countFrom00To21 << " countFrom21ToPi = " << countFrom21ToPi << endl;
+	cout << (double) countFrom00To21 / countFrom21ToPi << endl;
+	ASSERT_NEAR((double) countFrom00To21 / countFrom21ToPi, 25.9, 4.0);
 }
 

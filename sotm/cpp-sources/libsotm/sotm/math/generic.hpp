@@ -14,6 +14,8 @@ namespace sotm {
 
 using Function1D = std::function<double(double)>;
 
+double zero(double);
+
 template<typename T>
 T sqr(const T& x) { return x*x; }
 

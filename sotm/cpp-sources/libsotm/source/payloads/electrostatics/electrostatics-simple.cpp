@@ -49,6 +49,11 @@ void ElectrostaticPhysicalContext::step()
 
 }
 
+void ElectrostaticPhysicalContext::setDischargeFunc(Function1D func)
+{
+	m_dischargeProb = func;
+}
+
 ////////////////////////////////////
 ////////////////////////////////////
 // ElectrostaticNodePayload
