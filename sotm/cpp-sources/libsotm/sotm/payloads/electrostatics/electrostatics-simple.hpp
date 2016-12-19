@@ -9,12 +9,15 @@
 #define LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_SIMPLE_HPP_
 
 #include "sotm/base/physical-payload.hpp"
+#include "sotm/math/integration.hpp"
+#include <memory>
 
 namespace sotm
 {
 
 class ElectrostaticPhysicalContext : public IPhysicalContext
 {
+friend class ElectrostaticNodePayload;
 public:
 	void destroyGraph();
 	bool readyToDestroy();
@@ -43,6 +46,7 @@ public:
 private:
 	bool m_readyToDestroy = false;
 	Function1D m_dischargeProb{zero};
+	std::unique_ptr<DefinedIntegral> m_integralOfProb;
 };
 
 class ElectrostaticNodePayload : public NodePayloadBase
@@ -54,13 +58,11 @@ public:
 	void calculateRHS(double time) override;
 	void addRHSToDelta(double m) override;
 	void makeSubIteration(double dt) override;
-
 	void step() override;
-
 	void doBifurcation(double time, double dt) override;
+	void getBranchingParameters(double time, double dt, BranchingParameters& branchingParameters) override;
 
 	void getColor(double* rgb) override;
-
 	std::string getFollowerText() override;
 
 	void setCharge(double charge);

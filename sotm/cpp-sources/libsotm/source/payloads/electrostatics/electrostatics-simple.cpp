@@ -1,6 +1,7 @@
 #include "sotm/payloads/electrostatics/electrostatics-simple.hpp"
 #include "sotm/base/model-context.hpp"
 #include "sotm/utils/const.hpp"
+#include "sotm/math/distrib-gen.hpp"
 
 #include <iostream>
 
@@ -52,6 +53,7 @@ void ElectrostaticPhysicalContext::step()
 void ElectrostaticPhysicalContext::setDischargeFunc(Function1D func)
 {
 	m_dischargeProb = func;
+	m_integralOfProb.reset(new DefinedIntegral(m_dischargeProb, -20e6, 20e6, 10000));
 }
 
 ////////////////////////////////////
@@ -126,6 +128,29 @@ void ElectrostaticNodePayload::doBifurcation(double time, double dt)
 	if (context->readyToDestroy())
 	{
 		onDeletePayload();
+	}
+}
+
+void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, BranchingParameters& branchingParameters)
+{
+	ElectrostaticPhysicalContext* context = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext());
+	double E1 = Const::Si::k*charge / sqr(radius);
+	DistributionResult<SphericalPoint> res = generateDischargeDirection(
+			dt,
+			radius,
+			0.0,
+			E1,
+			context->m_dischargeProb,
+			*(context->m_integralOfProb.get())
+	);
+	branchingParameters.needBranching = res.isHappened;
+	if (branchingParameters.needBranching)
+	{
+		branchingParameters.direction.x[0] = sin(res.value.theta) * cos(res.value.phi);
+		branchingParameters.direction.x[1] = sin(res.value.theta) * sin(res.value.phi);
+		branchingParameters.direction.x[2] = cos(res.value.theta);
+		branchingParameters.length = 1.0;
+		cout << "Branching" << endl;
 	}
 }
 

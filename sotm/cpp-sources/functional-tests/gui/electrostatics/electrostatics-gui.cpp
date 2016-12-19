@@ -19,7 +19,17 @@ int main(int argc, char** argv)
 	c.setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory>(new ElectrostaticLinkPayloadFactory()));
 	c.setPhysicalContext(std::unique_ptr<IPhysicalContext>(new ElectrostaticPhysicalContext()));
 
-	ElectrostaticNodePayload::setChargeColorLimits(0.0, 10e-9);
+	static_cast<ElectrostaticPhysicalContext*>(c.physicalContext())->setDischargeFunc(
+			[](double E) -> double
+			{
+				double Eabs = fabs(E);
+				if (Eabs > 2e6)
+					return (Eabs - 2e6)/2e6 * 100;
+				return 0.0;
+			}
+	);
+
+	ElectrostaticNodePayload::setChargeColorLimits(0.0, 50e-6);
 
 	{ // Scope to remove pointers
 
@@ -41,7 +51,7 @@ int main(int argc, char** argv)
 		l2->connect(n2, n4);
 		l3->connect(n2, n5);
 
-		static_cast<ElectrostaticNodePayload*>(n1->payload.get())->setCharge(10e-9);
+		static_cast<ElectrostaticNodePayload*>(n1->payload.get())->setCharge(1e-6);
 	}
 
 	// Time iteration
