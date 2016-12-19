@@ -21,11 +21,21 @@ namespace sotm
 template<typename T>
 struct DistributionResult
 {
+	DistributionResult() { }
+	DistributionResult(const T& obj) {
+		value = obj;
+		isHappened = true;
+	}
 	T value;
 	bool isHappened = false;
 };
 
-DistributionResult<SphericalPoint> generateDischargeDirection(double E0, double E1, Function1D integralDistribution);
+/**
+ * Generate direction of discharge from conductive sphere. Normal field on sphere is
+ * E_n = E_0*cos(theta) + E_1. Probability of discharge per 1m^2 given by integral
+ * distribution function integralDistribution.
+ */
+DistributionResult<SphericalPoint> generateDischargeDirection(double dt, double r, double E0, double E1, Function1D integralDistribution);
 
 }
 

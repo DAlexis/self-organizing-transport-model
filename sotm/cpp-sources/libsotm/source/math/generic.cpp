@@ -9,29 +9,45 @@
 
 using namespace sotm;
 
-double sotm::MonotonicFunctionSolve(Function1D func, double value, double from, double to, double precision)
+MonotonicFunctionSolver::MonotonicFunctionSolver(Function1D func, double from, double to, double precision) :
+		m_func(func),
+		m_from(from),
+		m_to(to),
+		m_precision(precision)
 {
-	double left = from, right = to;
-	double fr = func(right);
-	double fl = func(left);
+}
+
+double MonotonicFunctionSolver::operator()(double x)
+{
+	double left = m_from, right = m_to;
+	double fr = m_func(right);
+	double fl = m_func(left);
 	double center = (right+left)/2.0;
 	if (fr > fl)
 	{
-		while (right - left > precision)
+		while (right - left > m_precision)
 		{
-			double f = func(center);
-			if (f-value < 0.0) left = center;
-			if (f-value > 0.0) right = center;
+			double f = m_func(center);
+			if (f-x < 0.0) left = center;
+			if (f-x > 0.0) right = center;
 			center = (right+left)/2.0;
 		}
 	} else {
-		while (right - left > precision)
+		while (right - left > m_precision)
 		{
-			double f = func(center);
-			if (f-value > 0.0) left = center;
-			if (f-value < 0.0) right = center;
+			double f = m_func(center);
+			if (f-x > 0.0) left = center;
+			if (f-x < 0.0) right = center;
 			center = (right+left)/2.0;
 		}
 	}
 	return center;
+}
+
+bool MonotonicFunctionSolver::inRange(double x)
+{
+	double lv = m_func(m_from);
+	double rv = m_func(m_to);
+
+	return (lv-x)*(rv-x) <= 0;
 }

@@ -13,6 +13,7 @@ set(EXE_SOURCES
     math/generic-ut.cpp
     math/geometry-ut.cpp
     math/integration-ut.cpp
+    math/distrib-gen-ut.cpp
     base/transport-graph-ut.cpp
     utils/memory-ut.cpp
     payloads/demo/empty-payload-ut.cpp
