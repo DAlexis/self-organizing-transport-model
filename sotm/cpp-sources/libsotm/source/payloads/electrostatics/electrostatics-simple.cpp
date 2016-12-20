@@ -56,6 +56,11 @@ void ElectrostaticPhysicalContext::setDischargeFunc(Function1D func)
 	m_integralOfProb.reset(new DefinedIntegral(m_dischargeProb, -20e6, 20e6, 10000));
 }
 
+void ElectrostaticPhysicalContext::setExternalConstField(Vector<3> field)
+{
+	m_externalConstField = field;
+}
+
 ////////////////////////////////////
 ////////////////////////////////////
 // ElectrostaticNodePayload
@@ -68,17 +73,18 @@ ElectrostaticNodePayload::ElectrostaticNodePayload(PhysicalPayloadsRegister* reg
 void ElectrostaticNodePayload::calculateSecondaryValues()
 {
 	double capacity = radius / Const::Si::k;
-	phi = charge / capacity;
 
-	externalField[0] = externalField[1] = externalField[2] = 0;
+	externalField = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext())->m_externalConstField;
 
-	Point<3> r0 = node->pos;
+	phi = charge / capacity - (node->pos ^ externalField);
+
+	Vector<3> r0 = node->pos;
 
 	auto nodeVisitor = [this, &r0](Node* node) {
 		// Skip this node
 		if (node == this->node.data())
 			return;
-		Point<3> r1 = node->pos;
+		Vector<3> r1 = node->pos;
 
 		double dist = (r0 - r1).len();
 		double dist3 = dist*dist*dist;
@@ -93,6 +99,7 @@ void ElectrostaticNodePayload::calculateSecondaryValues()
 	};
 
 	node->context()->graphRegister.applyNodeVisitor(nodeVisitor);
+	externalField = externalField * 3;
 }
 
 void ElectrostaticNodePayload::calculateRHS(double time)
@@ -138,7 +145,7 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 	DistributionResult<SphericalPoint> res = generateDischargeDirection(
 			dt,
 			radius,
-			0.0,
+			externalField.len(),
 			E1,
 			context->m_dischargeProb,
 			*(context->m_integralOfProb.get())
@@ -146,10 +153,14 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 	branchingParameters.needBranching = res.isHappened;
 	if (branchingParameters.needBranching)
 	{
-		branchingParameters.direction.x[0] = sin(res.value.theta) * cos(res.value.phi);
+		SphericalVectorPlacer pl(externalField);
+
+		branchingParameters.direction = pl.place(1.0, res.value);
+		/*branchingParameters.direction.x[0] = sin(res.value.theta) * cos(res.value.phi);
 		branchingParameters.direction.x[1] = sin(res.value.theta) * sin(res.value.phi);
-		branchingParameters.direction.x[2] = cos(res.value.theta);
-		branchingParameters.length = 1.0;
+		branchingParameters.direction.x[2] = cos(res.value.theta);*/
+
+		branchingParameters.length = 0.3;
 		cout << "Branching" << endl;
 	}
 }
@@ -163,6 +174,11 @@ void ElectrostaticNodePayload::getColor(double* rgb)
 	rgb[0] = v;
 	rgb[1] = 0;
 	rgb[2] = 1.0-v;
+}
+
+double ElectrostaticNodePayload::getSize()
+{
+	return radius*0.2;
 }
 
 std::string ElectrostaticNodePayload::getFollowerText()

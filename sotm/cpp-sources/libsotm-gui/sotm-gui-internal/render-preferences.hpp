@@ -13,6 +13,9 @@ class RenderPreferences
 public:
 	constexpr static double defaultGamma = 1.0;
 	double gamma = defaultGamma;
+	bool enableFollowers = true;
+	bool enableSpheres = true;
+
 };
 
 

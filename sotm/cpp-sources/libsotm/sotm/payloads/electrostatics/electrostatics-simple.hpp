@@ -31,7 +31,7 @@ public:
 	void doBifurcation(double time, double dt) { UNUSED_ARG(time); UNUSED_ARG(dt); }
 
 	void setDischargeFunc(Function1D func);
-
+	void setExternalConstField(Vector<3> field);
 
 	static inline ElectrostaticPhysicalContext* cast(IPhysicalContext* context)
 	{
@@ -47,6 +47,7 @@ private:
 	bool m_readyToDestroy = false;
 	Function1D m_dischargeProb{zero};
 	std::unique_ptr<DefinedIntegral> m_integralOfProb;
+	Vector<3> m_externalConstField;
 };
 
 class ElectrostaticNodePayload : public NodePayloadBase
@@ -63,23 +64,24 @@ public:
 	void getBranchingParameters(double time, double dt, BranchingParameters& branchingParameters) override;
 
 	void getColor(double* rgb) override;
+	double getSize() override;
 	std::string getFollowerText() override;
 
 	void setCharge(double charge);
 
 	static void setChargeColorLimits(double chargeMin, double chargeMax);
 	// Parameters
-	double radius = 0.01;
+	double radius = 0.13;
 
 	// Primary current
-	double charge = 0;
+	double charge = 0.0;
 
 	// Primary previous
-	double charge_prev = 0;
+	double charge_prev = 0.0;
 
 	// Secondary
 	double phi = 0; // Electrostatic potential
-	Point<3> externalField; // Electric field from other nodes
+	Vector<3> externalField; // Electric field from other nodes
 
 	// RHS
 	double charge_rhs = 0;

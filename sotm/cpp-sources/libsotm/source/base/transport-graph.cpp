@@ -123,7 +123,7 @@ IPhysicalContext* ModelContextDependent::physicalContext()
 
 ////////////////////////////
 // Node
-Node::Node(ModelContext* context, Point<3> pos) :
+Node::Node(ModelContext* context, Vector<3> pos) :
 	ModelContextDependent(context),
 	pos(pos)
 {
@@ -170,7 +170,7 @@ Link::Link(ModelContext* context) :
 	m_context->graphRegister.addLink(this);
 }
 
-Link::Link(ModelContext* context, Node* nodeFrom, Point<3> pointTo) :
+Link::Link(ModelContext* context, Node* nodeFrom, Vector<3> pointTo) :
 	ModelContextDependent(context)
 {
 	ASSERT(nodeFrom != nullptr, "Cannot create link with nullptr node");

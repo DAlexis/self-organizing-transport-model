@@ -19,12 +19,12 @@ SphereDrawer::SphereDrawer()
 {
 }
 
-SphereDrawer::SphereDrawer(Point<3> pos, double radius, double color[3], const std::string& follower)
+SphereDrawer::SphereDrawer(Vector<3> pos, double radius, double color[3], const std::string& follower)
 {
 	create(pos, radius, color, follower);
 }
 
-void SphereDrawer::create(Point<3> pos, double radius, double color[3], const std::string& follower)
+void SphereDrawer::create(Vector<3> pos, double radius, double color[3], const std::string& follower)
 {
 	vtkSmartPointer<vtkSphereSource> m_source = vtkSmartPointer<vtkSphereSource>::New();
 	m_source->SetCenter(pos.x);
@@ -82,13 +82,15 @@ void GraphWireframeDrawer::prepareNextActor()
 			linkVisitor(link);
 		}
 	);
-
-	m_modelContext->graphRegister.applyNodeVisitor(
-		[this] (sotm::Node* node)
-		{
-			nodeVisitor(node);
-		}
-	);
+	if (m_renderPreferences->enableSpheres)
+	{
+		m_modelContext->graphRegister.applyNodeVisitor(
+			[this] (sotm::Node* node)
+			{
+				nodeVisitor(node);
+			}
+		);
+	}
 	m_nextBuffer->prepareWireframeActor();
 }
 
@@ -161,5 +163,8 @@ void GraphWireframeDrawer::nodeVisitor(sotm::Node* node)
 {
 	double rgb[3];
 	node->payload->getColor(rgb);
-	m_nextBuffer->sphereDrawers.push_back(SphereDrawer(node->pos, node->payload->getSize() * 0.1, rgb, node->payload->getFollowerText()));
+	if (m_renderPreferences->enableFollowers)
+		m_nextBuffer->sphereDrawers.push_back(SphereDrawer(node->pos, node->payload->getSize(), rgb, node->payload->getFollowerText()));
+	else
+		m_nextBuffer->sphereDrawers.push_back(SphereDrawer(node->pos, node->payload->getSize(), rgb, ""));
 }

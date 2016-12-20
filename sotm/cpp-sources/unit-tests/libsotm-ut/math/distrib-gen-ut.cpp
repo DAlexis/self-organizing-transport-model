@@ -134,8 +134,6 @@ TEST(generateDischargeDirection, E0moreThanE1)
 			//fl << res.value.theta << " ";
 		}
 	}
-	cout << "countFrom00To21 = " << countFrom00To21 << " countFrom21ToPi = " << countFrom21ToPi << endl;
-	cout << (double) countFrom00To21 / countFrom21ToPi << endl;
 	ASSERT_NEAR((double) countFrom00To21 / countFrom21ToPi, 25.9, 4.0);
 }
 

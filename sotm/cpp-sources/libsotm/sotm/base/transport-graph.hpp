@@ -81,7 +81,7 @@ class Node : public ModelContextDependent, public SelfMemMgr
 public:
 	using LinkVisitor = std::function<void(Link*, LinkDirection)>;
 
-	Node(ModelContext* context, Point<3> pos = Point<3>());
+	Node(ModelContext* context, Vector<3> pos = Vector<3>());
 	~Node();
 	void addLink(Link* link);
 	void removeLink(Link* link);
@@ -89,7 +89,7 @@ public:
 
 	std::unique_ptr<NodePayloadBase> payload;
 
-	Point<3> pos;
+	Vector<3> pos;
 
 private:
 	std::set<Link*> m_links;
@@ -100,7 +100,7 @@ class Link : public ModelContextDependent, public SelfMemMgr
 {
 public:
 	Link(ModelContext* context);
-	Link(ModelContext* context, Node* nodeFrom, Point<3> pointTo);
+	Link(ModelContext* context, Node* nodeFrom, Vector<3> pointTo);
 	~Link();
 	void connect(Node* n1, Node* n2);
 
