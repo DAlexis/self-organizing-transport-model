@@ -14,7 +14,7 @@
 namespace sotm
 {
 
-class EmptyPhysicalContext : public IPhysicalContext
+class EmptyPhysicalContext : public PhysicalContextBase
 {
 public:
 	void destroyGraph();

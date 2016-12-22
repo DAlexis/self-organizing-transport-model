@@ -71,6 +71,41 @@ void GraphRegister::applyLinkVisitor(LinkVisitor v)
 	}
 }
 
+void GraphRegister::applyNodeVisitorWithoutGraphChganges(NodeVisitor v)
+{
+	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
+	{
+		v(*it);
+	}
+}
+
+void GraphRegister::applyLinkVisitorWithoutGraphChganges(LinkVisitor v)
+{
+	for (auto it = m_links.begin(); it != m_links.end(); ++it)
+	{
+		v(*it);
+	}
+}
+
+Node* GraphRegister::getNearestNode(const Vector<3>& point)
+{
+	Node* result = nullptr;
+	double minDist = 0.0;
+
+	auto visitor = [&point, &minDist, &result] (Node* node) {
+		double d = (node->pos - point).len();
+		if (d < minDist || result == nullptr)
+		{
+			result = node;
+			minDist = d;
+		}
+	};
+
+	applyNodeVisitorWithoutGraphChganges(visitor);
+
+	return result;
+}
+
 size_t GraphRegister::nodesCount()
 {
 	return m_nodes.size();

@@ -156,7 +156,7 @@ public:
         return result;
     }
     
-    double operator^(Vector<dim> right)
+    double operator^(const Vector<dim>& right) const
     {
     	double result = 0;
     	for (int i=0; i<dim; i++)

@@ -47,6 +47,10 @@ private slots:
 
   void on_horizontalSlider_valueChanged(int value);
 
+  void on_checkBoxFollowers_clicked();
+
+  void on_checkBoxSpheres_clicked();
+
 private:
     void updateEdiableFields();
     void stopFrameWaiting();

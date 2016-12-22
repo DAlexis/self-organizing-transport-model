@@ -61,6 +61,33 @@ void ElectrostaticPhysicalContext::setExternalConstField(Vector<3> field)
 	m_externalConstField = field;
 }
 
+void ElectrostaticPhysicalContext::getElectricField(const Vector<3>& point, Vector<3>& outField, double& outPotential, const Node* exclude)
+{
+	outPotential = - (point ^ m_externalConstField);
+	outField = m_externalConstField;
+
+	auto nodeVisitor = [&point, exclude, &outPotential, &outField](const Node* node) {
+
+		// Skip this node
+		if (node == exclude)
+			return;
+		Vector<3> r1 = node->pos;
+
+		double dist = (point - r1).len();
+		double dist3 = dist*dist*dist;
+
+		double charge = static_cast<ElectrostaticNodePayload*>(node->payload.get())->charge;
+
+		outPotential += Const::Si::k * charge / dist;
+
+		outField[0] += Const::Si::k * charge * (point[0]-r1[0]) / dist3;
+		outField[1] += Const::Si::k * charge * (point[1]-r1[1]) / dist3;
+		outField[2] += Const::Si::k * charge * (point[2]-r1[2]) / dist3;
+	};
+
+	m_model->graphRegister.applyNodeVisitorWithoutGraphChganges(nodeVisitor);
+}
+
 ////////////////////////////////////
 ////////////////////////////////////
 // ElectrostaticNodePayload
@@ -71,12 +98,9 @@ ElectrostaticNodePayload::ElectrostaticNodePayload(PhysicalPayloadsRegister* reg
 }
 
 void ElectrostaticNodePayload::calculateSecondaryValues()
-{
-	double capacity = radius / Const::Si::k;
-
+{/*
+	phi = -(node->pos ^ externalField);
 	externalField = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext())->m_externalConstField;
-
-	phi = charge / capacity - (node->pos ^ externalField);
 
 	Vector<3> r0 = node->pos;
 
@@ -99,7 +123,19 @@ void ElectrostaticNodePayload::calculateSecondaryValues()
 	};
 
 	node->context()->graphRegister.applyNodeVisitor(nodeVisitor);
+
+	double capacity = radius / Const::Si::k;
 	externalField = externalField * 3;
+	phi += charge / capacity;*/
+
+
+	static_cast<ElectrostaticPhysicalContext*>(node->physicalContext())->
+			getElectricField(node->pos, externalField, phi, this->node.data());
+
+
+	double capacity = radius / Const::Si::k;
+	externalField = externalField * 3;
+	phi += charge / capacity;
 }
 
 void ElectrostaticNodePayload::calculateRHS(double time)
@@ -154,13 +190,23 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 	if (branchingParameters.needBranching)
 	{
 		SphericalVectorPlacer pl(externalField);
-
 		branchingParameters.direction = pl.place(1.0, res.value);
-		/*branchingParameters.direction.x[0] = sin(res.value.theta) * cos(res.value.phi);
-		branchingParameters.direction.x[1] = sin(res.value.theta) * sin(res.value.phi);
-		branchingParameters.direction.x[2] = cos(res.value.theta);*/
 
-		branchingParameters.length = 0.3;
+		Vector<3> branchStartPoint = node->pos + branchingParameters.direction * (radius*1.00);
+		double len = calculateBranchLen(branchStartPoint, branchingParameters.direction, 0.5, 0.3);
+		cout << "branch len should be " << len << endl;
+
+		len = 0.3;
+
+		Vector<3> newPlace = node->pos + branchingParameters.direction * len;
+		Node *nearest = context->m_model->graphRegister.getNearestNode(newPlace);
+		if (nearest && (nearest->pos - newPlace).len() < radius*2.0)
+		{
+			cout << "Branching disabled" << endl;
+			branchingParameters.needBranching = false;
+		}
+
+		branchingParameters.length = len;
 		cout << "Branching" << endl;
 	}
 }
@@ -178,19 +224,52 @@ void ElectrostaticNodePayload::getColor(double* rgb)
 
 double ElectrostaticNodePayload::getSize()
 {
-	return radius*0.2;
+	return radius;
 }
 
 std::string ElectrostaticNodePayload::getFollowerText()
 {
 	std::ostringstream ss;
-	ss << "  q = " << std::scientific << std::setprecision(2) << charge;
+	ss << "  q = " << std::scientific << std::setprecision(2) << charge << endl;
+	ss << "  phi = " << phi;
 	return ss.str();
 }
 
 void ElectrostaticNodePayload::setCharge(double charge)
 {
 	charge_prev = this->charge = charge;
+}
+
+double ElectrostaticNodePayload::calculateBranchLen(const Vector<3>& startPoint, const Vector<3>& direction, double eDiffMax, double lenMax)
+{
+
+	ElectrostaticPhysicalContext* context = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext());
+
+	Vector<3> step = direction;
+	step.normalize();
+	step = step * branchProbeStep;
+
+	Vector<3> currentPoint = startPoint;
+	double currentPhi = 0;
+	Vector<3> startField;
+	Vector<3> currentField;
+
+	Vector<3> deltaField;
+
+	// Getting start field
+	context->getElectricField(currentPoint, startField, currentPhi);
+
+	double len = 0;
+
+	do {
+		context->getElectricField(currentPoint, currentField, currentPhi);
+		currentPoint += step;
+		len = (currentPoint - startPoint).len();
+		deltaField = currentField - startField;
+
+	} while (deltaField.len() / startField.len() < eDiffMax && len < lenMax);
+
+	return len;
 }
 
 void ElectrostaticNodePayload::setChargeColorLimits(double chargeMin, double chargeMax)

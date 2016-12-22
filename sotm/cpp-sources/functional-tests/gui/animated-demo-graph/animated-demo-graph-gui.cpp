@@ -4,6 +4,7 @@
 #include "sotm/base/model-context.hpp"
 #include "sotm/payloads/demo/absolute-random-graph.hpp"
 #include "sotm/time-iter/euler-explicit.hpp"
+#include "sotm/math/random.hpp"
 
 #include "sotm-gui/gui.hpp"
 
@@ -13,6 +14,7 @@ using namespace sotm;
 
 int main(int argc, char** argv)
 {
+	Random::randomize(0);
 	ModelContext c;
 
 	c.setNodePayloadFactory(std::unique_ptr<INodePayloadFactory>(new RandomGraphNodePayloadFactory()));

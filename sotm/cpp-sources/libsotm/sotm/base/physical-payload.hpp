@@ -12,6 +12,7 @@ namespace sotm
 {
 
 class AnyPhysicalPayloadBase;
+class ModelContext;
 
 class PhysicalPayloadsRegister : public IContinuousTimeIterable
 {
@@ -62,6 +63,16 @@ class IPhysicalContext : public IContinuousTimeIterable, public IBifurcationTime
 {
 public:
 	virtual ~IPhysicalContext() {}
+	virtual void connectModel(ModelContext* m) = 0;
+};
+
+class PhysicalContextBase : public IPhysicalContext
+{
+public:
+	void connectModel(ModelContext* m) override { m_model = m; }
+
+protected:
+	ModelContext* m_model = nullptr;
 };
 
 struct BranchingParameters

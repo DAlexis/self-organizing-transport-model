@@ -15,6 +15,7 @@ void ModelContext::setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory> fa
 void ModelContext::setPhysicalContext(std::unique_ptr<IPhysicalContext> physicalContext)
 {
 	m_physicalContext = std::move(physicalContext);
+	m_physicalContext->connectModel(this);
 }
 
 NodePayloadBase* ModelContext::createNodePayload(Node* node)

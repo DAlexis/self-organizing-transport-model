@@ -43,7 +43,10 @@ void VisualizerUIWindow::prepareUIToRun()
 
 void VisualizerUIWindow::updateEdiableFields()
 {
-    horizontalSlider->setValue((m_gui->frameMaker()->renderPreferences()->gamma - 0.2) / 2.0 * 100);
+    RenderPreferences* rp = m_gui->frameMaker()->renderPreferences();
+    horizontalSlider->setValue((rp->gamma - 0.2) / 2.0 * 100);
+    checkBoxFollowers->setChecked(rp->enableFollowers);
+    checkBoxSpheres->setChecked(rp->enableSpheres);
     if (m_gui->isStaticGraph())
     {
         groupBoxIterating->setEnabled(false);
@@ -207,4 +210,16 @@ void VisualizerUIWindow::on_horizontalSlider_valueChanged(int value)
 
     m_gui->frameMaker()->renderPreferences()->gamma = gammaValue;
     reRenderCurrentFrame();
+}
+
+void VisualizerUIWindow::on_checkBoxFollowers_clicked()
+{
+	m_gui->frameMaker()->renderPreferences()->enableFollowers = checkBoxFollowers->isChecked();
+	reRenderCurrentFrame();
+}
+
+void VisualizerUIWindow::on_checkBoxSpheres_clicked()
+{
+	m_gui->frameMaker()->renderPreferences()->enableSpheres = checkBoxSpheres->isChecked();
+	reRenderCurrentFrame();
 }

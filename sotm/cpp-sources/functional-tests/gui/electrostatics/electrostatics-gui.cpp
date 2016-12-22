@@ -4,6 +4,7 @@
 #include "sotm/base/model-context.hpp"
 #include "sotm/payloads/electrostatics/electrostatics-simple.hpp"
 #include "sotm/time-iter/euler-explicit.hpp"
+#include "sotm/math/random.hpp"
 
 #include "sotm-gui/gui.hpp"
 
@@ -13,6 +14,7 @@ using namespace sotm;
 
 int main(int argc, char** argv)
 {
+	Random::randomize(0);
 	ModelContext c;
 
 	c.setNodePayloadFactory(std::unique_ptr<INodePayloadFactory>(new ElectrostaticNodePayloadFactory()));
@@ -30,7 +32,7 @@ int main(int argc, char** argv)
 			}
 	);
 
-	Vector<3> externalField{0.0, 0.0, 1.0e6};
+	Vector<3> externalField{0.0, 0.0, 0.6e6};
 	physCont->setExternalConstField(externalField);
 
 	ElectrostaticNodePayload::setChargeColorLimits(0.0, 50e-6);
@@ -38,8 +40,8 @@ int main(int argc, char** argv)
 	{ // Scope to remove pointers
 
 		/// Building initial tree
-		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, Vector<3>(0.0, 0.0, 0.0));
-		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, Vector<3>(0.0, 0.0, 0.4));
+		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, Vector<3>(0.0, 0.0, -0.2));
+		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, Vector<3>(0.0, 0.0, 0.2));
 /*
 		PtrWrap<Node> n3 = PtrWrap<Node>::make(&c, Vector<3>(2.0, 1.0, 1.0));
 		PtrWrap<Node> n4 = PtrWrap<Node>::make(&c, Vector<3>(1.0, 2.0, 1.0));

@@ -44,6 +44,14 @@ public:
 	/// Safely iterate by all links. New links may be added during iteration
 	void applyLinkVisitor(LinkVisitor v);
 
+	/// Iterate by all nodes. New nodes should not be added during iteration
+	void applyNodeVisitorWithoutGraphChganges(NodeVisitor v);
+
+	/// Iterate by all links. New nodes should not be added during iteration
+	void applyLinkVisitorWithoutGraphChganges(LinkVisitor v);
+
+	Node* getNearestNode(const Vector<3>& point);
+
 	size_t nodesCount();
 	size_t linksCount();
 private:

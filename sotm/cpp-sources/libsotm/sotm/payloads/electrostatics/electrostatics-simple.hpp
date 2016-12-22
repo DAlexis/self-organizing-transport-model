@@ -15,7 +15,7 @@
 namespace sotm
 {
 
-class ElectrostaticPhysicalContext : public IPhysicalContext
+class ElectrostaticPhysicalContext : public PhysicalContextBase
 {
 friend class ElectrostaticNodePayload;
 public:
@@ -32,6 +32,8 @@ public:
 
 	void setDischargeFunc(Function1D func);
 	void setExternalConstField(Vector<3> field);
+
+	void getElectricField(const Vector<3>& point, Vector<3>& outField, double& outPotential, const Node* excludeNode = nullptr);
 
 	static inline ElectrostaticPhysicalContext* cast(IPhysicalContext* context)
 	{
@@ -72,6 +74,7 @@ public:
 	static void setChargeColorLimits(double chargeMin, double chargeMax);
 	// Parameters
 	double radius = 0.13;
+	double branchProbeStep = 0.001;
 
 	// Primary current
 	double charge = 0.0;
@@ -90,6 +93,13 @@ public:
 	double charge_delta = 0;
 
 private:
+	double calculateBranchLen(
+			const Vector<3>& startPoint,
+			const Vector<3>& direction,
+			double eDiffMax,
+			double lenMax
+	);
+
 	static double chargeMin;
 	static double chargeMax;
 };
@@ -108,7 +118,7 @@ public:
 	void doBifurcation(double time, double dt) override;
 
 	// Parameters
-	double conductivity = 1e-13;
+	double conductivity = 300e-13;
 
 	// Primary
 
