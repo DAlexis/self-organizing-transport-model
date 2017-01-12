@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 	c.setPhysicalContext(std::unique_ptr<IPhysicalContext>(new ElectrostaticPhysicalContext()));
 
 	ElectrostaticPhysicalContext* physCont = static_cast<ElectrostaticPhysicalContext*>(c.physicalContext());
-	physCont->setDischargeFunc(
+	/*physCont->setDischargeFunc(
 			[](double E) -> double
 			{
 				double Eabs = fabs(E);
@@ -31,8 +31,20 @@ int main(int argc, char** argv)
 				return 0.0;
 			}
 	);
+	*/
+	physCont->setDischargeFunc(
+			[](double E) -> double
+			{
+				if (E > 1e6) // 20 kV/cm
+					return (E - 1e6)/2e6 * 400;
+				if (E < -0.5e6) // 20 kV/cm
+					return (-E - 0.5e6)/2e6 * 400;
+				return 0.0;
+			}
+	);
 
-	Vector<3> externalField{0.0, 0.0, 0.6e6};
+	//Vector<3> externalField{0.0, 0.0, 0.6e6};
+	Vector<3> externalField{0.0, 0.0, 0.2e6};
 	physCont->setExternalConstField(externalField);
 
 	ElectrostaticNodePayload::setChargeColorLimits(0.0, 50e-6);

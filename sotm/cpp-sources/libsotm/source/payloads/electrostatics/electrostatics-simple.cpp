@@ -76,7 +76,7 @@ void ElectrostaticPhysicalContext::getElectricField(const Vector<3>& point, Vect
 		double dist = (point - r1).len();
 		double dist3 = dist*dist*dist;
 
-		double charge = static_cast<ElectrostaticNodePayload*>(node->payload.get())->charge;
+		double charge = static_cast<ElectrostaticNodePayload*>(node->payload.get())->charge.current;
 
 		outPotential += Const::Si::k * charge / dist;
 
@@ -135,33 +135,32 @@ void ElectrostaticNodePayload::calculateSecondaryValues()
 
 	double capacity = radius / Const::Si::k;
 	externalField = externalField * 3;
-	phi += charge / capacity;
+	phi += charge.current / capacity;
 }
 
 void ElectrostaticNodePayload::calculateRHS(double time)
 {
-	charge_rhs = 0;
+	charge.rhs = 0;
 	auto linkVisitor = [this](Link* link, LinkDirection dir){
 		double current = static_cast<ElectrostaticLinkPayload*>(link->payload.get())->current;
-		charge_rhs += current * (dir == LinkDirection::in ? 1.0 : -1.0);
+		charge.rhs += current * (dir == LinkDirection::in ? 1.0 : -1.0);
 	};
 	node->applyConnectedLinksVisitor(linkVisitor);
 }
 
 void ElectrostaticNodePayload::addRHSToDelta(double m)
 {
-	charge_delta += charge_rhs * m;
+	charge.addRHSToDelta(m);
 }
 
 void ElectrostaticNodePayload::makeSubIteration(double dt)
 {
-	charge = charge_prev + charge_rhs * dt;
+	charge.makeSubIteration(dt);
 }
 
 void ElectrostaticNodePayload::step()
 {
-	charge = charge_prev = charge_prev + charge_delta;
-	charge_delta = 0.0;
+	charge.step();
 }
 
 void ElectrostaticNodePayload::doBifurcation(double time, double dt)
@@ -177,7 +176,7 @@ void ElectrostaticNodePayload::doBifurcation(double time, double dt)
 void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, BranchingParameters& branchingParameters)
 {
 	ElectrostaticPhysicalContext* context = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext());
-	double E1 = Const::Si::k*charge / sqr(radius);
+	double E1 = Const::Si::k*charge.current / sqr(radius);
 	DistributionResult<SphericalPoint> res = generateDischargeDirection(
 			dt,
 			radius,
@@ -213,7 +212,7 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 
 void ElectrostaticNodePayload::getColor(double* rgb)
 {
-	double v = (charge_prev - chargeMin) / (chargeMax - chargeMin);
+	double v = (charge.previous - chargeMin) / (chargeMax - chargeMin);
 	if (v < 0.0) v = 0.0;
 	if (v > 1.0) v = 1.0;
 
@@ -230,14 +229,14 @@ double ElectrostaticNodePayload::getSize()
 std::string ElectrostaticNodePayload::getFollowerText()
 {
 	std::ostringstream ss;
-	ss << "  q = " << std::scientific << std::setprecision(2) << charge << endl;
+	ss << "  q = " << std::scientific << std::setprecision(2) << charge.current << endl;
 	ss << "  phi = " << phi;
 	return ss.str();
 }
 
 void ElectrostaticNodePayload::setCharge(double charge)
 {
-	charge_prev = this->charge = charge;
+	this->charge.setInitial(charge);
 }
 
 double ElectrostaticNodePayload::calculateBranchLen(const Vector<3>& startPoint, const Vector<3>& direction, double eDiffMax, double lenMax)
@@ -312,4 +311,8 @@ void ElectrostaticLinkPayload::doBifurcation(double time, double dt)
 	{
 		onDeletePayload();
 	}
+}
+
+void ElectrostaticLinkPayload::calculateHeatnessByTemperature(double temp)
+{
 }

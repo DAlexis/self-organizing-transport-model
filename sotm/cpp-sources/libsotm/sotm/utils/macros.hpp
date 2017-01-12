@@ -49,6 +49,12 @@
 // Says the compiler that function argument is unused and we know it. Used to prevent 'Unused argument' warning
 #define UNUSED_ARG(x)       ( (void) x )
 
+#ifdef __GNUC__
+	#define SOTM_INLINE	__attribute__((always_inline))
+#else
+	#define SOTM_INLINE	inline
+#endif
+
 //////////////////////////////////////////////////////////////////////
 // Macros to add static initializer and deinitializer to class
 //

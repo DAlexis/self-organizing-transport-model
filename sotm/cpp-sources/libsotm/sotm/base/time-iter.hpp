@@ -8,8 +8,26 @@
 #ifndef LIBSTEPMOD_STEPMOD_BASE_TIME_ITER_HPP_
 #define LIBSTEPMOD_STEPMOD_BASE_TIME_ITER_HPP_
 
+#include "sotm/utils/macros.hpp"
+
 namespace sotm
 {
+
+struct Variable {
+	double previous = 0;
+	double current = 0;
+	double delta = 0;
+	double rhs = 0;
+
+	SOTM_INLINE void makeSubIteration(double dt) { current = previous + rhs * dt; }
+	SOTM_INLINE void addRHSToDelta(double m) { delta += rhs * m; }
+	SOTM_INLINE void step()
+	{
+		current = previous = previous + delta;
+		delta = 0.0;
+	}
+	SOTM_INLINE void setInitial(double value) { previous = current = value; }
+};
 
 /**
  * This class represent some lines from system x'=f(time, x)
@@ -37,13 +55,19 @@ public:
 	 */
 	virtual void calculateRHS(double time) = 0;
 
-	/// Adds rhs multiplied by m to xDelta
+	/**
+	 * Adds rhs multiplied by m to xDelta
+	 */
 	virtual void addRHSToDelta(double m) = 0;
 
-	/// Makes xCurrent = xPrevious + rhs*dt
+	/**
+	 * Makes xCurrent = xPrevious + rhs*dt
+	 */
 	virtual void makeSubIteration(double dt) = 0;
 
-	/// Makes xCurrent = xPrevious = xPrevious + xDelta; xDelta = 0;
+	/*
+	 * Makes xCurrent = xPrevious = xPrevious + xDelta; xDelta = 0;
+	 */
 	virtual void step() = 0;
 };
 

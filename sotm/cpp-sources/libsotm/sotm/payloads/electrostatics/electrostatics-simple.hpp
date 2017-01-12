@@ -45,6 +45,8 @@ public:
 		return static_cast<const ElectrostaticPhysicalContext*>(context);
 	}
 
+	double airTemperature = 300;
+
 private:
 	bool m_readyToDestroy = false;
 	Function1D m_dischargeProb{zero};
@@ -76,21 +78,12 @@ public:
 	double radius = 0.13;
 	double branchProbeStep = 0.001;
 
-	// Primary current
-	double charge = 0.0;
-
-	// Primary previous
-	double charge_prev = 0.0;
+	// Primary
+	Variable charge;
 
 	// Secondary
 	double phi = 0; // Electrostatic potential
 	Vector<3> externalField; // Electric field from other nodes
-
-	// RHS
-	double charge_rhs = 0;
-
-	// Delta
-	double charge_delta = 0;
 
 private:
 	double calculateBranchLen(
@@ -117,14 +110,19 @@ public:
 
 	void doBifurcation(double time, double dt) override;
 
+	void calculateHeatnessByTemperature(double temp);
+
 	// Parameters
-	double conductivity = 300e-13;
+	double diameter = 0.01; // 1cm
+	//constexpr static Cp = 1.0
 
 	// Primary
+	double heatness = 0.0;
 
 	// Secondary
+	double temperature = 0.0;
 	double current = 0;
-
+	double conductivity = 300e-13;
 };
 
 SOTM_QUICK_NPF(ElectrostaticNodePayload, ElectrostaticNodePayloadFactory);

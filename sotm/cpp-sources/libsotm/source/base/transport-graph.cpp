@@ -3,7 +3,10 @@
 #include "sotm/base/physical-payload.hpp"
 #include "sotm/utils/utils.hpp"
 
+#include <tbb/tbb.h>
+
 using namespace sotm;
+using namespace tbb;
 
 void GraphRegister::addLink(Link* link)
 {
@@ -73,6 +76,10 @@ void GraphRegister::applyLinkVisitor(LinkVisitor v)
 
 void GraphRegister::applyNodeVisitorWithoutGraphChganges(NodeVisitor v)
 {
+	/*
+	tbb::parallel_for( size_t(0), n, [&]( size_t i ) {
+	        Foo(a[i]);
+	    } );*/
 	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
 	{
 		v(*it);
