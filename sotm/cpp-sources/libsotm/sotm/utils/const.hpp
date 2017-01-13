@@ -20,6 +20,11 @@ namespace sotm
 		{
 			constexpr static double epsilon_0 = 8.85418781762039e-12;
 			constexpr static double k = 1 / (4*pi*epsilon_0);
+
+			namespace SpecificHeat
+			{
+				constexpr static double air = 1005; // J / (kg*K)
+			}
 		}
 	}
 }

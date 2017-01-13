@@ -227,6 +227,10 @@ Link::Link(ModelContext* context, Node* nodeFrom, Vector<3> pointTo) :
 
 Link::~Link()
 {
+	if (m_n1.assigned())
+		m_n1->removeLink(this);
+	if (m_n2.assigned())
+		m_n2->removeLink(this);
 	m_context->graphRegister.rmLink(this);
 }
 
@@ -251,5 +255,18 @@ PtrWrap<Node> Link::getNode2()
 PtrWrap<Node> Link::getNode(unsigned int index)
 {
 	return index == 0 ? m_n1 : m_n2;
+}
+
+double Link::length()
+{
+	return (m_n1->pos - m_n2->pos).len();
+}
+
+double Link::lengthCached()
+{
+	if (m_lengthCached < 0.0) {
+		m_lengthCached = length();
+	}
+	return m_lengthCached;
 }
 

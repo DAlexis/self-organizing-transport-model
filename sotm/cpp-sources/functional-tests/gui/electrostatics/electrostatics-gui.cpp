@@ -65,6 +65,7 @@ int main(int argc, char** argv)
 		PtrWrap<Link> l3 = PtrWrap<Link>::make(&c);*/
 
 		l->connect(n1, n2);
+		l->payload->init();
 /*		l1->connect(n2, n3);
 		l2->connect(n2, n4);
 		l3->connect(n2, n5);*/

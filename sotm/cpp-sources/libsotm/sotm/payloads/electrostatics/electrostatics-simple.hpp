@@ -110,17 +110,23 @@ public:
 
 	void doBifurcation(double time, double dt) override;
 
-	void calculateHeatnessByTemperature(double temp);
+	void init() override;
+	std::string getFollowerText() override;
+
+
+	void setTemperature(double temp);
+	double getTemperature();
+
+	double heatCapacity();
 
 	// Parameters
-	double diameter = 0.01; // 1cm
+	double radius = 0.01; // 1cm
 	//constexpr static Cp = 1.0
 
 	// Primary
-	double heatness = 0.0;
+	Variable heatness = 0.0; // J
 
 	// Secondary
-	double temperature = 0.0;
 	double current = 0;
 	double conductivity = 300e-13;
 };

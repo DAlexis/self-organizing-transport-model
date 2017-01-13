@@ -69,6 +69,8 @@ private:
 		std::vector< vtkSmartPointer<vtkLine> > lines;
 
 		std::vector<SphereDrawer> sphereDrawers;
+
+		std::vector< vtkSmartPointer<vtkFollower> > wireLabels;
 	};
 
 	sotm::ModelContext* m_modelContext;

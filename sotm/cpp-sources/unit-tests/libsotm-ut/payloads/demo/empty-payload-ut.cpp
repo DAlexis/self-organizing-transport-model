@@ -21,7 +21,7 @@ TEST(EmptyPayload, ModelContextInitialization)
 		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c);
 		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c);
 		PtrWrap<Link> l = PtrWrap<Link>::make(&c);
-	) << "Building simpliest graph";
+	) << "Building simplest graph";
 
 	// We had no assertion so we can create nodes and link without ASSERT_NO_THROW environment
 	PtrWrap<Node> n1 = PtrWrap<Node>::make(&c);

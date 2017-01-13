@@ -47,7 +47,7 @@ void SphereDrawer::create(Vector<3> pos, double radius, double color[3], const s
 		m_label->GetProperty()->SetColor( 1, 0, 0 ); // red
 		m_label->SetPosition(pos.x);
 		m_label->PickableOff();
-		m_label->SetScale(0.1);
+		m_label->SetScale(0.05);
 	}
 
 	m_actor = vtkSmartPointer<vtkActor>::New();
@@ -100,6 +100,12 @@ void GraphWireframeDrawer::addCurrentActors(vtkRenderer* renderer)
 
 	for (auto& sd : m_currentBuffer->sphereDrawers)
 		sd.addActors(renderer);
+
+	for (auto& wl : m_currentBuffer->wireLabels)
+	{
+		wl->SetCamera(renderer->GetActiveCamera());
+		renderer->AddActor(wl);
+	}
 }
 
 GraphWireframeDrawer::WireframeBuffer::WireframeBuffer()
@@ -116,6 +122,7 @@ void GraphWireframeDrawer::WireframeBuffer::clear()
 	colors->SetNumberOfComponents(3);
 	lines.clear();
 	sphereDrawers.clear();
+	wireLabels.clear();
 }
 
 void GraphWireframeDrawer::WireframeBuffer::prepareWireframeActor()
@@ -135,8 +142,12 @@ void GraphWireframeDrawer::swapBuffers()
 
 void GraphWireframeDrawer::linkVisitor(sotm::Link* link)
 {
-	vtkIdType id1 = m_nextBuffer->points->InsertNextPoint( link->getNode1()->pos.x );
-	vtkIdType id2 = m_nextBuffer->points->InsertNextPoint( link->getNode2()->pos.x );
+	auto& p1 = link->getNode1()->pos;
+	auto& p2 = link->getNode2()->pos;
+	vtkIdType id1 = m_nextBuffer->points->InsertNextPoint( p1.x );
+	vtkIdType id2 = m_nextBuffer->points->InsertNextPoint( p2.x );
+
+	Vector<3> center = (p1 + p2) / 2.0;
 
 	vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
 	line->GetPointIds()->SetId(0, id1);
@@ -157,6 +168,29 @@ void GraphWireframeDrawer::linkVisitor(sotm::Link* link)
 	m_nextBuffer->colors->InsertNextTupleValue(color_uchar);
 
 	m_nextBuffer->linesCellArray->InsertNextCell(line);
+
+	std::string linkFollowerText = link->payload->getFollowerText();
+
+	if (m_renderPreferences->enableFollowers && !linkFollowerText.empty())
+	{
+
+		vtkSmartPointer<vtkVectorText> textSource = vtkSmartPointer<vtkVectorText>::New();
+		textSource->SetText(linkFollowerText.c_str());
+
+		// Create a mapper
+		vtkSmartPointer<vtkPolyDataMapper> textMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+		textMapper->SetInputConnection( textSource->GetOutputPort() );
+
+		vtkSmartPointer<vtkFollower> label = vtkSmartPointer<vtkFollower>::New();
+
+		label = vtkSmartPointer<vtkFollower>::New();
+		label->SetMapper( textMapper );
+		label->GetProperty()->SetColor( 0.2, 0.8, 0.1 );
+		label->SetPosition(center.x);
+		label->PickableOff();
+		label->SetScale(0.05);
+		m_nextBuffer->wireLabels.push_back(label);
+	}
 }
 
 void GraphWireframeDrawer::nodeVisitor(sotm::Node* node)

@@ -14,10 +14,11 @@ namespace sotm
 {
 
 struct Variable {
-	double previous = 0;
-	double current = 0;
-	double delta = 0;
-	double rhs = 0;
+	Variable(double initValue = 0.0) : previous(initValue), current(initValue) { }
+	double previous;
+	double current;
+	double delta = 0.0;
+	double rhs = 0.0;
 
 	SOTM_INLINE void makeSubIteration(double dt) { current = previous + rhs * dt; }
 	SOTM_INLINE void addRHSToDelta(double m) { delta += rhs * m; }

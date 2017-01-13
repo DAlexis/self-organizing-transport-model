@@ -37,6 +37,14 @@ public:
 	AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg);
 	virtual ~AnyPhysicalPayloadBase();
 
+	/**
+	 * This function will be called when after payload is connected to link.
+	 * Initial values for variables may be set here
+	 *
+	 * todo: check real usage of this function
+	 */
+	virtual void init() { }
+
 	virtual void calculateSecondaryValues() { }
 
 	/// Get object color for visualization purpose. Color is RGB array. Each color is from interval [0.0; 1.0]

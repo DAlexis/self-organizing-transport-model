@@ -298,13 +298,36 @@ void ElectrostaticLinkPayload::calculateSecondaryValues()
 	current = (p1->phi - p2->phi) * conductivity;
 }
 
-void ElectrostaticLinkPayload::calculateRHS(double time) { }
-void ElectrostaticLinkPayload::addRHSToDelta(double m) { }
-void ElectrostaticLinkPayload::makeSubIteration(double dt) { }
-void ElectrostaticLinkPayload::step() { }
+void ElectrostaticLinkPayload::calculateRHS(double time)
+{
+	heatness.rhs =
+			sqr(current) / conductivity // Heat source
+			- 0.5*heatness.rhs; // Dissipation
+}
+
+void ElectrostaticLinkPayload::addRHSToDelta(double m)
+{
+	heatness.addRHSToDelta(m);
+}
+
+void ElectrostaticLinkPayload::makeSubIteration(double dt)
+{
+	heatness.makeSubIteration(dt);
+}
+
+void ElectrostaticLinkPayload::step()
+{
+	heatness.step();
+}
 
 void ElectrostaticLinkPayload::doBifurcation(double time, double dt)
 {
+	if (current != 0.0 && fabs(current) < 5e-7)
+	{
+		onDeletePayload();
+		return;
+	}
+
 	// Check if physics tells us we can release parent object
 	ElectrostaticPhysicalContext* context = ElectrostaticPhysicalContext::cast(link->context()->physicalContext());
 	if (context->readyToDestroy())
@@ -313,6 +336,33 @@ void ElectrostaticLinkPayload::doBifurcation(double time, double dt)
 	}
 }
 
-void ElectrostaticLinkPayload::calculateHeatnessByTemperature(double temp)
+void ElectrostaticLinkPayload::init()
 {
+	setTemperature(300);
+}
+
+std::string ElectrostaticLinkPayload::getFollowerText()
+{
+	std::ostringstream ss;
+	ss << "  t = " << std::scientific << std::setprecision(2) << getTemperature() << endl;
+	ss << "  I = " << std::scientific << std::setprecision(2) << current << endl;
+	return ss.str();
+}
+
+void ElectrostaticLinkPayload::setTemperature(double temp)
+{
+	heatness.setInitial(temp*heatCapacity());
+}
+
+double ElectrostaticLinkPayload::getTemperature()
+{
+	return heatness.current / heatCapacity();
+}
+
+double ElectrostaticLinkPayload::heatCapacity()
+{
+	double l = link->lengthCached();
+	double volume = Const::pi/4.0*radius*radius*l;
+	double heatCapacity = volume * Const::Si::SpecificHeat::air;
+	return heatCapacity;
 }
