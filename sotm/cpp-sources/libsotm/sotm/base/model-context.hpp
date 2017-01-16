@@ -11,6 +11,8 @@
 #include "sotm/base/transport-graph.hpp"
 #include "sotm/base/time-iter.hpp"
 #include "sotm/base/physical-payload.hpp"
+#include "sotm/base/parallel.hpp"
+
 #include <memory>
 
 namespace sotm
@@ -36,7 +38,9 @@ public:
 
 	inline IPhysicalContext* physicalContext() { return m_physicalContext.get(); }
 
-	PhysicalPayloadsRegister payloadsRegister;
+	ParallelSettings parallelSettings;
+
+	PhysicalPayloadsRegister payloadsRegister{&parallelSettings};
 	GraphRegister graphRegister;
 
 private:

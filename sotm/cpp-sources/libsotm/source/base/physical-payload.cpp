@@ -8,27 +8,53 @@
 #include "sotm/base/physical-payload.hpp"
 #include "sotm/utils/assert.hpp"
 
+#include <tbb/tbb.h>
+
 using namespace sotm;
 
-PhysicalPayloadsRegister::PhysicalPayloadsRegister()
+PhysicalPayloadsRegister::PhysicalPayloadsRegister(const ParallelSettings* parallelSettings) :
+		m_parallelSettings(parallelSettings)
 {
 }
 
 void PhysicalPayloadsRegister::add(AnyPhysicalPayloadBase* payload)
 {
 	m_payloads.insert(payload);
+	m_payloadsVector.push_back(payload);
 }
 
 void PhysicalPayloadsRegister::remove(AnyPhysicalPayloadBase* payload)
 {
 	size_t count = m_payloads.erase(payload);
+	m_payloadsVectorDirty = true;
 	ASSERT(count == 1, "Removing payload without adding");
+}
+
+void PhysicalPayloadsRegister::rebuildPayloadsVectorIfNeeded()
+{
+	if (!m_payloadsVectorDirty)
+		return;
+
+	m_payloadsVector.clear();
+	for (auto &it : m_payloads)
+		m_payloadsVector.push_back(it);
+	m_payloadsVectorDirty = false;
 }
 
 void PhysicalPayloadsRegister::calculateSecondaryValues()
 {
-	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
-		(*it)->calculateSecondaryValues();
+	if (m_parallelSettings->parallelContiniousIteration.calculateSecondaryValues)
+	{
+		rebuildPayloadsVectorIfNeeded();
+		tbb::parallel_for( size_t(0), m_payloadsVector.size(),
+			[this]( size_t i ) {
+				m_payloadsVector[i]->calculateSecondaryValues();
+			}
+		);
+	} else {
+		for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
+			(*it)->calculateSecondaryValues();
+	}
 }
 
 void PhysicalPayloadsRegister::calculateRHS(double time)

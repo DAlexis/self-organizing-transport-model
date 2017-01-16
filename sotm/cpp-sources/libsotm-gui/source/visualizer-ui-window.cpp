@@ -151,7 +151,6 @@ void VisualizerUIWindow::on_pushButtonOneIteration_clicked()
 {
     if (!m_gui->isStaticGraph())
     {
-    	m_gui->animationMaker()->doIteration();
     	prepareNextFrame();
         this->qvtkWidget->repaint();
         updateModelInfo();

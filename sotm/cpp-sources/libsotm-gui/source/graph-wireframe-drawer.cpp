@@ -165,7 +165,7 @@ void GraphWireframeDrawer::linkVisitor(sotm::Link* link)
 			(unsigned char) ( pow(rgb[1], m_renderPreferences->gamma)*255 ),
 			(unsigned char) ( pow(rgb[2], m_renderPreferences->gamma)*255 )
 		};
-	m_nextBuffer->colors->InsertNextTupleValue(color_uchar);
+	m_nextBuffer->colors->InsertNextTypedTuple(color_uchar);
 
 	m_nextBuffer->linesCellArray->InsertNextCell(line);
 

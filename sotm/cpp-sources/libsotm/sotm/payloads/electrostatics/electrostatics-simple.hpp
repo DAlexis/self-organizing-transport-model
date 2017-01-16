@@ -116,6 +116,7 @@ public:
 
 	void setTemperature(double temp);
 	double getTemperature();
+	double getCurrent();
 
 	double heatCapacity();
 
@@ -127,7 +128,7 @@ public:
 	Variable heatness = 0.0; // J
 
 	// Secondary
-	double current = 0;
+	//double current = 0;
 	double conductivity = 300e-13;
 };
 

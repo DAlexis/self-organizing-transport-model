@@ -66,7 +66,7 @@ void ElectrostaticPhysicalContext::getElectricField(const Vector<3>& point, Vect
 	outPotential = - (point ^ m_externalConstField);
 	outField = m_externalConstField;
 
-	auto nodeVisitor = [&point, exclude, &outPotential, &outField](const Node* node) {
+	GraphRegister::NodeVisitor nodeVisitor = [&point, exclude, &outPotential, &outField](const Node* node) {
 
 		// Skip this node
 		if (node == exclude)
@@ -98,37 +98,7 @@ ElectrostaticNodePayload::ElectrostaticNodePayload(PhysicalPayloadsRegister* reg
 }
 
 void ElectrostaticNodePayload::calculateSecondaryValues()
-{/*
-	phi = -(node->pos ^ externalField);
-	externalField = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext())->m_externalConstField;
-
-	Vector<3> r0 = node->pos;
-
-	auto nodeVisitor = [this, &r0](Node* node) {
-		// Skip this node
-		if (node == this->node.data())
-			return;
-		Vector<3> r1 = node->pos;
-
-		double dist = (r0 - r1).len();
-		double dist3 = dist*dist*dist;
-
-		double charge = static_cast<ElectrostaticNodePayload*>(node->payload.get())->charge;
-
-		phi += Const::Si::k * charge / dist;
-
-		externalField[0] += Const::Si::k * charge * (r0[0]-r1[0]) / dist3;
-		externalField[1] += Const::Si::k * charge * (r0[1]-r1[1]) / dist3;
-		externalField[2] += Const::Si::k * charge * (r0[2]-r1[2]) / dist3;
-	};
-
-	node->context()->graphRegister.applyNodeVisitor(nodeVisitor);
-
-	double capacity = radius / Const::Si::k;
-	externalField = externalField * 3;
-	phi += charge / capacity;*/
-
-
+{
 	static_cast<ElectrostaticPhysicalContext*>(node->physicalContext())->
 			getElectricField(node->pos, externalField, phi, this->node.data());
 
@@ -141,8 +111,9 @@ void ElectrostaticNodePayload::calculateSecondaryValues()
 void ElectrostaticNodePayload::calculateRHS(double time)
 {
 	charge.rhs = 0;
-	auto linkVisitor = [this](Link* link, LinkDirection dir){
-		double current = static_cast<ElectrostaticLinkPayload*>(link->payload.get())->current;
+	Node::LinkVisitor linkVisitor = [this](Link* link, LinkDirection dir)
+	{
+		double current = static_cast<ElectrostaticLinkPayload*>(link->payload.get())->getCurrent();
 		charge.rhs += current * (dir == LinkDirection::in ? 1.0 : -1.0);
 	};
 	node->applyConnectedLinksVisitor(linkVisitor);
@@ -289,19 +260,12 @@ ElectrostaticLinkPayload::ElectrostaticLinkPayload(PhysicalPayloadsRegister* reg
 
 void ElectrostaticLinkPayload::calculateSecondaryValues()
 {
-	Node* n1 = link->getNode1();
-	ElectrostaticNodePayload* p1 = static_cast<ElectrostaticNodePayload*>(n1->payload.get());
-
-	Node* n2 = link->getNode2();
-	ElectrostaticNodePayload* p2 = static_cast<ElectrostaticNodePayload*>(n2->payload.get());
-
-	current = (p1->phi - p2->phi) * conductivity;
 }
 
 void ElectrostaticLinkPayload::calculateRHS(double time)
 {
 	heatness.rhs =
-			sqr(current) / conductivity // Heat source
+			sqr(getCurrent()) / conductivity // Heat source
 			- 0.5*heatness.rhs; // Dissipation
 }
 
@@ -322,6 +286,7 @@ void ElectrostaticLinkPayload::step()
 
 void ElectrostaticLinkPayload::doBifurcation(double time, double dt)
 {
+	double current = getCurrent();
 	if (current != 0.0 && fabs(current) < 5e-7)
 	{
 		onDeletePayload();
@@ -345,8 +310,19 @@ std::string ElectrostaticLinkPayload::getFollowerText()
 {
 	std::ostringstream ss;
 	ss << "  t = " << std::scientific << std::setprecision(2) << getTemperature() << endl;
-	ss << "  I = " << std::scientific << std::setprecision(2) << current << endl;
+	ss << "  I = " << std::scientific << std::setprecision(2) << getCurrent() << endl;
 	return ss.str();
+}
+
+double ElectrostaticLinkPayload::getCurrent()
+{
+	Node* n1 = link->getNode1();
+	ElectrostaticNodePayload* p1 = static_cast<ElectrostaticNodePayload*>(n1->payload.get());
+
+	Node* n2 = link->getNode2();
+	ElectrostaticNodePayload* p2 = static_cast<ElectrostaticNodePayload*>(n2->payload.get());
+
+	return (p1->phi - p2->phi) * conductivity;
 }
 
 void ElectrostaticLinkPayload::setTemperature(double temp)

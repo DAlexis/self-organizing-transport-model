@@ -4,6 +4,8 @@
 #include "sotm/base/transport-graph.hpp"
 #include "sotm/base/time-iter.hpp"
 #include "sotm/utils/memory.hpp"
+#include "sotm/base/parallel.hpp"
+
 #include <vector>
 #include <set>
 #include <string>
@@ -17,7 +19,7 @@ class ModelContext;
 class PhysicalPayloadsRegister : public IContinuousTimeIterable
 {
 public:
-	PhysicalPayloadsRegister();
+	PhysicalPayloadsRegister(const ParallelSettings* parallelSettings = &ParallelSettings::parallelDisabled);
 	void add(AnyPhysicalPayloadBase* payload);
 	void remove(AnyPhysicalPayloadBase* payload);
 
@@ -28,7 +30,12 @@ public:
 	void step() override final;
 
 private:
+	void rebuildPayloadsVectorIfNeeded();
 	std::set<AnyPhysicalPayloadBase*> m_payloads;
+	std::vector<AnyPhysicalPayloadBase*> m_payloadsVector;
+	bool m_payloadsVectorDirty = true;
+
+	const ParallelSettings* m_parallelSettings;
 };
 
 class AnyPhysicalPayloadBase : public IContinuousTimeIterable, public IBifurcationTimeIterable

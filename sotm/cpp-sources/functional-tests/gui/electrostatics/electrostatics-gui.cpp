@@ -7,6 +7,7 @@
 #include "sotm/math/random.hpp"
 
 #include "sotm-gui/gui.hpp"
+#include <tbb/tbb.h>
 
 using namespace std;
 using namespace sotm;
@@ -14,12 +15,15 @@ using namespace sotm;
 
 int main(int argc, char** argv)
 {
+	//tbb::task_scheduler_init init(2);
 	Random::randomize(0);
 	ModelContext c;
 
 	c.setNodePayloadFactory(std::unique_ptr<INodePayloadFactory>(new ElectrostaticNodePayloadFactory()));
 	c.setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory>(new ElectrostaticLinkPayloadFactory()));
 	c.setPhysicalContext(std::unique_ptr<IPhysicalContext>(new ElectrostaticPhysicalContext()));
+
+	//c.parallelSettings.parallelContiniousIteration.calculateSecondaryValues = true;
 
 	ElectrostaticPhysicalContext* physCont = static_cast<ElectrostaticPhysicalContext*>(c.physicalContext());
 	/*physCont->setDischargeFunc(

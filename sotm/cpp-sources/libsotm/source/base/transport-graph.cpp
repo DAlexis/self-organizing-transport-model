@@ -74,16 +74,22 @@ void GraphRegister::applyLinkVisitor(LinkVisitor v)
 	}
 }
 
-void GraphRegister::applyNodeVisitorWithoutGraphChganges(NodeVisitor v)
+void GraphRegister::applyNodeVisitorWithoutGraphChganges(NodeVisitor v, bool parallel)
 {
-	/*
-	tbb::parallel_for( size_t(0), n, [&]( size_t i ) {
-	        Foo(a[i]);
-	    } );*/
-	for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
+	/*if (parallel)
 	{
-		v(*it);
-	}
+		if (m_nodesVectorDirty) {
+			updateNodesVector();
+		}
+		tbb::parallel_for( size_t(0), m_nodesVector.size(), [this, v]( size_t i ) {
+			v(m_nodesVector[i]);
+		} );
+	} else {*/
+		for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
+		{
+			v(*it);
+		}
+	//}
 }
 
 void GraphRegister::applyLinkVisitorWithoutGraphChganges(LinkVisitor v)
@@ -130,8 +136,12 @@ void GraphRegister::beginIterating()
 
 void GraphRegister::endIterating()
 {
+	if (!m_nodesToAdd.empty() || !m_nodesToDelete.empty())
+		m_nodesVectorDirty = true;
+
 	m_iteratingNow = false;
 	m_nodes.insert(m_nodesToAdd.begin(), m_nodesToAdd.end());
+
 	m_nodesToAdd.clear();
 	m_links.insert(m_linksToAdd.begin(), m_linksToAdd.end());
 	m_linksToAdd.clear();
@@ -145,6 +155,14 @@ void GraphRegister::endIterating()
 		m_links.erase(*it);
 	}
 	m_linksToDelete.clear();
+}
+
+void GraphRegister::updateNodesVector()
+{
+	m_nodesVector.clear();
+	for (auto &it : m_nodes)
+		m_nodesVector.push_back(it);
+	m_nodesVectorDirty = false;
 }
 
 ////////////////////////////

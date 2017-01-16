@@ -4,9 +4,11 @@
 #include "sotm/math/geometry.hpp"
 #include "sotm/utils/memory.hpp"
 #include "sotm/utils/macros.hpp"
+
 #include <list>
 #include <memory>
 #include <set>
+#include <vector>
 #include <functional>
 
 namespace sotm
@@ -45,7 +47,7 @@ public:
 	void applyLinkVisitor(LinkVisitor v);
 
 	/// Iterate by all nodes. New nodes should not be added during iteration
-	void applyNodeVisitorWithoutGraphChganges(NodeVisitor v);
+	void applyNodeVisitorWithoutGraphChganges(NodeVisitor v, bool parallel = false);
 
 	/// Iterate by all links. New nodes should not be added during iteration
 	void applyLinkVisitorWithoutGraphChganges(LinkVisitor v);
@@ -64,12 +66,16 @@ private:
 	/// Apply cached add/remove operations with links/nodes
 	void endIterating();
 
+	void updateNodesVector();
+
 	/// If true we cannot add/remove directly to/from m_nodes and m_links because we are iterating by them
 	bool m_iteratingNow = false;
 
 	NodeSet m_nodes, m_nodesToAdd, m_nodesToDelete;
 	LinkSet m_links, m_linksToAdd, m_linksToDelete;
 
+	std::vector<Node*> m_nodesVector;
+	bool m_nodesVectorDirty = true;
 };
 
 class ModelContextDependent
