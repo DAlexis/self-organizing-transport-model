@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 	c.setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory>(new ElectrostaticLinkPayloadFactory()));
 	c.setPhysicalContext(std::unique_ptr<IPhysicalContext>(new ElectrostaticPhysicalContext()));
 
-	//c.parallelSettings.parallelContiniousIteration.calculateSecondaryValues = true;
+	c.parallelSettings.parallelContiniousIteration.calculateSecondaryValues = true;
 
 	ElectrostaticPhysicalContext* physCont = static_cast<ElectrostaticPhysicalContext*>(c.physicalContext());
 	/*physCont->setDischargeFunc(
@@ -58,21 +58,11 @@ int main(int argc, char** argv)
 		/// Building initial tree
 		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, Vector<3>(0.0, 0.0, -0.2));
 		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, Vector<3>(0.0, 0.0, 0.2));
-/*
-		PtrWrap<Node> n3 = PtrWrap<Node>::make(&c, Vector<3>(2.0, 1.0, 1.0));
-		PtrWrap<Node> n4 = PtrWrap<Node>::make(&c, Vector<3>(1.0, 2.0, 1.0));
-		PtrWrap<Node> n5 = PtrWrap<Node>::make(&c, Vector<3>(1.0, 1.0, 2.0));*/
 
 		PtrWrap<Link> l = PtrWrap<Link>::make(&c);
-/*		PtrWrap<Link> l1 = PtrWrap<Link>::make(&c);
-		PtrWrap<Link> l2 = PtrWrap<Link>::make(&c);
-		PtrWrap<Link> l3 = PtrWrap<Link>::make(&c);*/
 
 		l->connect(n1, n2);
 		l->payload->init();
-/*		l1->connect(n2, n3);
-		l2->connect(n2, n4);
-		l3->connect(n2, n5);*/
 
 		//static_cast<ElectrostaticNodePayload*>(n1->payload.get())->setCharge(4e-6);
 		//static_cast<ElectrostaticNodePayload*>(n2->payload.get())->setCharge(4e-6);
@@ -83,7 +73,8 @@ int main(int argc, char** argv)
 	TimeIterator iter(&c, &euler, &c);
 	iter.setTime(0.0);
 	iter.setStep(0.001);
-	iter.setStopTime(1.0);
+	//iter.setStopTime(5.0);
+	//iter.run();
 
 	// Running GUI
 	GUI gui(&c, &iter);

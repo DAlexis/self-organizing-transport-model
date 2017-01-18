@@ -82,8 +82,8 @@ void VisualizerUIWindow::startFrameTimer()
 void VisualizerUIWindow::prepareNextFrame()
 {
     updateModelInfo();
-    m_gui->animationMaker()->drawNextFrame();
     m_gui->animationMaker()->iterateToNextFrame();
+    m_gui->animationMaker()->drawNextFrame();
     this->qvtkWidget->repaint();
 }
 

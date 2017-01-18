@@ -9,21 +9,21 @@ FrameMaker::FrameMaker(ModelContext *modelContext) :
 
 void FrameMaker::prepareNextFrameAndSwapBuffers()
 {
-	m_wireframeDrawer.prepareNextActor();
+	m_wireframeDrawer.prepareNextBuffer();
 	m_wireframeDrawer.swapBuffers();
 }
 
 void FrameMaker::recreateCurrentFrame()
 {
 	m_wireframeDrawer.swapBuffers();
-	m_wireframeDrawer.prepareNextActor();
+	m_wireframeDrawer.prepareNextBuffer();
 	m_wireframeDrawer.swapBuffers();
 }
 
 void FrameMaker::draw(vtkRenderer *renderer)
 {
 	renderer->RemoveAllViewProps();
-	m_wireframeDrawer.addCurrentActors(renderer);
+	m_wireframeDrawer.addActorsFromCurrentBuffer(renderer);
 }
 
 RenderPreferences* FrameMaker::renderPreferences()

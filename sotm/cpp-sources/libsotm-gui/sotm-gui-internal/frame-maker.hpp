@@ -2,10 +2,9 @@
 #ifndef LIBSOTM_GUI_SOTM_GUI_INTERNAL_FRAME_MAKER_HPP_
 #define LIBSOTM_GUI_SOTM_GUI_INTERNAL_FRAME_MAKER_HPP_
 
-#include "sotm-gui-internal/graph-wireframe-drawer.hpp"
-
+#include "sotm/output/graph-drawer.hpp"
 #include "sotm/base/model-context.hpp"
-#include "sotm-gui-internal/render-preferences.hpp"
+#include "sotm/output/render-preferences.hpp"
 
 #include <vtkRenderer.h>
 
@@ -35,7 +34,7 @@ public:
 
 private:
 	RenderPreferences m_renderPreferences;
-	GraphWireframeDrawer m_wireframeDrawer;
+	GraphDrawer m_wireframeDrawer;
 };
 
 }  // namespace sotm

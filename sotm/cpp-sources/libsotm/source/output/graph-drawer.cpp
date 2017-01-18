@@ -5,11 +5,10 @@
  *      Author: dalexies
  */
 
-#include "sotm-gui-internal/graph-wireframe-drawer.hpp"
-
-#include <vtkCellData.h>
-#include <vtkProperty.h>
-#include <vtkVectorText.h>
+#include "sotm/output/graph-drawer.hpp"
+#include <vtk/vtkCellData.h>
+#include <vtk/vtkProperty.h>
+#include <vtk/vtkVectorText.h>
 
 #include <cmath>
 
@@ -66,15 +65,25 @@ void SphereDrawer::addActors(vtkRenderer* renderer)
 
 }
 
-GraphWireframeDrawer::GraphWireframeDrawer(sotm::ModelContext* modelContext, RenderPreferences* renderPreferences) :
+GraphDrawer::GraphDrawer(sotm::ModelContext* modelContext, RenderPreferences* renderPreferences) :
 	m_modelContext(modelContext),
 	m_renderPreferences(renderPreferences)
 {
 }
 
-void GraphWireframeDrawer::prepareNextActor()
+void GraphDrawer::prepareNextBuffer()
 {
-	m_nextBuffer->clear();
+	prepareBuffer(m_nextBuffer);
+}
+
+void GraphDrawer::prepareCurrentBuffer()
+{
+	prepareBuffer(m_currentBuffer);
+}
+
+void GraphDrawer::prepareBuffer(WireframeBuffer* buffer)
+{
+	buffer->clear();
 
 	m_modelContext->graphRegister.applyLinkVisitor(
 		[this] (sotm::Link* link)
@@ -91,10 +100,10 @@ void GraphWireframeDrawer::prepareNextActor()
 			}
 		);
 	}
-	m_nextBuffer->prepareWireframeActor();
+	buffer->prepareWireframeActor();
 }
 
-void GraphWireframeDrawer::addCurrentActors(vtkRenderer* renderer)
+void GraphDrawer::addActorsFromCurrentBuffer(vtkRenderer* renderer)
 {
 	renderer->AddActor(m_currentBuffer->actor);
 
@@ -108,12 +117,12 @@ void GraphWireframeDrawer::addCurrentActors(vtkRenderer* renderer)
 	}
 }
 
-GraphWireframeDrawer::WireframeBuffer::WireframeBuffer()
+GraphDrawer::WireframeBuffer::WireframeBuffer()
 {
 	clear();
 }
 
-void GraphWireframeDrawer::WireframeBuffer::clear()
+void GraphDrawer::WireframeBuffer::clear()
 {
 	points->Reset();
 	linesCellArray->Reset();
@@ -125,7 +134,7 @@ void GraphWireframeDrawer::WireframeBuffer::clear()
 	wireLabels.clear();
 }
 
-void GraphWireframeDrawer::WireframeBuffer::prepareWireframeActor()
+void GraphDrawer::WireframeBuffer::prepareWireframeActor()
 {
 	polyData->SetPoints(points);
 	polyData->SetLines(linesCellArray);
@@ -135,12 +144,12 @@ void GraphWireframeDrawer::WireframeBuffer::prepareWireframeActor()
 	actor->SetMapper(mapper);
 }
 
-void GraphWireframeDrawer::swapBuffers()
+void GraphDrawer::swapBuffers()
 {
 	std::swap(m_nextBuffer, m_currentBuffer);
 }
 
-void GraphWireframeDrawer::linkVisitor(sotm::Link* link)
+void GraphDrawer::linkVisitor(sotm::Link* link)
 {
 	auto& p1 = link->getNode1()->pos;
 	auto& p2 = link->getNode2()->pos;
@@ -193,7 +202,7 @@ void GraphWireframeDrawer::linkVisitor(sotm::Link* link)
 	}
 }
 
-void GraphWireframeDrawer::nodeVisitor(sotm::Node* node)
+void GraphDrawer::nodeVisitor(sotm::Node* node)
 {
 	double rgb[3];
 	node->payload->getColor(rgb);

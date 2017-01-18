@@ -9,20 +9,19 @@
 #define LIBSOTM_GUI_GRAPH_WIREFRAME_DRAWER_HPP_
 
 #include "sotm/base/model-context.hpp"
-#include "sotm-gui-internal/render-preferences.hpp"
+#include "sotm/output/render-preferences.hpp"
 
-
-#include <vtkDataSet.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkSphereSource.h>
-#include <vtkLineSource.h>
-#include <vtkCellArray.h>
-#include <vtkLine.h>
-#include <vtkActor.h>
-#include <vtkSmartPointer.h>
-#include <vtkFollower.h>
+#include <vtk/vtkDataSet.h>
+#include <vtk/vtkPolyDataMapper.h>
+#include <vtk/vtkRenderer.h>
+#include <vtk/vtkRenderWindow.h>
+#include <vtk/vtkSphereSource.h>
+#include <vtk/vtkLineSource.h>
+#include <vtk/vtkCellArray.h>
+#include <vtk/vtkLine.h>
+#include <vtk/vtkActor.h>
+#include <vtk/vtkSmartPointer.h>
+#include <vtk/vtkFollower.h>
 
 #include <vector>
 
@@ -41,18 +40,16 @@ private:
 	vtkSmartPointer<vtkFollower> m_label = nullptr;
 };
 
-class GraphWireframeDrawer
+class GraphDrawer
 {
 public:
-	GraphWireframeDrawer(ModelContext* modelContext, RenderPreferences* renderPreferences);
-	void prepareNextActor();
-	void addCurrentActors(vtkRenderer* renderer);
+	GraphDrawer(ModelContext* modelContext, RenderPreferences* renderPreferences);
+	void prepareNextBuffer();
+	void prepareCurrentBuffer();
+	void addActorsFromCurrentBuffer(vtkRenderer* renderer);
 	void swapBuffers();
 
 private:
-	void linkVisitor(sotm::Link* link);
-	void nodeVisitor(sotm::Node* node);
-
 	struct WireframeBuffer {
 		WireframeBuffer();
 		void clear();
@@ -72,6 +69,11 @@ private:
 
 		std::vector< vtkSmartPointer<vtkFollower> > wireLabels;
 	};
+
+	void linkVisitor(sotm::Link* link);
+	void nodeVisitor(sotm::Node* node);
+
+	void prepareBuffer(WireframeBuffer* buffer);
 
 	sotm::ModelContext* m_modelContext;
 	RenderPreferences* m_renderPreferences;

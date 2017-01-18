@@ -1,9 +1,8 @@
+#include "sotm/output/graph-drawer.hpp"
 #include "sotm-gui/gui.hpp"
 #include "sotm-gui-internal/gui-internal.hpp"
 
 #include "sotm-gui-internal/visualizer-ui-window.hpp"
-#include "sotm-gui-internal/graph-wireframe-drawer.hpp"
-
 #include <vtkPolyDataMapper.h>
 
 #include <QApplication>

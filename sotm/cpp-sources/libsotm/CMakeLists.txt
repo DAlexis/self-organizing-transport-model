@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 2.8)
 
 project(sotm)
 
+find_package(VTK REQUIRED)
+#include(${VTK_USE_FILE})
+
+
 set(LIB_SOURCE
     ${PROJECT_SOURCE_DIR}/source/math/generic.cpp
     ${PROJECT_SOURCE_DIR}/source/math/geometry.cpp
@@ -13,6 +17,7 @@ set(LIB_SOURCE
     ${PROJECT_SOURCE_DIR}/source/base/model-context.cpp
     ${PROJECT_SOURCE_DIR}/source/base/parallel.cpp
     ${PROJECT_SOURCE_DIR}/source/base/time-iter.cpp
+    ${PROJECT_SOURCE_DIR}/source/output/graph-drawer.cpp
     ${PROJECT_SOURCE_DIR}/source/time-iter/euler-explicit.cpp
     ${PROJECT_SOURCE_DIR}/source/time-iter/runge-kutta.cpp
     ${PROJECT_SOURCE_DIR}/source/payloads/demo/empty-payloads.cpp
@@ -21,19 +26,22 @@ set(LIB_SOURCE
 )
 
 set(LIB_HPP
+    ${PROJECT_SOURCE_DIR}/sotm/payloads/electrostatics/electrostatics-simple.hpp
     ${PROJECT_SOURCE_DIR}/sotm/payloads/demo/empty-payloads.hpp
     ${PROJECT_SOURCE_DIR}/sotm/payloads/demo/absolute-random-graph.hpp
-    ${PROJECT_SOURCE_DIR}/sotm/time-iter/euler-explicit.hpp
     ${PROJECT_SOURCE_DIR}/sotm/time-iter/runge-kutta.hpp
-    ${PROJECT_SOURCE_DIR}/sotm/math/geometry.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/time-iter/euler-explicit.hpp
     ${PROJECT_SOURCE_DIR}/sotm/math/random.hpp
-    ${PROJECT_SOURCE_DIR}/sotm/math/generic.hpp
     ${PROJECT_SOURCE_DIR}/sotm/math/integration.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/math/generic.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/math/geometry.hpp
     ${PROJECT_SOURCE_DIR}/sotm/math/distrib-gen.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/output/graph-drawer.hpp
     ${PROJECT_SOURCE_DIR}/sotm/utils/memory.hpp
     ${PROJECT_SOURCE_DIR}/sotm/utils/assert.hpp
     ${PROJECT_SOURCE_DIR}/sotm/utils/macros.hpp
     ${PROJECT_SOURCE_DIR}/sotm/utils/utils.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/utils/const.hpp
     ${PROJECT_SOURCE_DIR}/sotm/base/model-context.hpp
     ${PROJECT_SOURCE_DIR}/sotm/base/time-iter.hpp
     ${PROJECT_SOURCE_DIR}/sotm/base/physical-payload.hpp
