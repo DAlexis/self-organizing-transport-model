@@ -100,6 +100,7 @@ public:
 	void addLink(Link* link);
 	void removeLink(Link* link);
 	void applyConnectedLinksVisitor(LinkVisitor visitor);
+	bool hasNeighbour(Node* node);
 
 	std::unique_ptr<NodePayloadBase> payload;
 

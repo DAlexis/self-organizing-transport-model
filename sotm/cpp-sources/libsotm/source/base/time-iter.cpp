@@ -57,6 +57,16 @@ void TimeIterator::setStopTime(double stopTime)
 	m_stopTime = stopTime;
 }
 
+void TimeIterator::addHook(ITimeHook* hook)
+{
+	m_timeHooks.push_back(hook);
+	if (m_timeHooks.size() == 1)
+	{
+		m_nextHookTime = hook->getNextTime();
+		m_nextHook = 0;
+	}
+}
+
 double TimeIterator::getStep()
 {
 	return m_dt;
@@ -84,6 +94,33 @@ void TimeIterator::iterate()
 	{
 		m_bifurcationIterable->doBifurcation(time, time - m_lastBifurcationTime);
 		m_lastBifurcationTime = time;
+	}
+	callHook();
+}
+
+void TimeIterator::callHook()
+{
+	if (m_timeHooks.empty())
+		return;
+	double time = m_continiousIterator->time();
+	if (time >= m_nextHookTime)
+	{
+		m_timeHooks[m_nextHook]->runHook(time);
+		findNextHook();
+	}
+}
+
+void TimeIterator::findNextHook()
+{
+	m_nextHookTime = m_timeHooks[0]->getNextTime();
+	m_nextHook = 0;
+	for (size_t i=1; i<m_timeHooks.size(); i++)
+	{
+		double candidatTime = m_timeHooks[i]->getNextTime();
+		if (candidatTime < m_nextHook) {
+			m_nextHook = i;
+			m_nextHookTime = candidatTime;
+		}
 	}
 }
 

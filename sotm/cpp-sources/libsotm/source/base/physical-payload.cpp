@@ -59,26 +59,66 @@ void PhysicalPayloadsRegister::calculateSecondaryValues()
 
 void PhysicalPayloadsRegister::calculateRHS(double time)
 {
-	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
-		(*it)->calculateRHS(time);
+	if (m_parallelSettings->parallelContiniousIteration.calculateRHS)
+	{
+		rebuildPayloadsVectorIfNeeded();
+		tbb::parallel_for( size_t(0), m_payloadsVector.size(),
+			[this, time]( size_t i ) {
+				m_payloadsVector[i]->calculateRHS(time);
+			}
+		);
+	} else {
+		for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
+			(*it)->calculateRHS(time);
+	}
 }
 
 void PhysicalPayloadsRegister::addRHSToDelta(double m)
 {
-	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
-		(*it)->addRHSToDelta(m);
+	if (m_parallelSettings->parallelContiniousIteration.addRHSToDelta)
+	{
+		rebuildPayloadsVectorIfNeeded();
+		tbb::parallel_for( size_t(0), m_payloadsVector.size(),
+			[this, m]( size_t i ) {
+				m_payloadsVector[i]->addRHSToDelta(m);
+			}
+		);
+	} else {
+		for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
+			(*it)->addRHSToDelta(m);
+	}
 }
 
 void PhysicalPayloadsRegister::makeSubIteration(double dt)
 {
-	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
-		(*it)->makeSubIteration(dt);
+	if (m_parallelSettings->parallelContiniousIteration.addRHSToDelta)
+	{
+		rebuildPayloadsVectorIfNeeded();
+		tbb::parallel_for( size_t(0), m_payloadsVector.size(),
+			[this, dt]( size_t i ) {
+				m_payloadsVector[i]->makeSubIteration(dt);
+			}
+		);
+	} else {
+		for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
+			(*it)->makeSubIteration(dt);
+	}
 }
 
 void PhysicalPayloadsRegister::step()
 {
-	for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
-		(*it)->step();
+	if (m_parallelSettings->parallelContiniousIteration.step)
+	{
+		rebuildPayloadsVectorIfNeeded();
+		tbb::parallel_for( size_t(0), m_payloadsVector.size(),
+			[this]( size_t i ) {
+				m_payloadsVector[i]->step();
+			}
+		);
+	} else {
+		for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
+			(*it)->step();
+	}
 }
 
 AnyPhysicalPayloadBase::AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg) :

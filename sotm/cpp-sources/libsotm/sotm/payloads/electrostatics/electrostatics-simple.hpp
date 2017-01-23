@@ -77,6 +77,7 @@ public:
 	// Parameters
 	double radius = 0.13;
 	double branchProbeStep = 0.001;
+	double criticalField = 0.6e6;
 
 	// Primary
 	Variable charge;
@@ -129,7 +130,8 @@ public:
 
 	// Secondary
 	//double current = 0;
-	double conductivity = 300e-13;
+	double conductivity = 380e-13;
+	double minimalCurrent = 3e-7;
 };
 
 SOTM_QUICK_NPF(ElectrostaticNodePayload, ElectrostaticNodePayloadFactory);

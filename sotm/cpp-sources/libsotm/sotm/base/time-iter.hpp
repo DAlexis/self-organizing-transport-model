@@ -10,6 +10,9 @@
 
 #include "sotm/utils/macros.hpp"
 
+#include <vector>
+#include <cstddef>
+
 namespace sotm
 {
 
@@ -90,6 +93,28 @@ public:
 	virtual double time() = 0;
 };
 
+class ITimeHook
+{
+public:
+	virtual ~ITimeHook() {}
+	virtual void runHook(double time) = 0;
+	virtual double getNextTime() = 0;
+};
+
+class TimeHookPeriodic : public ITimeHook
+{
+public:
+	void runHook(double time) override final { m_lastRun = time; hook(); }
+	double getNextTime() override final { return m_lastRun + m_period; }
+
+	void setPeriod(double period) { m_period = period; }
+	virtual void hook() = 0;
+
+private:
+	double m_lastRun = 0.0;
+	double m_period = 1.0;
+};
+
 class ContinuousTimeIteratorBase : public IContinuousTimeIterator
 {
 public:
@@ -115,6 +140,7 @@ public:
 	void setBifurcationRunPeriod(double bifurcationPeriod);
 	void setStep(double dt);
 	void setStopTime(double stopTime);
+	void addHook(ITimeHook* hook);
 
 	double getStep();
 	double getStopTime();
@@ -124,13 +150,22 @@ public:
 	void run();
 
 private:
+	void callHook();
+	void findNextHook();
+
 	double m_stopTime = 1.0;
 	double m_dt = 0.01;
 	double m_bifurcationPeriod = 0;
 	double m_lastBifurcationTime = 0;
+
+	double m_nextHookTime = 0;
+	size_t m_nextHook = 0;
+
 	IContinuousTimeIterable* m_continiousIterable;
 	IContinuousTimeIterator* m_continiousIterator;
 	IBifurcationTimeIterable* m_bifurcationIterable;
+
+	std::vector<ITimeHook*> m_timeHooks;
 };
 
 }

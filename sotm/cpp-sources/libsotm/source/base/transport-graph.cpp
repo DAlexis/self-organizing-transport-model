@@ -220,6 +220,16 @@ void Node::applyConnectedLinksVisitor(LinkVisitor visitor)
 	}
 }
 
+bool Node::hasNeighbour(Node* node)
+{
+	for (auto it = m_links.begin(); it != m_links.end(); it++)
+	{
+		if ((*it)->getNode1().data() == node || (*it)->getNode2().data() == node)
+			return true;
+	}
+	return false;
+}
+
 Link::Link(ModelContext* context) :
 	ModelContextDependent(context)
 {
