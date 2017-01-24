@@ -35,6 +35,8 @@ public:
 
 	void getElectricField(const Vector<3>& point, Vector<3>& outField, double& outPotential, const Node* excludeNode = nullptr);
 
+	bool testConnection(Node* n1, Node* n2);
+
 	static inline ElectrostaticPhysicalContext* cast(IPhysicalContext* context)
 	{
 		return static_cast<ElectrostaticPhysicalContext*>(context);
@@ -45,7 +47,16 @@ public:
 		return static_cast<const ElectrostaticPhysicalContext*>(context);
 	}
 
-	double airTemperature = 300;
+
+	Parameter<double> airTemperature = 300;
+
+	Parameter<double> branchingStep = 0.3;
+
+	Parameter<bool>   smartBranching = false;
+	Parameter<double> smartBranchingEDiff = 0.5;
+	Parameter<double> smartBranchingMaxLen = 0.5;
+
+	Parameter<double> connectionCriticalField;
 
 private:
 	bool m_readyToDestroy = false;
@@ -64,7 +75,9 @@ public:
 	void addRHSToDelta(double m) override;
 	void makeSubIteration(double dt) override;
 	void step() override;
+	void prepareBifurcation(double time, double dt) override;
 	void doBifurcation(double time, double dt) override;
+	void init() override;
 	void getBranchingParameters(double time, double dt, BranchingParameters& branchingParameters) override;
 
 	void getColor(double* rgb) override;
@@ -77,7 +90,6 @@ public:
 	// Parameters
 	double radius = 0.13;
 	double branchProbeStep = 0.001;
-	double criticalField = 0.6e6;
 
 	// Primary
 	Variable charge;
@@ -87,6 +99,9 @@ public:
 	Vector<3> externalField; // Electric field from other nodes
 
 private:
+	void calculateExtFieldAndPhi();
+	void findTargetToConnect();
+	void connectToTarget();
 	double calculateBranchLen(
 			const Vector<3>& startPoint,
 			const Vector<3>& direction,
@@ -96,6 +111,8 @@ private:
 
 	static double chargeMin;
 	static double chargeMax;
+
+	Node* m_connectTo = nullptr;
 };
 
 class ElectrostaticLinkPayload : public LinkPayloadBase

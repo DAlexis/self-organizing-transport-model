@@ -1,4 +1,5 @@
 #include "sotm/base/model-context.hpp"
+#include <tbb/tbb.h>
 
 using namespace sotm;
 
@@ -60,6 +61,37 @@ void ModelContext::step()
 	payloadsRegister.step();
 }
 
+void ModelContext::prepareBifurcation(double time, double dt)
+{
+	ASSERT(dt >= 0, "Cannot prepare bifurcations when dt < 0");
+
+	m_physicalContext->prepareBifurcation(time, dt);
+
+	if (parallelSettings.parallelBifurcationIteration.prepareBifurcation)
+	{
+		rebuildBufurcatableVectorIfNeeded();
+		tbb::parallel_for( size_t(0), m_bifurcatableObjects.size(),
+			[this, time, dt]( size_t i ) {
+				m_bifurcatableObjects[i]->prepareBifurcation(time, dt);
+			}
+		);
+	} else {
+		graphRegister.applyLinkVisitor(
+			[time, dt](Link* l)
+			{
+				l->payload->prepareBifurcation(time, dt);
+			}
+		);
+
+		graphRegister.applyNodeVisitor(
+			[time, dt](Node* n)
+			{
+				n->payload->prepareBifurcation(time, dt);
+			}
+		);
+	}
+}
+
 void ModelContext::doBifurcation(double time, double dt)
 {
 	ASSERT(dt >= 0, "Cannot iterate bifurcations when dt < 0");
@@ -88,6 +120,23 @@ void ModelContext::doBifurcation(double time, double dt)
 	);
 }
 
+void ModelContext::initAllPhysicalPayloads()
+{
+	graphRegister.applyNodeVisitor(
+		[](Node* n)
+		{
+			n->payload->init();
+		}
+	);
+
+	graphRegister.applyLinkVisitor(
+		[](Link* l)
+		{
+			l->payload->init();
+		}
+	);
+}
+
 void ModelContext::branchIteration(double time, double dt, Node* node)
 {
 	BranchingParameters bp;
@@ -98,6 +147,29 @@ void ModelContext::branchIteration(double time, double dt, Node* node)
 	// Its time to create new node with link
 	Vector<3> newPos = node->pos + bp.direction * bp.length;
 	PtrWrap<Link> newLink = PtrWrap<Link>::make(this, node, newPos);
-	newLink->payload->init();
 	newLink->getNode2()->payload->init();
+	newLink->payload->init();
+
+}
+
+void ModelContext::rebuildBufurcatableVectorIfNeeded()
+{
+	if (m_lastStateHash != graphRegister.stateHash())
+	{
+		m_bifurcatableObjects.clear();
+		graphRegister.applyNodeVisitorWithoutGraphChganges(
+			[this](Node* n)
+			{
+				m_bifurcatableObjects.push_back(n->payload.get());
+			}
+		);
+
+		graphRegister.applyLinkVisitorWithoutGraphChganges(
+			[this](Link* l)
+			{
+				m_bifurcatableObjects.push_back(l->payload.get());
+			}
+		);
+		m_lastStateHash = graphRegister.stateHash();
+	}
 }

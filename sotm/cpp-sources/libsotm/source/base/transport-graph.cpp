@@ -17,6 +17,7 @@ void GraphRegister::addLink(Link* link)
 		m_linksToAdd.insert(link);
 	} else {
 		m_links.insert(link);
+		changeStateHash();
 	}
 }
 
@@ -29,6 +30,7 @@ void GraphRegister::addNode(Node* node)
 		m_nodesToAdd.insert(node);
 	} else {
 		m_nodes.insert(node);
+		changeStateHash();
 	}
 }
 
@@ -40,6 +42,7 @@ void GraphRegister::rmLink(Link* link)
 		m_linksToDelete.insert(link);
 	} else {
 		m_links.erase(link);
+		changeStateHash();
 	}
 }
 
@@ -51,6 +54,7 @@ void GraphRegister::rmNode(Node* node)
 		m_nodesToDelete.insert(node);
 	} else {
 		m_nodes.erase(node);
+		changeStateHash();
 	}
 }
 
@@ -129,6 +133,11 @@ size_t GraphRegister::linksCount()
 	return m_links.size();
 }
 
+size_t GraphRegister::stateHash()
+{
+	return m_stateHash;
+}
+
 void GraphRegister::beginIterating()
 {
 	m_iteratingNow = true;
@@ -136,10 +145,17 @@ void GraphRegister::beginIterating()
 
 void GraphRegister::endIterating()
 {
-	if (!m_nodesToAdd.empty() || !m_nodesToDelete.empty())
-		m_nodesVectorDirty = true;
-
 	m_iteratingNow = false;
+
+	if (!m_nodesToAdd.empty()
+		|| !m_nodesToDelete.empty()
+		|| !m_linksToAdd.empty()
+		|| !m_linksToDelete.empty())
+	{
+		changeStateHash();
+	} else
+		return;
+
 	m_nodes.insert(m_nodesToAdd.begin(), m_nodesToAdd.end());
 
 	m_nodesToAdd.clear();
@@ -157,12 +173,9 @@ void GraphRegister::endIterating()
 	m_linksToDelete.clear();
 }
 
-void GraphRegister::updateNodesVector()
+void GraphRegister::changeStateHash()
 {
-	m_nodesVector.clear();
-	for (auto &it : m_nodes)
-		m_nodesVector.push_back(it);
-	m_nodesVectorDirty = false;
+	m_stateHash++;
 }
 
 ////////////////////////////

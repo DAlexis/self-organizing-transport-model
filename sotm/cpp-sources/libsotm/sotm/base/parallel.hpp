@@ -18,7 +18,12 @@ struct ParallelSettings
 		bool step = false;
 	};
 
+	struct BifurcationIteration {
+		bool prepareBifurcation = false;
+	};
+
 	ContiniousIteration parallelContiniousIteration;
+	BifurcationIteration parallelBifurcationIteration;
 
 	static ParallelSettings parallelDisabled;
 };

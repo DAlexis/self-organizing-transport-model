@@ -88,6 +88,20 @@ void ElectrostaticPhysicalContext::getElectricField(const Vector<3>& point, Vect
 	m_model->graphRegister.applyNodeVisitorWithoutGraphChganges(nodeVisitor);
 }
 
+bool ElectrostaticPhysicalContext::testConnection(Node* n1, Node* n2)
+{
+	double phi1 = static_cast<ElectrostaticNodePayload*>(n1->payload.get())->phi;
+	double phi2 = static_cast<ElectrostaticNodePayload*>(n2->payload.get())->phi;
+
+	double U = fabs(phi1 - phi2);
+	double l = (n1->pos - n2->pos).len();
+	// Filed is enough and we are not already connected. Second check is here for performance reason
+	if (U/l > connectionCriticalField && !n1->hasNeighbour(n2))
+		return true;
+	else
+		return false;
+}
+
 ////////////////////////////////////
 ////////////////////////////////////
 // ElectrostaticNodePayload
@@ -99,40 +113,8 @@ ElectrostaticNodePayload::ElectrostaticNodePayload(PhysicalPayloadsRegister* reg
 
 void ElectrostaticNodePayload::calculateSecondaryValues()
 {
+	calculateExtFieldAndPhi();
 
-	const Vector<3>& point = node->pos;
-	ElectrostaticPhysicalContext* context = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext());
-	//Vector<3>& outField, double& outPotential, const Node* exclude
-
-	phi = - (point ^ context->m_externalConstField);
-	externalField = context->m_externalConstField;
-
-	// Node visitor for field accumulation and reconnection detection
-	GraphRegister::NodeVisitor nodeVisitor = [&point, this](const Node* n) {
-		// Skip this node
-		if (n == this->node)
-			return;
-		Vector<3> r1 = n->pos;
-
-		double dist = (point - r1).len();
-		double dist3 = dist*dist*dist;
-
-		double charge = static_cast<ElectrostaticNodePayload*>(n->payload.get())->charge.current;
-
-		phi += Const::Si::k * charge / dist;
-
-		externalField[0] += Const::Si::k * charge * (point[0]-r1[0]) / dist3;
-		externalField[1] += Const::Si::k * charge * (point[1]-r1[1]) / dist3;
-		externalField[2] += Const::Si::k * charge * (point[2]-r1[2]) / dist3;
-	};
-
-	context->m_model->graphRegister.applyNodeVisitorWithoutGraphChganges(nodeVisitor);
-
-/*
-	static_cast<ElectrostaticPhysicalContext*>(node->physicalContext())->
-			getElectricField(node->pos, externalField, phi, this->node.data());
-
-*/
 	double capacity = radius / Const::Si::k;
 	externalField = externalField * 3;
 	phi += charge.current / capacity;
@@ -164,41 +146,64 @@ void ElectrostaticNodePayload::step()
 	charge.step();
 }
 
+void ElectrostaticNodePayload::calculateExtFieldAndPhi()
+{
+	static_cast<ElectrostaticPhysicalContext*>(node->physicalContext())->
+		getElectricField(node->pos, externalField, phi, this->node.data());
+}
+
+void ElectrostaticNodePayload::findTargetToConnect()
+{
+	ElectrostaticPhysicalContext* context = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext());
+	m_connectTo = nullptr;
+
+	GraphRegister::NodeVisitor nodeVisitor = [this, context](Node* n)
+	{
+		if (n <= this->node.data()) // To prevent double connections
+			return;
+
+		if (context->testConnection(this->node, n)) // We are not already connected
+			m_connectTo = n;
+	};
+
+	context->m_model->graphRegister.applyNodeVisitorWithoutGraphChganges(nodeVisitor);
+}
+
+void ElectrostaticNodePayload::connectToTarget()
+{
+	ElectrostaticPhysicalContext* context = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext());
+	if (m_connectTo != nullptr)
+	{
+
+		PtrWrap<Link> newLink = PtrWrap<Link>::make(context->m_model);
+		newLink->connect(this->node, m_connectTo);
+		newLink->payload->init();
+		//cout << "Connection!!!" << endl;
+	}
+}
+
+void ElectrostaticNodePayload::prepareBifurcation(double time, double dt)
+{
+	findTargetToConnect();
+}
+
 void ElectrostaticNodePayload::doBifurcation(double time, double dt)
 {
 	ElectrostaticPhysicalContext* context = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext());
 
-	Node* connectTo = nullptr;
-
-	GraphRegister::NodeVisitor nodeVisitor = [this, &connectTo](Node* n)
-	{
-		if (n <= this->node.data()) // To brevent double connections
-			return;
-
-		double U = fabs(this->phi - static_cast<ElectrostaticNodePayload*>(n->payload.get())->phi);
-		double l = (this->node->pos - n->pos).len();
-		if (U/l > criticalField && !this->node->hasNeighbour(n)) // We are not already connected
-		{
-			connectTo = n;
-		}
-	};
-
-	context->m_model->graphRegister.applyNodeVisitorWithoutGraphChganges(nodeVisitor);
-
-	if (connectTo != nullptr)
-	{
-
-		PtrWrap<Link> newLink = PtrWrap<Link>::make(context->m_model);
-		newLink->connect(this->node, connectTo);
-		newLink->payload->init();
-		//cout << "Connection!!!" << endl;
-	}
+	//findTargetToConnect();
+	connectToTarget();
 
 	// Check if physics tells us we can release parent object
 	if (context->readyToDestroy())
 	{
 		onDeletePayload();
 	}
+}
+
+void ElectrostaticNodePayload::init()
+{
+	calculateExtFieldAndPhi();
 }
 
 void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, BranchingParameters& branchingParameters)
@@ -220,11 +225,14 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 		branchingParameters.direction = pl.place(1.0, res.value);
 
 		Vector<3> branchStartPoint = node->pos + branchingParameters.direction * (radius*1.00);
-		double len = calculateBranchLen(branchStartPoint, branchingParameters.direction, 0.5, 0.3);
+		double len;
+		if (context->smartBranching)
+			len = calculateBranchLen(branchStartPoint, branchingParameters.direction, 0.5, 0.3);
+		else
+			len = context->branchingStep;
 		//cout << "branch len should be " << len << endl;
 
-		len = 0.3;
-
+		// Testing for collision with nearest nodes
 		Vector<3> newPlace = node->pos + branchingParameters.direction * len;
 		Node *nearest = context->m_model->graphRegister.getNearestNode(newPlace);
 		if (nearest && (nearest->pos - newPlace).len() < radius*2.0)

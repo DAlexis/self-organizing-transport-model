@@ -56,6 +56,9 @@ public:
 
 	size_t nodesCount();
 	size_t linksCount();
+
+	size_t stateHash();
+
 private:
 	using NodeSet = std::set<Node*>;
 	using LinkSet = std::set<Link*>;
@@ -66,7 +69,7 @@ private:
 	/// Apply cached add/remove operations with links/nodes
 	void endIterating();
 
-	void updateNodesVector();
+	void changeStateHash();
 
 	/// If true we cannot add/remove directly to/from m_nodes and m_links because we are iterating by them
 	bool m_iteratingNow = false;
@@ -74,8 +77,7 @@ private:
 	NodeSet m_nodes, m_nodesToAdd, m_nodesToDelete;
 	LinkSet m_links, m_linksToAdd, m_linksToDelete;
 
-	std::vector<Node*> m_nodesVector;
-	bool m_nodesVectorDirty = true;
+	size_t m_stateHash = 0;
 };
 
 class ModelContextDependent

@@ -92,7 +92,9 @@ void TimeIterator::iterate()
 			m_bifurcationIterable != nullptr
 		)
 	{
-		m_bifurcationIterable->doBifurcation(time, time - m_lastBifurcationTime);
+		double dt = time - m_lastBifurcationTime;
+		m_bifurcationIterable->prepareBifurcation(time, dt);
+		m_bifurcationIterable->doBifurcation(time, dt);
 		m_lastBifurcationTime = time;
 	}
 	callHook();

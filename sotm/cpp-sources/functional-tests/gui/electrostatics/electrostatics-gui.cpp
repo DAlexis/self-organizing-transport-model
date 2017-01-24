@@ -24,6 +24,7 @@ int main(int argc, char** argv)
 	c.setPhysicalContext(std::unique_ptr<IPhysicalContext>(new ElectrostaticPhysicalContext()));
 
 	c.parallelSettings.parallelContiniousIteration.calculateSecondaryValues = true;
+	c.parallelSettings.parallelBifurcationIteration.prepareBifurcation = true;
 
 	ElectrostaticPhysicalContext* physCont = static_cast<ElectrostaticPhysicalContext*>(c.physicalContext());
 	/*physCont->setDischargeFunc(
@@ -46,6 +47,7 @@ int main(int argc, char** argv)
 				return 0.0;
 			}
 	);
+	physCont->connectionCriticalField = 0.3e6;
 
 	//Vector<3> externalField{0.0, 0.0, 0.6e6};
 	Vector<3> externalField{0.0, 0.0, 0.2e6};
@@ -62,11 +64,12 @@ int main(int argc, char** argv)
 		PtrWrap<Link> l = PtrWrap<Link>::make(&c);
 
 		l->connect(n1, n2);
-		l->payload->init();
 
 		//static_cast<ElectrostaticNodePayload*>(n1->payload.get())->setCharge(4e-6);
 		//static_cast<ElectrostaticNodePayload*>(n2->payload.get())->setCharge(4e-6);
 	}
+
+	c.initAllPhysicalPayloads();
 
 	// Time iteration
 	EulerExplicitIterator euler;

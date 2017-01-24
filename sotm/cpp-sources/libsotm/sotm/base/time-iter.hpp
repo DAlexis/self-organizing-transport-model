@@ -9,7 +9,7 @@
 #define LIBSTEPMOD_STEPMOD_BASE_TIME_ITER_HPP_
 
 #include "sotm/utils/macros.hpp"
-
+#include "sotm/utils/assert.hpp"
 #include <vector>
 #include <cstddef>
 
@@ -31,6 +31,43 @@ struct Variable {
 		delta = 0.0;
 	}
 	SOTM_INLINE void setInitial(double value) { previous = current = value; }
+};
+
+template<typename T>
+struct Parameter
+{
+	Parameter(T initValue) :
+		m_value(initValue)
+#ifdef DEBUG
+		, m_isInitialized(true)
+#endif
+	{ }
+
+	Parameter() :
+		m_value(0.0)
+#ifdef DEBUG
+		, m_isInitialized(false)
+#endif
+	{ }
+
+	SOTM_INLINE T operator=(T newValue)
+	{
+#ifdef DEBUG
+		m_isInitialized = true;
+#endif
+		return m_value = newValue;
+	}
+
+	SOTM_INLINE operator T() const
+	{
+		ASSERT(m_isInitialized, "Parameter usage without initialization!");
+		return m_value;
+	}
+private:
+	T m_value;
+#ifdef DEBUG
+	bool m_isInitialized;
+#endif
 };
 
 /**
@@ -80,6 +117,7 @@ class IBifurcationTimeIterable
 public:
 	virtual ~IBifurcationTimeIterable() {}
 
+	virtual void prepareBifurcation(double time, double dt) = 0;
 	virtual void doBifurcation(double time, double dt) = 0;
 };
 

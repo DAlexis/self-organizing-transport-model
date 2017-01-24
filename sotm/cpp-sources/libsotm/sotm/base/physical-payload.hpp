@@ -62,6 +62,8 @@ public:
 
 	virtual std::string getFollowerText();
 
+	virtual void prepareBifurcation(double time, double dt) override { }
+
 
 protected:
 	constexpr static double defaultColor[3] = {1.0, 0.8, 0.3};
@@ -85,6 +87,7 @@ class PhysicalContextBase : public IPhysicalContext
 {
 public:
 	void connectModel(ModelContext* m) override { m_model = m; }
+	virtual void prepareBifurcation(double time, double dt) override { }
 
 protected:
 	ModelContext* m_model = nullptr;

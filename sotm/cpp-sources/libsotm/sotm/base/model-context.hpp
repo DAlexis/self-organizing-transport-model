@@ -34,9 +34,12 @@ public:
 	void makeSubIteration(double dt) override final;
 	void step() override final;
 
+	void prepareBifurcation(double time, double dt) override final;
 	void doBifurcation(double time, double dt) override final;
 
-	inline IPhysicalContext* physicalContext() { return m_physicalContext.get(); }
+	void initAllPhysicalPayloads();
+
+	SOTM_INLINE IPhysicalContext* physicalContext() { return m_physicalContext.get(); }
 
 	ParallelSettings parallelSettings;
 
@@ -45,10 +48,14 @@ public:
 
 private:
 	void branchIteration(double time, double dt, Node* node);
+	void rebuildBufurcatableVectorIfNeeded();
 
 	std::unique_ptr<INodePayloadFactory> m_nodePayloadFactory;
 	std::unique_ptr<ILinkPayloadFactory> m_linkPayloadFactory;
 	std::unique_ptr<IPhysicalContext> m_physicalContext;
+
+	std::vector<IBifurcationTimeIterable*> m_bifurcatableObjects;
+	size_t m_lastStateHash = 0;
 };
 
 }
