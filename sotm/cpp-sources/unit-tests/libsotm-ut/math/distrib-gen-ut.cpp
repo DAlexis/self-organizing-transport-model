@@ -25,7 +25,7 @@ TEST(generateDischargeDirection, E1zero)
 
 	for (int i=0; i<50000; i++)
 	{
-		DistributionResult<SphericalPoint> res = generateDischargeDirection(1, 1, 1.0, 0.0, f, intF);
+		DistributionResult<SphericalPoint> res = generateDischargeDirection(1, 1, 1.0, 0.0, f, intF.function());
 		if (res.isHappened) {
 			if (res.value.theta < Const::pi / 2.0)
 				countFrom0ToPi_2++;
@@ -54,7 +54,7 @@ TEST(generateDischargeDirection, E1E0eq)
 	//ofstream fl("points.txt", fstream::out);
 	for (int i=0; i<50000; i++)
 	{
-		DistributionResult<SphericalPoint> res = generateDischargeDirection(1.0, 1.0, 1.0, 1.0, f, intF);
+		DistributionResult<SphericalPoint> res = generateDischargeDirection(1.0, 1.0, 1.0, 1.0, f, intF.function());
 		if (res.isHappened) {
 			if (res.value.theta > 1.0 && res.value.theta < 1.5)
 				countFrom10to15++;
@@ -77,7 +77,7 @@ TEST(generateDischargeDirection, E1E0eqOther)
 	//ofstream fl("points.txt", fstream::out);
 	for (int i=0; i<50000; i++)
 	{
-		DistributionResult<SphericalPoint> res = generateDischargeDirection(0.1, 1.0, 1.0, 1.0, f, intF);
+		DistributionResult<SphericalPoint> res = generateDischargeDirection(0.1, 1.0, 1.0, 1.0, f, intF.function());
 		if (res.isHappened) {
 			if (res.value.theta > 1.0 && res.value.theta < 1.5)
 				countFrom10to15++;
@@ -101,7 +101,7 @@ TEST(generateDischargeDirection, E0zero)
 	//fstream fl("points.txt", fstream::out);
 	for (int i=0; i<50000; i++)
 	{
-		DistributionResult<SphericalPoint> res = generateDischargeDirection(0.1, 1.0, 0.0, 1.0, f, intF);
+		DistributionResult<SphericalPoint> res = generateDischargeDirection(0.1, 1.0, 0.0, 1.0, f, intF.function());
 		if (res.isHappened) {
 			if (res.value.theta < Const::pi / 2.0)
 				countFrom0ToPi_2++;
@@ -125,7 +125,7 @@ TEST(generateDischargeDirection, E0moreThanE1)
 	//fstream fl("points.txt", fstream::out);
 	for (int i=0; i<50000; i++)
 	{
-		DistributionResult<SphericalPoint> res = generateDischargeDirection(0.1, 1.0, 2.0, 1.0, f, intF);
+		DistributionResult<SphericalPoint> res = generateDischargeDirection(0.1, 1.0, 2.0, 1.0, f, intF.function());
 		if (res.isHappened) {
 			if (res.value.theta < 2.1)
 				countFrom00To21++;

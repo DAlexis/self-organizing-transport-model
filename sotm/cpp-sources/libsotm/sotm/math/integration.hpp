@@ -20,6 +20,15 @@ public:
 	DefinedIntegral(Function1D target, double from, double to, size_t pointsCount);
 	double operator()(double arg);
 
+	// Use this to prevent copying to whole object to wrapper
+	Function1D function()
+	{
+		return [this](double arg)
+		{
+			return (*this)(arg);
+		};
+	}
+
 private:
 	std::vector<double> m_results;
 	double m_from, m_to;

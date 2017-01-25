@@ -216,7 +216,7 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 			externalField.len(),
 			E1,
 			context->m_dischargeProb,
-			*(context->m_integralOfProb.get())
+			context->m_integralOfProb->function()
 	);
 	branchingParameters.needBranching = res.isHappened;
 	if (branchingParameters.needBranching)
