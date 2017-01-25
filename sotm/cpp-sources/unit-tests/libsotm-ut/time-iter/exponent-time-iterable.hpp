@@ -20,7 +20,7 @@
 class Exponent : public sotm::IContinuousTimeIterable
 {
 public:
-	void calculateSecondaryValues() override;
+	void calculateSecondaryValues(double time) override;
 	void calculateRHS(double time) override;
 	void addRHSToDelta(double m) override;
 	void makeSubIteration(double dt) override;

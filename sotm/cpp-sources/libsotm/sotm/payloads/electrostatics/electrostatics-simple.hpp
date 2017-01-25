@@ -22,7 +22,7 @@ public:
 	void destroyGraph();
 	bool readyToDestroy();
 
-	virtual void calculateSecondaryValues() override;
+	virtual void calculateSecondaryValues(double time) override;
 	virtual void calculateRHS(double time) override;
 	virtual void addRHSToDelta(double m) override;
 	virtual void makeSubIteration(double dt) override;
@@ -70,7 +70,7 @@ class ElectrostaticNodePayload : public NodePayloadBase
 public:
 	ElectrostaticNodePayload(PhysicalPayloadsRegister* reg, Node* node);
 
-	void calculateSecondaryValues() override;
+	void calculateSecondaryValues(double time) override;
 	void calculateRHS(double time) override;
 	void addRHSToDelta(double m) override;
 	void makeSubIteration(double dt) override;
@@ -120,7 +120,7 @@ class ElectrostaticLinkPayload : public LinkPayloadBase
 public:
 	ElectrostaticLinkPayload(PhysicalPayloadsRegister* reg, Link* link);
 
-	void calculateSecondaryValues() override;
+	void calculateSecondaryValues(double time) override;
 	void calculateRHS(double time) override;
 	void addRHSToDelta(double m) override;
 	void makeSubIteration(double dt) override;

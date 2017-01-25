@@ -41,19 +41,19 @@ void PhysicalPayloadsRegister::rebuildPayloadsVectorIfNeeded()
 	m_payloadsVectorDirty = false;
 }
 
-void PhysicalPayloadsRegister::calculateSecondaryValues()
+void PhysicalPayloadsRegister::calculateSecondaryValues(double time)
 {
 	if (m_parallelSettings->parallelContiniousIteration.calculateSecondaryValues)
 	{
 		rebuildPayloadsVectorIfNeeded();
 		tbb::parallel_for( size_t(0), m_payloadsVector.size(),
-			[this]( size_t i ) {
-				m_payloadsVector[i]->calculateSecondaryValues();
+			[this, time]( size_t i ) {
+				m_payloadsVector[i]->calculateSecondaryValues(time);
 			}
 		);
 	} else {
 		for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
-			(*it)->calculateSecondaryValues();
+			(*it)->calculateSecondaryValues(time);
 	}
 }
 

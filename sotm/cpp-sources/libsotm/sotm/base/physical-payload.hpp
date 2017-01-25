@@ -23,7 +23,7 @@ public:
 	void add(AnyPhysicalPayloadBase* payload);
 	void remove(AnyPhysicalPayloadBase* payload);
 
-	void calculateSecondaryValues() override final;
+	void calculateSecondaryValues(double time) override final;
 	void calculateRHS(double time) override final;
 	void addRHSToDelta(double m) override final;
 	void makeSubIteration(double dt) override final;
@@ -52,7 +52,7 @@ public:
 	 */
 	virtual void init() { }
 
-	virtual void calculateSecondaryValues() { }
+	virtual void calculateSecondaryValues(double time) { }
 
 	/// Get object color for visualization purpose. Color is RGB array. Each color is from interval [0.0; 1.0]
 	virtual void getColor(double* rgb);

@@ -26,7 +26,7 @@ bool ElectrostaticPhysicalContext::readyToDestroy()
 	return m_readyToDestroy;
 }
 
-void ElectrostaticPhysicalContext::calculateSecondaryValues()
+void ElectrostaticPhysicalContext::calculateSecondaryValues(double time)
 {
 }
 
@@ -111,7 +111,7 @@ ElectrostaticNodePayload::ElectrostaticNodePayload(PhysicalPayloadsRegister* reg
 {
 }
 
-void ElectrostaticNodePayload::calculateSecondaryValues()
+void ElectrostaticNodePayload::calculateSecondaryValues(double time)
 {
 	calculateExtFieldAndPhi();
 
@@ -339,7 +339,7 @@ ElectrostaticLinkPayload::ElectrostaticLinkPayload(PhysicalPayloadsRegister* reg
 }
 
 
-void ElectrostaticLinkPayload::calculateSecondaryValues()
+void ElectrostaticLinkPayload::calculateSecondaryValues(double time)
 {
 }
 

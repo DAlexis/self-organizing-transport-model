@@ -18,6 +18,7 @@ set(EXE_SOURCES
     utils/memory-ut.cpp
     payloads/demo/empty-payload-ut.cpp
     time-iter/euler-explicit-ut.cpp
+    time-iter/runge-kutta-ut.cpp
     time-iter/exponent-time-iterable.cpp
     complex/branching-ut.cpp
 )

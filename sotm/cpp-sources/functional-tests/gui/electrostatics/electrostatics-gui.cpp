@@ -4,6 +4,7 @@
 #include "sotm/base/model-context.hpp"
 #include "sotm/payloads/electrostatics/electrostatics-simple.hpp"
 #include "sotm/time-iter/euler-explicit.hpp"
+#include "sotm/time-iter/runge-kutta.hpp"
 #include "sotm/math/random.hpp"
 
 #include "sotm-gui/gui.hpp"
@@ -72,8 +73,9 @@ int main(int argc, char** argv)
 	c.initAllPhysicalPayloads();
 
 	// Time iteration
-	EulerExplicitIterator euler;
-	TimeIterator iter(&c, &euler, &c);
+	//EulerExplicitIterator continiousIterator;
+	RungeKuttaIterator continiousIterator;
+	TimeIterator iter(&c, &continiousIterator, &c);
 	iter.setTime(0.0);
 	iter.setStep(0.001);
 	//iter.setStopTime(5.0);

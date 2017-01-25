@@ -227,7 +227,7 @@ void Node::applyConnectedLinksVisitor(LinkVisitor visitor)
 	for (auto it = m_links.begin(); it != m_links.end(); it++)
 	{
 		LinkDirection dir = LinkDirection::in;
-		if ((*it)->getNode1().data() == this)
+		if ((*it)->getNode1() == this)
 			dir = LinkDirection::out;
 		visitor(*it, dir);
 	}
@@ -237,7 +237,7 @@ bool Node::hasNeighbour(Node* node)
 {
 	for (auto it = m_links.begin(); it != m_links.end(); it++)
 	{
-		if ((*it)->getNode1().data() == node || (*it)->getNode2().data() == node)
+		if ((*it)->getNode1() == node || (*it)->getNode2() == node)
 			return true;
 	}
 	return false;
@@ -283,19 +283,19 @@ void Link::connect(Node* n1, Node* n2)
 	n2->addLink(this);
 }
 
-PtrWrap<Node> Link::getNode1()
+Node* Link::getNode1()
 {
-	return m_n1;
+	return m_n1.data();
 }
 
-PtrWrap<Node> Link::getNode2()
+Node* Link::getNode2()
 {
-	return m_n2;
+	return m_n2.data();
 }
 
-PtrWrap<Node> Link::getNode(unsigned int index)
+Node* Link::getNode(unsigned int index)
 {
-	return index == 0 ? m_n1 : m_n2;
+	return index == 0 ? m_n1.data() : m_n2.data();
 }
 
 double Link::length()

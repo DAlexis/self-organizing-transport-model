@@ -8,7 +8,7 @@
 #include "exponent-time-iterable.hpp"
 #include "sotm/utils/macros.hpp"
 
-void Exponent::calculateSecondaryValues()
+void Exponent::calculateSecondaryValues(double time)
 {
 	tmp = xCurrent;
 }

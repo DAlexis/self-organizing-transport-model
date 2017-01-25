@@ -121,9 +121,9 @@ public:
 	~Link();
 	void connect(Node* n1, Node* n2);
 
-	PtrWrap<Node> getNode1();
-	PtrWrap<Node> getNode2();
-	PtrWrap<Node> getNode(unsigned int index);
+	Node* getNode1();
+	Node* getNode2();
+	Node* getNode(unsigned int index);
 	double length();
 	double lengthCached();
 

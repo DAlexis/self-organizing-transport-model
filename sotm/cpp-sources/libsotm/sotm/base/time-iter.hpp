@@ -89,7 +89,7 @@ public:
 	 * contain any differential operators. This function should be called for all objects
 	 * before calling calculateRHS
 	 */
-	virtual void calculateSecondaryValues() = 0;
+	virtual void calculateSecondaryValues(double time) = 0;
 
 	/** Calculate right hand side with values of
 	 * f(time, xCurrent, xCurrent of other objects, secondaryValues of other objects)

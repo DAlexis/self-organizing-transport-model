@@ -31,10 +31,10 @@ LinkPayloadBase* ModelContext::createLinkPayload(Link* link)
 	return m_linkPayloadFactory->create(&payloadsRegister, link);
 }
 
-void ModelContext::calculateSecondaryValues()
+void ModelContext::calculateSecondaryValues(double time)
 {
-	m_physicalContext->calculateSecondaryValues();
-	payloadsRegister.calculateSecondaryValues();
+	m_physicalContext->calculateSecondaryValues(time);
+	payloadsRegister.calculateSecondaryValues(time);
 }
 
 void ModelContext::calculateRHS(double time)
