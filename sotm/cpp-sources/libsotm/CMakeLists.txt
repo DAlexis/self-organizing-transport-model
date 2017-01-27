@@ -18,6 +18,7 @@ set(LIB_SOURCE
     ${PROJECT_SOURCE_DIR}/source/base/parallel.cpp
     ${PROJECT_SOURCE_DIR}/source/base/time-iter.cpp
     ${PROJECT_SOURCE_DIR}/source/output/graph-drawer.cpp
+    ${PROJECT_SOURCE_DIR}/source/output/variables.cpp
     ${PROJECT_SOURCE_DIR}/source/time-iter/euler-explicit.cpp
     ${PROJECT_SOURCE_DIR}/source/time-iter/runge-kutta.cpp
     ${PROJECT_SOURCE_DIR}/source/payloads/demo/empty-payloads.cpp

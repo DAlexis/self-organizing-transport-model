@@ -187,6 +187,11 @@ public:
 	void iterate();
 	void run();
 
+	/**
+	 * Stop after current iteration. May be called from another thread
+	 */
+	void stop();
+
 private:
 	void callHook();
 	void findNextHook();
@@ -198,6 +203,7 @@ private:
 
 	double m_nextHookTime = 0;
 	size_t m_nextHook = 0;
+	bool m_needStop = false;
 
 	IContinuousTimeIterable* m_continiousIterable;
 	IContinuousTimeIterator* m_continiousIterator;

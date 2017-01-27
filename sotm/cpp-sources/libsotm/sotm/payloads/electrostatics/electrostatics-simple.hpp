@@ -10,6 +10,8 @@
 
 #include "sotm/base/physical-payload.hpp"
 #include "sotm/math/integration.hpp"
+#include "sotm/output/variables.hpp"
+
 #include <memory>
 
 namespace sotm
@@ -57,6 +59,9 @@ public:
 	Parameter<double> smartBranchingMaxLen = 0.5;
 
 	Parameter<double> connectionCriticalField;
+
+	Scaler heatScaler;
+	LinearGradientColorMapper heatColorMapper;
 
 private:
 	bool m_readyToDestroy = false;

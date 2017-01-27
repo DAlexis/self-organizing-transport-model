@@ -15,6 +15,7 @@ set(EXE_SOURCES
     math/integration-ut.cpp
     math/distrib-gen-ut.cpp
     base/transport-graph-ut.cpp
+    output/variables-ut.cpp
     utils/memory-ut.cpp
     payloads/demo/empty-payload-ut.cpp
     time-iter/euler-explicit-ut.cpp

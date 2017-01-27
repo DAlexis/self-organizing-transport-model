@@ -128,6 +128,12 @@ void TimeIterator::findNextHook()
 
 void TimeIterator::run()
 {
-	while (m_continiousIterator->time() < m_stopTime)
+	m_needStop = false;
+	while (m_continiousIterator->time() < m_stopTime && !m_needStop)
 		iterate();
+}
+
+void TimeIterator::stop()
+{
+	m_needStop = true;
 }
