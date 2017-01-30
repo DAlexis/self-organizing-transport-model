@@ -86,17 +86,17 @@ void GraphDrawer::prepareBuffer(WireframeBuffer* buffer)
 	buffer->clear();
 
 	m_modelContext->graphRegister.applyLinkVisitor(
-		[this] (sotm::Link* link)
+		[this, buffer] (sotm::Link* link)
 		{
-			linkVisitor(link);
+			linkVisitor(link, buffer);
 		}
 	);
 	if (m_renderPreferences->enableSpheres)
 	{
 		m_modelContext->graphRegister.applyNodeVisitor(
-			[this] (sotm::Node* node)
+			[this, buffer] (sotm::Node* node)
 			{
-				nodeVisitor(node);
+				nodeVisitor(node, buffer);
 			}
 		);
 	}
@@ -149,12 +149,12 @@ void GraphDrawer::swapBuffers()
 	std::swap(m_nextBuffer, m_currentBuffer);
 }
 
-void GraphDrawer::linkVisitor(sotm::Link* link)
+void GraphDrawer::linkVisitor(sotm::Link* link, WireframeBuffer* buffer)
 {
 	auto& p1 = link->getNode1()->pos;
 	auto& p2 = link->getNode2()->pos;
-	vtkIdType id1 = m_nextBuffer->points->InsertNextPoint( p1.x );
-	vtkIdType id2 = m_nextBuffer->points->InsertNextPoint( p2.x );
+	vtkIdType id1 = buffer->points->InsertNextPoint( p1.x );
+	vtkIdType id2 = buffer->points->InsertNextPoint( p2.x );
 
 	Vector<3> center = (p1 + p2) / 2.0;
 
@@ -162,7 +162,7 @@ void GraphDrawer::linkVisitor(sotm::Link* link)
 	line->GetPointIds()->SetId(0, id1);
 	line->GetPointIds()->SetId(1, id2);
 
-	m_nextBuffer->lines.push_back(line);
+	buffer->lines.push_back(line);
 
 	// Color source stub
 
@@ -174,9 +174,9 @@ void GraphDrawer::linkVisitor(sotm::Link* link)
 			(unsigned char) ( pow(rgb[1], m_renderPreferences->gamma)*255 ),
 			(unsigned char) ( pow(rgb[2], m_renderPreferences->gamma)*255 )
 		};
-	m_nextBuffer->colors->InsertNextTypedTuple(color_uchar);
+	buffer->colors->InsertNextTypedTuple(color_uchar);
 
-	m_nextBuffer->linesCellArray->InsertNextCell(line);
+	buffer->linesCellArray->InsertNextCell(line);
 
 	std::string linkFollowerText = link->payload->getFollowerText();
 
@@ -198,16 +198,16 @@ void GraphDrawer::linkVisitor(sotm::Link* link)
 		label->SetPosition(center.x);
 		label->PickableOff();
 		label->SetScale(0.05);
-		m_nextBuffer->wireLabels.push_back(label);
+		buffer->wireLabels.push_back(label);
 	}
 }
 
-void GraphDrawer::nodeVisitor(sotm::Node* node)
+void GraphDrawer::nodeVisitor(sotm::Node* node, WireframeBuffer* buffer)
 {
 	double rgb[3];
 	node->payload->getColor(rgb);
 	if (m_renderPreferences->enableFollowers)
-		m_nextBuffer->sphereDrawers.push_back(SphereDrawer(node->pos, node->payload->getSize(), rgb, node->payload->getFollowerText()));
+		buffer->sphereDrawers.push_back(SphereDrawer(node->pos, node->payload->getSize(), rgb, node->payload->getFollowerText()));
 	else
-		m_nextBuffer->sphereDrawers.push_back(SphereDrawer(node->pos, node->payload->getSize(), rgb, ""));
+		buffer->sphereDrawers.push_back(SphereDrawer(node->pos, node->payload->getSize(), rgb, ""));
 }

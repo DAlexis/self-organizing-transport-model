@@ -24,16 +24,16 @@ void AsyncIteratorWrapper::setPeriod(double period)
 
 void AsyncIteratorWrapper::calculateFrame()
 {
-	//m_timeIterator->run();
+	m_timeIterator->run();
+	/*
 	unsigned int d = 123;
 	cout << "Begin" << endl;
 	printThreadId();
 	for (size_t i = 0; i<1000000000; i++)
 	{
 		d = d*63542 + 12345;
-		/*if (i % 1000000 == 0)
-			emit tick();*/
 	}
+*/
 	cout << "End" << endl;
 	emit frameDone();
 }
@@ -44,17 +44,21 @@ AsyncIteratorRunner::AsyncIteratorRunner(AsyncIteratorWrapper& iteratorWrapper) 
 {
 }
 
-void AsyncIteratorRunner::run(QObject* signalReceiver)
+void AsyncIteratorRunner::run()
 {
-	if (m_thread)
+	if (!m_thread)
 	{
-		m_thread->wait();
-		m_thread = nullptr;
+		m_thread = new QThread;
+		//connect(m_thread, SIGNAL (started()), &m_iteratorWrapper, SLOT (calculateFrame()));
+		//connect(&m_iteratorWrapper, SIGNAL (frameDone()), signalReceiver, SLOT (onFrameDone()));
+		m_iteratorWrapper.moveToThread(m_thread);
+		m_thread->start();
 	}
-	m_thread = new QThread;
-	connect(m_thread, SIGNAL (started()), &m_iteratorWrapper, SLOT (calculateFrame()));
-	connect(&m_iteratorWrapper, SIGNAL (frameDone()), signalReceiver, SLOT (onFrameDone()));
-	m_iteratorWrapper.moveToThread(m_thread);
-	m_thread->start();
+}
+
+void AsyncIteratorRunner::stopAndJoin()
+{
+	m_thread->quit();
+	m_thread->wait();
 }
 

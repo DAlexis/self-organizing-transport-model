@@ -1,6 +1,8 @@
 #ifndef LIBSOTM_GUI_SOTM_GUI_INTERNAL_GUI_INTERNAL_HPP_
 #define LIBSOTM_GUI_SOTM_GUI_INTERNAL_GUI_INTERNAL_HPP_
 
+#include "sotm/output/render-preferences.hpp"
+
 #include "sotm-gui/gui.hpp"
 #include "sotm-gui-internal/frame-maker.hpp"
 #include "sotm-gui-internal/animation-maker.hpp"
@@ -17,21 +19,23 @@ public:
 	int run(int argc, char** argv) override;
 
 	TimeIterator* timeIterator();
-	AnimationMaker* animationMaker();
-    FrameMaker* frameMaker();
 	bool isStaticGraph();
 	ModelContext* context();
+	AsyncIteratorWrapper* asyncIteratorWrapper();
 	AsyncIteratorRunner* asyncIteratorRunner();
+	RenderPreferences* renderPreferences();
+	GraphDrawer* graphDrawer();
 
 private:
 	ModelContext* m_modelContext;
 	TimeIterator* m_timeIterator;
 
-    FrameMaker m_frameMaker;
-    std::unique_ptr<AnimationMaker> m_animationMaker;
+	GraphDrawer m_drawer;
 
     AsyncIteratorWrapper m_asynIterationWrapper;
     AsyncIteratorRunner m_asyncIterationRunner{m_asynIterationWrapper};
+
+    RenderPreferences m_renderPreferences;
 };
 
 }  // namespace sotm

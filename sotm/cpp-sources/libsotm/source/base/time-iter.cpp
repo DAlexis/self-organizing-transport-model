@@ -1,6 +1,8 @@
 #include "sotm/base/time-iter.hpp"
 #include "sotm/utils/assert.hpp"
 
+#include <iostream>
+
 using namespace sotm;
 
 void ContinuousTimeIteratorBase::setIterable(IContinuousTimeIterable* target)

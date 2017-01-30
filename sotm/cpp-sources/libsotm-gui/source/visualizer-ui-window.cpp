@@ -24,10 +24,16 @@ VisualizerUIWindow::VisualizerUIWindow(sotm::QtGUI *gui) :
 
     this->qvtkWidget->GetRenderWindow()->AddRenderer(m_renderer);
 
-    m_animationTimer = new QTimer(this);
-    connect(m_animationTimer, SIGNAL(timeout()), this, SLOT(on_animationTimerTimeout()));
+    m_frameTimer = new QTimer(this);
+    connect(m_frameTimer, SIGNAL(timeout()), this, SLOT(onFrameTimerTimeout()));
+
     // Set up action signals and slots
+
     connect(this->actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
+
+    connect(this, SIGNAL(calculateNextFrame()), m_gui->asyncIteratorWrapper(), SLOT(calculateFrame()));
+    connect(m_gui->asyncIteratorWrapper(), SIGNAL(frameDone()), this, SLOT(onFrameCalculated()));
+    m_gui->asyncIteratorRunner()->run();
 }
 
 vtkSmartPointer<vtkRenderer> VisualizerUIWindow::renderer()
@@ -43,7 +49,7 @@ void VisualizerUIWindow::prepareUIToRun()
 
 void VisualizerUIWindow::updateEdiableFields()
 {
-    RenderPreferences* rp = m_gui->frameMaker()->renderPreferences();
+    RenderPreferences* rp = m_gui->renderPreferences();
     horizontalSlider->setValue((rp->gamma - 0.2) / 2.0 * 100);
     checkBoxFollowers->setChecked(rp->enableFollowers);
     checkBoxSpheres->setChecked(rp->enableSpheres);
@@ -55,16 +61,15 @@ void VisualizerUIWindow::updateEdiableFields()
         groupBoxIterating->setEnabled(true);
         doubleSpinBoxTimestep->setValue(m_gui->timeIterator()->getStep());
         doubleSpinBoxTime->setValue(m_gui->timeIterator()->getTime());
-        //doubleSpinBoxIterateTo->setValue(m_gui->timeIterator()->getStopTime());
-        doubleSpinBoxRedrawPeriod->setValue(m_gui->animationMaker()->getFrameDuration());
-        spinBoxFPS->setValue(m_gui->animationMaker()->getFps());
+        doubleSpinBoxIterateTo->setValue(m_gui->timeIterator()->getStopTime());
+        //doubleSpinBoxRedrawPeriod->setValue(m_gui->animationMaker()->getFrameDuration());
+        //spinBoxFPS->setValue(m_gui->animationMaker()->getFps());
     }
 
 }
 
 void VisualizerUIWindow::stopFrameWaiting()
 {
-    m_animationTimer->stop();
     doubleSpinBoxTime->setValue(m_gui->timeIterator()->getTime());
 }
 
@@ -73,23 +78,17 @@ bool VisualizerUIWindow::shouldAnimationContinued()
     return m_gui->timeIterator()->getTime() < doubleSpinBoxIterateTo->value();
 }
 
-void VisualizerUIWindow::startFrameTimer()
-{
-	// Starting timer while frame is generating
-	m_animationTimer->start(1000 / m_gui->animationMaker()->getFps());
-}
-
 void VisualizerUIWindow::prepareNextFrame()
 {
     updateModelInfo();
-    m_gui->animationMaker()->iterateToNextFrame();
-    m_gui->animationMaker()->drawNextFrame();
+    //m_gui->animationMaker()->iterateToNextFrame();
+    //m_gui->animationMaker()->drawNextFrame();
     this->qvtkWidget->repaint();
 }
 
 void VisualizerUIWindow::startAnimation()
 {
-	startFrameTimer();
+	//startFrameTimer();
     prepareNextFrame();
 
     pushButtonOneIteration->setEnabled(false);
@@ -101,7 +100,7 @@ void VisualizerUIWindow::startAnimation()
 
 void VisualizerUIWindow::stopAnimation()
 {
-    m_animationTimer->stop();
+    //m_animationTimer->stop();
 
     pushButtonOneIteration->setEnabled(true);
     pushButtonStartAnimation->setEnabled(true);
@@ -121,22 +120,102 @@ void VisualizerUIWindow::updateModelInfo()
 
 void VisualizerUIWindow::slotExit()
 {
+	m_gui->asyncIteratorRunner()->stopAndJoin();
     qApp->exit();
 }
 
-void VisualizerUIWindow::onFrameDone()
+void VisualizerUIWindow::onFrameCalculated()
 {
+	/*
+	// Todo here
+	doubleSpinBoxTime->setValue(m_gui->timeIterator()->getTime());
+
+	if (shouldAnimationContinued())
+	{
+		//startFrameTimer();
+		prepareNextFrame();
+	} else {
+		//m_gui->animationMaker()->drawNextFrame();
+		this->qvtkWidget->repaint();
+		stopAnimation();
+	}
+
+	switch (m_runningState)
+	{
+	case RunningSate::needToBeStopped:
+	case RunningSate::stopped: // WTF??
+	case RunningSate::running:
+		break;
+	}*/
+
+	renderCurrentFrame();
+	unsigned int frameDuration = 1000;
+	unsigned int dt = m_frameCalculationElapsed.elapsed();
+	std::cout << "Calc done" << std::endl;
+	m_frameTimer->start(dt < frameDuration ? frameDuration - dt : 0);
 	pushButton_3->setText("Async iter done");
 }
 
-
-void VisualizerUIWindow::reRenderCurrentFrame()
+void VisualizerUIWindow::onFrameTimerTimeout()
 {
-    updateModelInfo();
-    m_gui->frameMaker()->recreateCurrentFrame();
-    m_gui->frameMaker()->draw(renderer());
-    this->qvtkWidget->repaint();
+	m_frameTimer->stop();
+	std::cout << "Timer" << std::endl;
+	switch (m_runningState)
+	{
+	case RunningSate::running:
+		startNextFrameCalculating();
+		break;
+
+	case RunningSate::needToBeStopped:
+		buttonsToStopped();
+		m_runningState = RunningSate::stopped;
+		break;
+
+	case RunningSate::stopped: // WTF??
+		break;
+	}
 }
+
+
+void VisualizerUIWindow::renderCurrentFrame()
+{
+	std::cout << "Rendering" << std::endl;
+    updateModelInfo();
+    m_renderer->RemoveAllViewProps();
+	m_gui->graphDrawer()->prepareCurrentBuffer();
+	m_gui->graphDrawer()->addActorsFromCurrentBuffer(renderer());
+	this->qvtkWidget->repaint();
+	std::cout << "Rendering done" << std::endl;
+
+	//m_gui->frameMaker()->recreateCurrentFrame();
+    //m_gui->frameMaker()->draw(renderer());
+    //this->qvtkWidget->repaint();
+}
+
+void VisualizerUIWindow::startNextFrameCalculating()
+{
+	m_frameCalculationElapsed.start();
+	emit calculateNextFrame();
+}
+
+void VisualizerUIWindow::buttonsToRunning()
+{
+	pushButtonStartAnimation->setEnabled(false);
+	pushButtonPauseAnimation->setEnabled(true);
+}
+
+void VisualizerUIWindow::buttonsToNeedToBeStopped()
+{
+	pushButtonStartAnimation->setEnabled(false);
+	pushButtonPauseAnimation->setEnabled(false);
+}
+
+void VisualizerUIWindow::buttonsToStopped()
+{
+	pushButtonStartAnimation->setEnabled(true);
+	pushButtonPauseAnimation->setEnabled(false);
+}
+
 
 void VisualizerUIWindow::on_animationTimerTimeout()
 {
@@ -144,10 +223,10 @@ void VisualizerUIWindow::on_animationTimerTimeout()
     stopFrameWaiting();
     if (shouldAnimationContinued())
     {
-    	startFrameTimer();
+    	//startFrameTimer();
         prepareNextFrame();
     } else {
-        m_gui->animationMaker()->drawNextFrame();
+        //m_gui->animationMaker()->drawNextFrame();
         this->qvtkWidget->repaint();
         stopAnimation();
     }
@@ -179,7 +258,7 @@ void VisualizerUIWindow::on_doubleSpinBoxRedrawPeriod_valueChanged(double arg1)
 {
     if (!m_gui->isStaticGraph())
     {
-        m_gui->animationMaker()->setFrameDuration(arg1);
+        //m_gui->animationMaker()->setFrameDuration(arg1);
     }
 }
 
@@ -187,7 +266,7 @@ void VisualizerUIWindow::on_spinBoxFPS_valueChanged(int arg1)
 {
     if (!m_gui->isStaticGraph())
     {
-        m_gui->animationMaker()->setFps(arg1);
+        //m_gui->animationMaker()->setFps(arg1);
     }
 }
 
@@ -200,12 +279,17 @@ void VisualizerUIWindow::on_pushButtonStartAnimation_clicked()
         return;
     }
     startAnimation();*/
-	m_gui->asyncIteratorRunner()->run(this);
+	//m_gui->asyncIteratorRunner()->run(this);
+
+	buttonsToRunning();
+	m_runningState = RunningSate::running;
+	startNextFrameCalculating();
 }
 
 void VisualizerUIWindow::on_pushButtonPauseAnimation_clicked()
 {
-    stopAnimation();
+	m_runningState = RunningSate::needToBeStopped;
+	buttonsToNeedToBeStopped();
 }
 
 void VisualizerUIWindow::on_horizontalSlider_valueChanged(int value)
@@ -215,18 +299,18 @@ void VisualizerUIWindow::on_horizontalSlider_valueChanged(int value)
     ss << fixed << setprecision(2) << gammaValue;
     labelGamma->setText(ss.str().c_str());
 
-    m_gui->frameMaker()->renderPreferences()->gamma = gammaValue;
-    reRenderCurrentFrame();
+    //m_gui->frameMaker()->renderPreferences()->gamma = gammaValue;
+    renderCurrentFrame();
 }
 
 void VisualizerUIWindow::on_checkBoxFollowers_clicked()
 {
-	m_gui->frameMaker()->renderPreferences()->enableFollowers = checkBoxFollowers->isChecked();
-	reRenderCurrentFrame();
+	//m_gui->frameMaker()->renderPreferences()->enableFollowers = checkBoxFollowers->isChecked();
+	renderCurrentFrame();
 }
 
 void VisualizerUIWindow::on_checkBoxSpheres_clicked()
 {
-	m_gui->frameMaker()->renderPreferences()->enableSpheres = checkBoxSpheres->isChecked();
-	reRenderCurrentFrame();
+	//m_gui->frameMaker()->renderPreferences()->enableSpheres = checkBoxSpheres->isChecked();
+	renderCurrentFrame();
 }

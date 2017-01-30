@@ -8,10 +8,19 @@
 
 #include <QTimer>
 #include <QMainWindow>
+#include <QElapsedTimer>
 
 namespace sotm {
     class QtGUI;
 }
+
+enum class RunningSate
+{
+	stopped = 0,
+    running,
+	needToBeStopped
+};
+
 
 class VisualizerUIWindow : public QMainWindow, private Ui::RenderWindowUIMultipleInheritance
 {
@@ -24,10 +33,14 @@ public:
   // this function should be called just before run when all objects that should exist in runtime exist
   void prepareUIToRun();
 
+signals:
+  void calculateNextFrame();
+
 public slots:
 
   virtual void slotExit();
-  void onFrameDone();
+  void onFrameCalculated();
+  void onFrameTimerTimeout();
 
 private slots:
   void on_pushButtonOneIteration_clicked();
@@ -56,17 +69,26 @@ private:
     void updateEdiableFields();
     void stopFrameWaiting();
     bool shouldAnimationContinued();
-    void startFrameTimer();
     void prepareNextFrame();
     void startAnimation();
     void stopAnimation();
     void updateModelInfo();
-    void reRenderCurrentFrame();
+    void renderCurrentFrame();
+
+    void startNextFrameCalculating();
+
+    void buttonsToRunning();
+    void buttonsToNeedToBeStopped();
+    void buttonsToStopped();
 
 	vtkSmartPointer<vtkRenderer> m_renderer{ vtkSmartPointer<vtkRenderer>::New() };
 
     sotm::QtGUI *m_gui;
-    QTimer *m_animationTimer;
+
+    RunningSate m_runningState = RunningSate::stopped;
+
+    QTimer *m_frameTimer = nullptr;
+    QElapsedTimer m_frameCalculationElapsed;
 };
 
 #endif

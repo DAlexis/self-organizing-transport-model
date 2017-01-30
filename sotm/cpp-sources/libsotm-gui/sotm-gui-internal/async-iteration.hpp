@@ -44,8 +44,8 @@ class AsyncIteratorRunner : public QObject
 	Q_OBJECT
 public:
 	AsyncIteratorRunner(AsyncIteratorWrapper& iteratorWrapper);
-	void run(QObject* signalReceiver);
-
+	void run();
+	void stopAndJoin();
 private:
 	AsyncIteratorWrapper& m_iteratorWrapper;
 	QThread *m_thread = nullptr;

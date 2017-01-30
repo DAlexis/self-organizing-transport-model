@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 	TimeIterator iter(&c, &continiousIterator, &c);
 	iter.setTime(0.0);
 	iter.setStep(0.001);
-	//iter.setStopTime(5.0);
+	iter.setStopTime(5.0);
 	//iter.run();
 
 	// Running GUI

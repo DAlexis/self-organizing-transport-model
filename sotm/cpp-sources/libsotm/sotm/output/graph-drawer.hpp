@@ -70,8 +70,8 @@ private:
 		std::vector< vtkSmartPointer<vtkFollower> > wireLabels;
 	};
 
-	void linkVisitor(sotm::Link* link);
-	void nodeVisitor(sotm::Node* node);
+	void linkVisitor(sotm::Link* link, WireframeBuffer* buffer);
+	void nodeVisitor(sotm::Node* node, WireframeBuffer* buffer);
 
 	void prepareBuffer(WireframeBuffer* buffer);
 
