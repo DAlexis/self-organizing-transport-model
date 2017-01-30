@@ -62,7 +62,7 @@ void VisualizerUIWindow::updateEdiableFields()
         doubleSpinBoxTimestep->setValue(m_gui->timeIterator()->getStep());
         doubleSpinBoxTime->setValue(m_gui->timeIterator()->getTime());
         doubleSpinBoxIterateTo->setValue(m_gui->timeIterator()->getStopTime());
-        //doubleSpinBoxRedrawPeriod->setValue(m_gui->animationMaker()->getFrameDuration());
+        doubleSpinBoxRedrawPeriod->setValue(m_gui->asyncIteratorWrapper()->getPeriod());
         //spinBoxFPS->setValue(m_gui->animationMaker()->getFps());
     }
 
@@ -149,11 +149,9 @@ void VisualizerUIWindow::onFrameCalculated()
 	}*/
 
 	renderCurrentFrame();
-	unsigned int frameDuration = 1000;
+	unsigned int frameDuration = 1000 / spinBoxFPS->value();
 	unsigned int dt = m_frameCalculationElapsed.elapsed();
-	std::cout << "Calc done" << std::endl;
 	m_frameTimer->start(dt < frameDuration ? frameDuration - dt : 0);
-	pushButton_3->setText("Async iter done");
 }
 
 void VisualizerUIWindow::onFrameTimerTimeout()
@@ -250,15 +248,15 @@ void VisualizerUIWindow::on_doubleSpinBoxTimestep_valueChanged(double arg1)
 
 void VisualizerUIWindow::on_doubleSpinBoxIterateTo_valueChanged(double arg1)
 {
-    /*if (!m_gui->isStaticGraph())
-        m_gui->timeIterator()->setStopTime(arg1);*/
+    if (!m_gui->isStaticGraph())
+        m_gui->timeIterator()->setStopTime(arg1);
 }
 
 void VisualizerUIWindow::on_doubleSpinBoxRedrawPeriod_valueChanged(double arg1)
 {
     if (!m_gui->isStaticGraph())
     {
-        //m_gui->animationMaker()->setFrameDuration(arg1);
+    	m_gui->asyncIteratorWrapper()->setPeriod(arg1);
     }
 }
 
@@ -305,12 +303,12 @@ void VisualizerUIWindow::on_horizontalSlider_valueChanged(int value)
 
 void VisualizerUIWindow::on_checkBoxFollowers_clicked()
 {
-	//m_gui->frameMaker()->renderPreferences()->enableFollowers = checkBoxFollowers->isChecked();
+	m_gui->renderPreferences()->enableFollowers = checkBoxFollowers->isChecked();
 	renderCurrentFrame();
 }
 
 void VisualizerUIWindow::on_checkBoxSpheres_clicked()
 {
-	//m_gui->frameMaker()->renderPreferences()->enableSpheres = checkBoxSpheres->isChecked();
+	m_gui->renderPreferences()->enableSpheres = checkBoxSpheres->isChecked();
 	renderCurrentFrame();
 }

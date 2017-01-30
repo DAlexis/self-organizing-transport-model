@@ -146,6 +146,7 @@ public:
 	double getNextTime() override final { return m_lastRun + m_period; }
 
 	void setPeriod(double period) { m_period = period; }
+	double getPeriod() { return m_period; }
 	virtual void hook() = 0;
 
 private:

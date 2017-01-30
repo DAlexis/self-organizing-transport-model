@@ -131,6 +131,7 @@ void TimeIterator::findNextHook()
 void TimeIterator::run()
 {
 	m_needStop = false;
+	findNextHook();
 	while (m_continiousIterator->time() < m_stopTime && !m_needStop)
 		iterate();
 }

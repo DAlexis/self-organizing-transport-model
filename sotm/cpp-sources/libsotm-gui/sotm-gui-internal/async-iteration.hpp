@@ -20,6 +20,7 @@ class AsyncIteratorWrapper : public QObject
 public:
 	AsyncIteratorWrapper(TimeIterator *timeIterator);
 	void setPeriod(double period);
+	double getPeriod();
 
 	static void printThreadId()
 	{

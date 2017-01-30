@@ -22,6 +22,11 @@ void AsyncIteratorWrapper::setPeriod(double period)
 	m_stopHook.setPeriod(period);
 }
 
+double AsyncIteratorWrapper::getPeriod()
+{
+	return m_stopHook.getPeriod();
+}
+
 void AsyncIteratorWrapper::calculateFrame()
 {
 	m_timeIterator->run();
