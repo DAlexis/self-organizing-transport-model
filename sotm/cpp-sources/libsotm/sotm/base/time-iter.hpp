@@ -212,6 +212,16 @@ private:
 	std::vector<ITimeHook*> m_timeHooks;
 };
 
+class PeriodicStopHook : public TimeHookPeriodic
+{
+public:
+	PeriodicStopHook(TimeIterator* iterator) : m_iterator(iterator) {}
+	void hook() override { m_iterator->stop(); }
+
+private:
+	TimeIterator* m_iterator;
+};
+
 }
 
 #endif /* LIBSTEPMOD_STEPMOD_BASE_TIME_ITER_HPP_ */

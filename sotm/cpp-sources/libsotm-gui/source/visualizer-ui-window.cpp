@@ -124,6 +124,12 @@ void VisualizerUIWindow::slotExit()
     qApp->exit();
 }
 
+void VisualizerUIWindow::onFrameDone()
+{
+	pushButton_3->setText("Async iter done");
+}
+
+
 void VisualizerUIWindow::reRenderCurrentFrame()
 {
     updateModelInfo();
@@ -187,12 +193,14 @@ void VisualizerUIWindow::on_spinBoxFPS_valueChanged(int arg1)
 
 void VisualizerUIWindow::on_pushButtonStartAnimation_clicked()
 {
+	/*
     if (m_gui->isStaticGraph())
     {
         cout << "Graph is static, iterating impossible" << endl;
         return;
     }
-    startAnimation();
+    startAnimation();*/
+	m_gui->asyncIteratorRunner()->run(this);
 }
 
 void VisualizerUIWindow::on_pushButtonPauseAnimation_clicked()

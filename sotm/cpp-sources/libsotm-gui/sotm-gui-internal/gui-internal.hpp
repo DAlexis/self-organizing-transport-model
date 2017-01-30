@@ -4,6 +4,7 @@
 #include "sotm-gui/gui.hpp"
 #include "sotm-gui-internal/frame-maker.hpp"
 #include "sotm-gui-internal/animation-maker.hpp"
+#include "sotm-gui-internal/async-iteration.hpp"
 
 #include <memory>
 
@@ -20,13 +21,17 @@ public:
     FrameMaker* frameMaker();
 	bool isStaticGraph();
 	ModelContext* context();
+	AsyncIteratorRunner* asyncIteratorRunner();
 
 private:
-	ModelContext* m_modelContext = nullptr;
-	TimeIterator* m_timeIterator = nullptr;
+	ModelContext* m_modelContext;
+	TimeIterator* m_timeIterator;
 
     FrameMaker m_frameMaker;
     std::unique_ptr<AnimationMaker> m_animationMaker;
+
+    AsyncIteratorWrapper m_asynIterationWrapper;
+    AsyncIteratorRunner m_asyncIterationRunner{m_asynIterationWrapper};
 };
 
 }  // namespace sotm

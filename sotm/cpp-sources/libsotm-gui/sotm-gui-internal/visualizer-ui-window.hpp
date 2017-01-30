@@ -27,6 +27,7 @@ public:
 public slots:
 
   virtual void slotExit();
+  void onFrameDone();
 
 private slots:
   void on_pushButtonOneIteration_clicked();
