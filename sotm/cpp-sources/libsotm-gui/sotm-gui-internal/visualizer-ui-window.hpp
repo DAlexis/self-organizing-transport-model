@@ -53,8 +53,6 @@ private slots:
 
   void on_spinBoxFPS_valueChanged(int arg1);
 
-  void on_animationTimerTimeout();
-
   void on_pushButtonStartAnimation_clicked();
 
   void on_pushButtonPauseAnimation_clicked();

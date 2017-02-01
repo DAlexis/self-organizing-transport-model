@@ -84,6 +84,11 @@ double TimeIterator::getTime()
 	return m_continiousIterator->time();
 }
 
+bool TimeIterator::isDone()
+{
+	return m_continiousIterator->time() >= m_stopTime;
+}
+
 void TimeIterator::iterate()
 {
 	double time = m_continiousIterator->time();
@@ -134,7 +139,7 @@ void TimeIterator::run()
 {
 	m_needStop = false;
 	findNextHook();
-	while (m_continiousIterator->time() < m_stopTime && !m_needStop)
+	while (!isDone() && !m_needStop)
 		iterate();
 }
 

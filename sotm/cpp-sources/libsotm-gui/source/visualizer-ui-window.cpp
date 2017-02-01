@@ -126,29 +126,15 @@ void VisualizerUIWindow::slotExit()
 
 void VisualizerUIWindow::onFrameCalculated()
 {
-	/*
-	// Todo here
-	doubleSpinBoxTime->setValue(m_gui->timeIterator()->getTime());
-
-	if (shouldAnimationContinued())
+	renderCurrentFrame();
+	if (m_runningState == RunningSate::needToBeStopped
+			|| m_gui->timeIterator()->isDone())
 	{
-		//startFrameTimer();
-		prepareNextFrame();
-	} else {
-		//m_gui->animationMaker()->drawNextFrame();
-		this->qvtkWidget->repaint();
-		stopAnimation();
+		buttonsToStopped();
+		m_runningState = RunningSate::stopped;
+		return;
 	}
 
-	switch (m_runningState)
-	{
-	case RunningSate::needToBeStopped:
-	case RunningSate::stopped: // WTF??
-	case RunningSate::running:
-		break;
-	}*/
-
-	renderCurrentFrame();
 	unsigned int frameDuration = 1000 / spinBoxFPS->value();
 	unsigned int dt = m_frameCalculationElapsed.elapsed();
 	m_frameTimer->start(dt < frameDuration ? frameDuration - dt : 0);
@@ -157,7 +143,7 @@ void VisualizerUIWindow::onFrameCalculated()
 void VisualizerUIWindow::onFrameTimerTimeout()
 {
 	m_frameTimer->stop();
-	std::cout << "Timer" << std::endl;
+	//std::cout << "Timer" << std::endl;
 	switch (m_runningState)
 	{
 	case RunningSate::running:
@@ -177,17 +163,13 @@ void VisualizerUIWindow::onFrameTimerTimeout()
 
 void VisualizerUIWindow::renderCurrentFrame()
 {
-	std::cout << "Rendering" << std::endl;
+	//std::cout << "Rendering" << std::endl;
     updateModelInfo();
     m_renderer->RemoveAllViewProps();
 	m_gui->graphDrawer()->prepareCurrentBuffer();
 	m_gui->graphDrawer()->addActorsFromCurrentBuffer(renderer());
 	this->qvtkWidget->repaint();
-	std::cout << "Rendering done" << std::endl;
-
-	//m_gui->frameMaker()->recreateCurrentFrame();
-    //m_gui->frameMaker()->draw(renderer());
-    //this->qvtkWidget->repaint();
+	//std::cout << "Rendering done" << std::endl;
 }
 
 void VisualizerUIWindow::startNextFrameCalculating()
@@ -214,30 +196,11 @@ void VisualizerUIWindow::buttonsToStopped()
 	pushButtonPauseAnimation->setEnabled(false);
 }
 
-
-void VisualizerUIWindow::on_animationTimerTimeout()
-{
-    cout << "Timer event" << endl;
-    stopFrameWaiting();
-    if (shouldAnimationContinued())
-    {
-    	//startFrameTimer();
-        prepareNextFrame();
-    } else {
-        //m_gui->animationMaker()->drawNextFrame();
-        this->qvtkWidget->repaint();
-        stopAnimation();
-    }
-}
-
 void VisualizerUIWindow::on_pushButtonOneIteration_clicked()
 {
-    if (!m_gui->isStaticGraph())
-    {
-    	prepareNextFrame();
-        this->qvtkWidget->repaint();
-        updateModelInfo();
-    }
+	buttonsToNeedToBeStopped();
+	m_runningState = RunningSate::needToBeStopped;
+	startNextFrameCalculating();
 }
 
 void VisualizerUIWindow::on_doubleSpinBoxTimestep_valueChanged(double arg1)
@@ -270,15 +233,6 @@ void VisualizerUIWindow::on_spinBoxFPS_valueChanged(int arg1)
 
 void VisualizerUIWindow::on_pushButtonStartAnimation_clicked()
 {
-	/*
-    if (m_gui->isStaticGraph())
-    {
-        cout << "Graph is static, iterating impossible" << endl;
-        return;
-    }
-    startAnimation();*/
-	//m_gui->asyncIteratorRunner()->run(this);
-
 	buttonsToRunning();
 	m_runningState = RunningSate::running;
 	startNextFrameCalculating();

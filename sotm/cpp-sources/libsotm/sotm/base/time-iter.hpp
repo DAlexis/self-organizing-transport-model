@@ -185,6 +185,8 @@ public:
 	double getStopTime();
 	double getTime();
 
+	bool isDone();
+
 	void iterate();
 	void run();
 
