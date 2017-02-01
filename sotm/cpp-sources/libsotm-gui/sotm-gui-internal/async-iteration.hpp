@@ -14,6 +14,11 @@
 #include <iostream>
 namespace sotm {
 
+struct FrameOptions
+{
+	double fps = 10;
+};
+
 class AsyncIteratorWrapper : public QObject
 {
     Q_OBJECT

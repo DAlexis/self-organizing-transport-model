@@ -116,6 +116,8 @@ void TimeIterator::callHook()
 
 void TimeIterator::findNextHook()
 {
+	if (m_timeHooks.empty())
+		return;
 	m_nextHookTime = m_timeHooks[0]->getNextTime();
 	m_nextHook = 0;
 	for (size_t i=1; i<m_timeHooks.size(); i++)

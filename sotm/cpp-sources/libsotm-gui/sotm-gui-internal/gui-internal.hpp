@@ -2,10 +2,9 @@
 #define LIBSOTM_GUI_SOTM_GUI_INTERNAL_GUI_INTERNAL_HPP_
 
 #include "sotm/output/render-preferences.hpp"
+#include "sotm/output/graph-drawer.hpp"
 
 #include "sotm-gui/gui.hpp"
-#include "sotm-gui-internal/frame-maker.hpp"
-#include "sotm-gui-internal/animation-maker.hpp"
 #include "sotm-gui-internal/async-iteration.hpp"
 
 #include <memory>
@@ -17,6 +16,7 @@ class QtGUI : public IGUIDriver
 public:
 	QtGUI(ModelContext* modelContext, TimeIterator* timeIterator = nullptr);
 	int run(int argc, char** argv) override;
+	void setFrameOptions(double FramePeriod, double fps = 10) override;
 
 	TimeIterator* timeIterator();
 	bool isStaticGraph();
@@ -25,6 +25,7 @@ public:
 	AsyncIteratorRunner* asyncIteratorRunner();
 	RenderPreferences* renderPreferences();
 	GraphDrawer* graphDrawer();
+	FrameOptions* frameOptions();
 
 private:
 	ModelContext* m_modelContext;
@@ -36,6 +37,8 @@ private:
     AsyncIteratorRunner m_asyncIterationRunner{m_asynIterationWrapper};
 
     RenderPreferences m_renderPreferences;
+
+    FrameOptions m_frameOptions;
 };
 
 }  // namespace sotm

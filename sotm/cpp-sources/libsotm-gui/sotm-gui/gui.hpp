@@ -20,6 +20,7 @@ class IGUIDriver
 public:
 	virtual ~IGUIDriver() { }
 	virtual int run(int argc, char** argv) = 0;
+	virtual void setFrameOptions(double FramePeriod, double fps = 10) = 0;
 };
 
 /**
@@ -31,6 +32,7 @@ class GUI
 public:
     GUI(ModelContext* modelContext, TimeIterator* timeIterator = nullptr);
 	int run(int argc, char** argv);
+	void setFrameOptions(double FramePeriod, double fps = 10);
 
 private:
 	ModelContext* m_modelContext;

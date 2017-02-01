@@ -23,6 +23,11 @@ int GUI::run(int argc, char** argv)
 	return m_guiDriver->run(argc, argv);
 }
 
+void GUI::setFrameOptions(double FramePeriod, double fps)
+{
+	m_guiDriver->setFrameOptions(FramePeriod, fps);
+}
+
 QtGUI::QtGUI(ModelContext* modelContext, TimeIterator* timeIterator) :
     m_modelContext(modelContext),
     m_timeIterator(timeIterator),
@@ -42,6 +47,12 @@ int QtGUI::run(int argc, char** argv)
 	renderWindowUIMultipleInheritance.show();
 
 	return app.exec();
+}
+
+void QtGUI::setFrameOptions(double FramePeriod, double fps)
+{
+	m_asynIterationWrapper.setPeriod(FramePeriod);
+	m_frameOptions.fps = fps;
 }
 
 TimeIterator* QtGUI::timeIterator()
@@ -77,4 +88,9 @@ RenderPreferences* QtGUI::renderPreferences()
 GraphDrawer* QtGUI::graphDrawer()
 {
 	return &m_drawer;
+}
+
+FrameOptions* QtGUI::frameOptions()
+{
+	return &m_frameOptions;
 }

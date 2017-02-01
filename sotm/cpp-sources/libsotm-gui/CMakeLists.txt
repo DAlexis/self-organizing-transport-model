@@ -34,9 +34,7 @@ set(EXE_QT_HPP
 
 # Headers without Q_OBJECT  
 set(EXE_HPP
-    ${PROJECT_SOURCE_DIR}/sotm-gui-internal/frame-maker.hpp
     ${PROJECT_SOURCE_DIR}/sotm-gui-internal/gui-internal.hpp
-    ${PROJECT_SOURCE_DIR}/sotm-gui-internal/animation-maker.hpp
     ${PROJECT_SOURCE_DIR}/sotm-gui-internal/async-iteration.hpp
     ${PROJECT_SOURCE_DIR}/sotm-gui/gui.hpp
 )
@@ -45,8 +43,6 @@ set(EXE_HPP
 set(EXE_SOURCE
     ${PROJECT_SOURCE_DIR}/source/visualizer-ui-window.cpp
     ${PROJECT_SOURCE_DIR}/source/gui.cpp
-    ${PROJECT_SOURCE_DIR}/source/frame-maker.cpp
-    ${PROJECT_SOURCE_DIR}/source/animation-maker.cpp
     ${PROJECT_SOURCE_DIR}/source/async-iteration.cpp
 )
 

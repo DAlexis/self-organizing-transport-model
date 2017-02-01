@@ -52,7 +52,7 @@ public:
 	/// Iterate by all links. New nodes should not be added during iteration
 	void applyLinkVisitorWithoutGraphChganges(LinkVisitor v);
 
-	Node* getNearestNode(const Vector<3>& point);
+	Node* getNearestNode(const Vector<3>& point, bool searchOverReceintlyAdded = true);
 
 	size_t nodesCount();
 	size_t linksCount();

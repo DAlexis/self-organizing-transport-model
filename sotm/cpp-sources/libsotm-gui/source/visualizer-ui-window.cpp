@@ -63,7 +63,7 @@ void VisualizerUIWindow::updateEdiableFields()
         doubleSpinBoxTime->setValue(m_gui->timeIterator()->getTime());
         doubleSpinBoxIterateTo->setValue(m_gui->timeIterator()->getStopTime());
         doubleSpinBoxRedrawPeriod->setValue(m_gui->asyncIteratorWrapper()->getPeriod());
-        //spinBoxFPS->setValue(m_gui->animationMaker()->getFps());
+        spinBoxFPS->setValue(m_gui->frameOptions()->fps);
     }
 
 }

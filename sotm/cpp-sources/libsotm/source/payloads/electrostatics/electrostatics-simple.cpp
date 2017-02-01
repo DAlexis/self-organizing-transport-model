@@ -235,7 +235,8 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 		// Testing for collision with nearest nodes
 		Vector<3> newPlace = node->pos + branchingParameters.direction * len;
 		Node *nearest = context->m_model->graphRegister.getNearestNode(newPlace);
-		if (nearest && (nearest->pos - newPlace).len() < radius*2.0)
+		double dist = (nearest->pos - newPlace).len();
+		if (nearest && dist < radius*2.0)
 		{
 			//cout << "Branching disabled" << endl;
 			branchingParameters.needBranching = false;

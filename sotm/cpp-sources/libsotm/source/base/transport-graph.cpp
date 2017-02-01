@@ -104,7 +104,7 @@ void GraphRegister::applyLinkVisitorWithoutGraphChganges(LinkVisitor v)
 	}
 }
 
-Node* GraphRegister::getNearestNode(const Vector<3>& point)
+Node* GraphRegister::getNearestNode(const Vector<3>& point, bool searchOverReceintlyAdded)
 {
 	Node* result = nullptr;
 	double minDist = 0.0;
@@ -119,6 +119,11 @@ Node* GraphRegister::getNearestNode(const Vector<3>& point)
 	};
 
 	applyNodeVisitorWithoutGraphChganges(visitor);
+	if (searchOverReceintlyAdded && m_iteratingNow)
+	{
+		for (auto &it : m_nodesToAdd)
+			visitor(it);
+	}
 
 	return result;
 }
