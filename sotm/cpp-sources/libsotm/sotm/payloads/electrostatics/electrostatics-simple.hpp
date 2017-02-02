@@ -58,7 +58,16 @@ public:
 	Parameter<double> smartBranchingEDiff = 0.5;
 	Parameter<double> smartBranchingMaxLen = 0.5;
 
+	Parameter<double> initialConductivity = 1e-5;
+	Parameter<double> minimalConductivity = 1e-5 / 3.0;
+	Parameter<double> minimalCurrent = 0.0;//3e-7;
+
 	Parameter<double> connectionCriticalField;
+
+	Parameter<double> nodeRadius = 0.13;
+
+	Parameter<double> linkEta = 1e-4;
+	Parameter<double> linkBeta = 1e4;
 
 	Scaler chargeScaler;
 	LinearGradientColorMapper chargeColorMapper;
@@ -78,6 +87,8 @@ class ElectrostaticNodePayload : public NodePayloadBase
 public:
 	ElectrostaticNodePayload(PhysicalPayloadsRegister* reg, Node* node);
 
+	SOTM_INLINE ElectrostaticPhysicalContext* context() { return static_cast<ElectrostaticPhysicalContext*>(node->physicalContext()); }
+
 	void calculateSecondaryValues(double time) override;
 	void calculateRHS(double time) override;
 	void addRHSToDelta(double m) override;
@@ -96,7 +107,6 @@ public:
 
 	static void setChargeColorLimits(double chargeMin, double chargeMax);
 	// Parameters
-	double radius = 0.13;
 	double branchProbeStep = 0.001;
 
 	// Primary
@@ -128,6 +138,8 @@ class ElectrostaticLinkPayload : public LinkPayloadBase
 public:
 	ElectrostaticLinkPayload(PhysicalPayloadsRegister* reg, Link* link);
 
+	SOTM_INLINE ElectrostaticPhysicalContext* context() { return static_cast<ElectrostaticPhysicalContext*>(link->physicalContext()); }
+
 	void calculateSecondaryValues(double time) override;
 	void calculateRHS(double time) override;
 	void addRHSToDelta(double m) override;
@@ -143,6 +155,7 @@ public:
 	void setTemperature(double temp);
 	double getTemperature();
 	double getCurrent();
+	double getVoltage();
 
 	double heatCapacity();
 
@@ -151,23 +164,16 @@ public:
 	//constexpr static Cp = 1.0
 
 	// Primary
-	Variable heatness = 0.0; // J
+	Variable conductivity; // J
 
 	// Secondary
 	//double current = 0;
-	double conductivity = 380e-13;
-	double minimalCurrent = 3e-7;
 };
 
 SOTM_QUICK_NPF(ElectrostaticNodePayload, ElectrostaticNodePayloadFactory);
 SOTM_QUICK_LPF(ElectrostaticLinkPayload, ElectrostaticLinkPayloadFactory);
 
 }
-
-
-
-
-
 
 
 #endif /* LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_SIMPLE_HPP_ */

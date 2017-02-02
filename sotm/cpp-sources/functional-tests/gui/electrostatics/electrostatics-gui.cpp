@@ -80,13 +80,13 @@ int main(int argc, char** argv)
 	RungeKuttaIterator continiousIterator;
 	TimeIterator iter(&c, &continiousIterator, &c);
 	iter.setTime(0.0);
-	iter.setStep(0.001);
-	iter.setStopTime(20.0);
+	iter.setStep(0.0000001);
+	iter.setStopTime(1.0);
 	//iter.run();
 
 	// Running GUI
 	GUI gui(&c, &iter);
-	gui.setFrameOptions(0.1, 10);
+	gui.setFrameOptions(0.000001, 1);
 	gui.run(argc, argv);
 
 	cout << "Destroying graph" << endl;

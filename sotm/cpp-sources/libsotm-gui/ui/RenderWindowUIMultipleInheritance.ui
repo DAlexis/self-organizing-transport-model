@@ -51,7 +51,7 @@
            <item row="0" column="1">
             <widget class="QDoubleSpinBox" name="doubleSpinBoxTimestep">
              <property name="decimals">
-              <number>5</number>
+              <number>8</number>
              </property>
              <property name="singleStep">
               <double>0.010000000000000</double>
@@ -81,7 +81,7 @@
               <bool>false</bool>
              </property>
              <property name="decimals">
-              <number>5</number>
+              <number>8</number>
              </property>
             </widget>
            </item>
@@ -102,7 +102,7 @@
            <item row="2" column="1">
             <widget class="QDoubleSpinBox" name="doubleSpinBoxIterateTo">
              <property name="decimals">
-              <number>5</number>
+              <number>8</number>
              </property>
              <property name="singleStep">
               <double>0.100000000000000</double>
@@ -170,7 +170,7 @@
            <item row="0" column="1">
             <widget class="QDoubleSpinBox" name="doubleSpinBoxRedrawPeriod">
              <property name="decimals">
-              <number>5</number>
+              <number>8</number>
              </property>
              <property name="singleStep">
               <double>0.010000000000000</double>

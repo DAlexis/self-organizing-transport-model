@@ -31,6 +31,13 @@ struct Variable {
 		delta = 0.0;
 	}
 	SOTM_INLINE void setInitial(double value) { previous = current = value; }
+
+	void set(double value)
+	{
+		previous = current = value;
+		delta = 0;
+		rhs = 0;
+	}
 };
 
 template<typename T>

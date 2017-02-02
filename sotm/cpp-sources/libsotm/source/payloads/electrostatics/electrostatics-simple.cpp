@@ -115,7 +115,7 @@ void ElectrostaticNodePayload::calculateSecondaryValues(double time)
 {
 	calculateExtFieldAndPhi();
 
-	double capacity = radius / Const::Si::k;
+	double capacity = context()->nodeRadius / Const::Si::k;
 	externalField = externalField * 3;
 	phi += charge.current / capacity;
 }
@@ -154,28 +154,26 @@ void ElectrostaticNodePayload::calculateExtFieldAndPhi()
 
 void ElectrostaticNodePayload::findTargetToConnect()
 {
-	ElectrostaticPhysicalContext* context = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext());
 	m_connectTo = nullptr;
 
-	GraphRegister::NodeVisitor nodeVisitor = [this, context](Node* n)
+	GraphRegister::NodeVisitor nodeVisitor = [this](Node* n)
 	{
 		if (n <= this->node.data()) // To prevent double connections
 			return;
 
-		if (context->testConnection(this->node, n)) // We are not already connected
+		if (context()->testConnection(this->node, n)) // We are not already connected
 			m_connectTo = n;
 	};
 
-	context->m_model->graphRegister.applyNodeVisitorWithoutGraphChganges(nodeVisitor);
+	context()->m_model->graphRegister.applyNodeVisitorWithoutGraphChganges(nodeVisitor);
 }
 
 void ElectrostaticNodePayload::connectToTarget()
 {
-	ElectrostaticPhysicalContext* context = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext());
 	if (m_connectTo != nullptr)
 	{
 
-		PtrWrap<Link> newLink = PtrWrap<Link>::make(context->m_model);
+		PtrWrap<Link> newLink = PtrWrap<Link>::make(context()->m_model);
 		newLink->connect(this->node, m_connectTo);
 		newLink->payload->init();
 		//cout << "Connection!!!" << endl;
@@ -189,13 +187,11 @@ void ElectrostaticNodePayload::prepareBifurcation(double time, double dt)
 
 void ElectrostaticNodePayload::doBifurcation(double time, double dt)
 {
-	ElectrostaticPhysicalContext* context = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext());
-
 	//findTargetToConnect();
 	connectToTarget();
 
 	// Check if physics tells us we can release parent object
-	if (context->readyToDestroy())
+	if (context()->readyToDestroy())
 	{
 		onDeletePayload();
 	}
@@ -207,7 +203,7 @@ void ElectrostaticNodePayload::init()
 }
 
 void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, BranchingParameters& branchingParameters)
-{
+{/*
 	ElectrostaticPhysicalContext* context = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext());
 	double E1 = Const::Si::k*charge.current / sqr(radius);
 	DistributionResult<SphericalPoint> res = generateDischargeDirection(
@@ -244,26 +240,24 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 
 		branchingParameters.length = len;
 		//cout << "Branching" << endl;
-	}
+	}*/
 }
 
 void ElectrostaticNodePayload::getColor(double* rgb)
 {
-	ElectrostaticPhysicalContext* context = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext());
-
-	static_cast<ColorMapperBase&>(context->chargeColorMapper).get(context->chargeScaler.scale(charge.previous), rgb);
+	static_cast<ColorMapperBase&>(context()->chargeColorMapper).get(context()->chargeScaler.scale(charge.previous), rgb);
 }
 
 double ElectrostaticNodePayload::getSize()
 {
-	return radius;
+	return context()->nodeRadius;
 }
 
 std::string ElectrostaticNodePayload::getFollowerText()
 {
 	std::ostringstream ss;
-	ss << "  q = " << std::scientific << std::setprecision(2) << charge.current << endl;
-	ss << "  phi = " << phi;
+	ss << "       q = " << std::scientific << std::setprecision(2) << charge.current << endl;
+	ss << "       phi = " << phi;
 	return ss.str();
 }
 
@@ -274,9 +268,6 @@ void ElectrostaticNodePayload::setCharge(double charge)
 
 double ElectrostaticNodePayload::calculateBranchLen(const Vector<3>& startPoint, const Vector<3>& direction, double eDiffMax, double lenMax)
 {
-
-	ElectrostaticPhysicalContext* context = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext());
-
 	Vector<3> step = direction;
 	step.normalize();
 	step = step * branchProbeStep;
@@ -289,12 +280,12 @@ double ElectrostaticNodePayload::calculateBranchLen(const Vector<3>& startPoint,
 	Vector<3> deltaField;
 
 	// Getting start field
-	context->getElectricField(currentPoint, startField, currentPhi);
+	context()->getElectricField(currentPoint, startField, currentPhi);
 
 	double len = 0;
 
 	do {
-		context->getElectricField(currentPoint, currentField, currentPhi);
+		context()->getElectricField(currentPoint, currentField, currentPhi);
 		currentPoint += step;
 		len = (currentPoint - startPoint).len();
 		deltaField = currentField - startField;
@@ -326,30 +317,28 @@ void ElectrostaticLinkPayload::calculateSecondaryValues(double time)
 
 void ElectrostaticLinkPayload::calculateRHS(double time)
 {
-	heatness.rhs =
-			sqr(getCurrent()) / conductivity // Heat source
-			- 0.5*heatness.rhs; // Dissipation
+	conductivity.rhs = (context()->linkEta * sqr(getVoltage()) - context()->linkBeta) * conductivity.current;
 }
 
 void ElectrostaticLinkPayload::addRHSToDelta(double m)
 {
-	heatness.addRHSToDelta(m);
+	conductivity.addRHSToDelta(m);
 }
 
 void ElectrostaticLinkPayload::makeSubIteration(double dt)
 {
-	heatness.makeSubIteration(dt);
+	conductivity.makeSubIteration(dt);
 }
 
 void ElectrostaticLinkPayload::step()
 {
-	heatness.step();
+	conductivity.step();
 }
 
 void ElectrostaticLinkPayload::doBifurcation(double time, double dt)
 {
 	double current = getCurrent();
-	if (current != 0.0 && fabs(current) < minimalCurrent)
+	if (current != 0.0 && conductivity.current < context()->minimalConductivity)
 	{
 		onDeletePayload();
 		return;
@@ -366,17 +355,23 @@ void ElectrostaticLinkPayload::doBifurcation(double time, double dt)
 void ElectrostaticLinkPayload::init()
 {
 	setTemperature(300);
+	conductivity.set(context()->initialConductivity);
 }
 
 std::string ElectrostaticLinkPayload::getFollowerText()
 {
 	std::ostringstream ss;
-	ss << "  t = " << std::scientific << std::setprecision(2) << getTemperature() << endl;
+	ss << "  G = " << std::scientific << std::setprecision(2) << conductivity.current << endl;
 	ss << "  I = " << std::scientific << std::setprecision(2) << getCurrent() << endl;
 	return ss.str();
 }
 
 double ElectrostaticLinkPayload::getCurrent()
+{
+	return getVoltage() * conductivity.current;
+}
+
+double ElectrostaticLinkPayload::getVoltage()
 {
 	Node* n1 = link->getNode1();
 	ElectrostaticNodePayload* p1 = static_cast<ElectrostaticNodePayload*>(n1->payload.get());
@@ -384,17 +379,18 @@ double ElectrostaticLinkPayload::getCurrent()
 	Node* n2 = link->getNode2();
 	ElectrostaticNodePayload* p2 = static_cast<ElectrostaticNodePayload*>(n2->payload.get());
 
-	return (p1->phi - p2->phi) * conductivity;
+	return (p1->phi - p2->phi);
 }
 
 void ElectrostaticLinkPayload::setTemperature(double temp)
 {
-	heatness.setInitial(temp*heatCapacity());
+	//heatness.setInitial(temp*heatCapacity());
 }
 
 double ElectrostaticLinkPayload::getTemperature()
 {
-	return heatness.current / heatCapacity();
+	//return heatness.current / heatCapacity();
+	return 0.0;
 }
 
 double ElectrostaticLinkPayload::heatCapacity()
