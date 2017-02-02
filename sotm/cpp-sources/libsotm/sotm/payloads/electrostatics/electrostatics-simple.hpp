@@ -60,8 +60,11 @@ public:
 
 	Parameter<double> connectionCriticalField;
 
-	Scaler heatScaler;
-	LinearGradientColorMapper heatColorMapper;
+	Scaler chargeScaler;
+	LinearGradientColorMapper chargeColorMapper;
+
+	Scaler conductivityScaler;
+	LinearGradientColorMapper conductivityColorMapper;
 
 private:
 	bool m_readyToDestroy = false;

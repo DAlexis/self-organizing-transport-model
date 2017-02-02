@@ -49,6 +49,9 @@ int main(int argc, char** argv)
 			}
 	);
 	physCont->connectionCriticalField = 0.3e6;
+	physCont->chargeScaler.fixValue(0.0, 0.5);
+	physCont->chargeColorMapper.setBlueRed();
+	physCont->conductivityColorMapper.setBlueRed();
 
 	//Vector<3> externalField{0.0, 0.0, 0.6e6};
 	Vector<3> externalField{0.0, 0.0, 0.2e6};
@@ -83,7 +86,7 @@ int main(int argc, char** argv)
 
 	// Running GUI
 	GUI gui(&c, &iter);
-	gui.setFrameOptions(0.1, 4);
+	gui.setFrameOptions(0.1, 10);
 	gui.run(argc, argv);
 
 	cout << "Destroying graph" << endl;

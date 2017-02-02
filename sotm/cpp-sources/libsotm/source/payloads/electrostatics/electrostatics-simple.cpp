@@ -249,29 +249,9 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 
 void ElectrostaticNodePayload::getColor(double* rgb)
 {
-	double q = charge.previous;
-	if (q > chargeMax)
-		chargeMax = q;
-	else if (q < chargeMin)
-		chargeMin = q;
+	ElectrostaticPhysicalContext* context = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext());
 
-	if (q > 0)
-	{
-		double v = q / chargeMax;
-		rgb[0] = v;
-		rgb[1] = 1.0-v;
-		rgb[2] = 0.0;
-	} else if (q < 0)
-	{
-		double v = q / chargeMin;
-		rgb[0] = 0.0;
-		rgb[1] = 1.0-v;
-		rgb[2] = v;
-	} else {
-		rgb[0] = 0.0;
-		rgb[1] = 1.0;
-		rgb[2] = 0.0;
-	}
+	static_cast<ColorMapperBase&>(context->chargeColorMapper).get(context->chargeScaler.scale(charge.previous), rgb);
 }
 
 double ElectrostaticNodePayload::getSize()

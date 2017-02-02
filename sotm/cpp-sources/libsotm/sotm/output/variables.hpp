@@ -22,6 +22,7 @@ public:
 
 	Scaler(Scale scale = Scale::linear);
 	double scale(double value);
+	void fixValue(double value, double result);
 
 	Scale getScale() { return m_scale; }
 
@@ -31,9 +32,11 @@ private:
 	double m_max = 0;
 	double m_min = 0;
 	bool m_initialized = false;
+	double m_fixedValue = 0.0, m_fixedResult = 0.0;
+	bool m_hasFixedValue = false;
 };
 
-class IColorMapper
+class ColorMapperBase
 {
 public:
 	struct Color {
@@ -46,17 +49,19 @@ public:
 	static Color green;
 	static Color blue;
 
-	virtual ~IColorMapper() {}
+	virtual ~ColorMapperBase() {}
 	virtual Color get(double value) = 0;
+	void get(double value, double* rgb);
 };
 
-class LinearGradientColorMapper : public IColorMapper
+class LinearGradientColorMapper : public ColorMapperBase
 {
 public:
 	LinearGradientColorMapper();
 	Color get(double value) override;
 	void addColor(double value, const Color& c);
 
+	void setBlueRed();
 private:
 	using ColorPoint = std::pair<double, Color>;
 	std::vector<ColorPoint> m_colors;

@@ -1,13 +1,14 @@
 #include "sotm/output/variables.hpp"
+#include "sotm/utils/assert.hpp"
 #include <algorithm>
 #include <cmath>
 
 using namespace sotm;
 
-IColorMapper::Color IColorMapper::black(0.0, 0.0, 0.0);
-IColorMapper::Color IColorMapper::red  (1.0, 0.0, 0.0);
-IColorMapper::Color IColorMapper::green(0.0, 1.0, 0.0);
-IColorMapper::Color IColorMapper::blue (0.0, 0.0, 1.0);
+ColorMapperBase::Color ColorMapperBase::black(0.0, 0.0, 0.0);
+ColorMapperBase::Color ColorMapperBase::red  (1.0, 0.0, 0.0);
+ColorMapperBase::Color ColorMapperBase::green(0.0, 1.0, 0.0);
+ColorMapperBase::Color ColorMapperBase::blue (0.0, 0.0, 1.0);
 
 
 Scaler::Scaler(Scale scale) :
@@ -30,10 +31,29 @@ double Scaler::scale(double value)
 	else if (value < m_min)
 		m_min = value;
 
-	if (m_min == m_max)
-		return 0.0;
+	if (m_hasFixedValue)
+	{
+		if (m_min == m_max)
+			return m_fixedResult;
 
-	return (value - m_min) / (m_max - m_min);
+		if (value > m_fixedValue)
+			return m_fixedResult + (value - m_fixedValue) / (m_max - m_fixedValue) * (1.0 - m_fixedResult);
+		else
+			return (value - m_min) / (m_fixedValue - m_min) * m_fixedResult;
+
+	} else {
+		if (m_min == m_max)
+			return 0.0;
+
+		return (value - m_min) / (m_max - m_min);
+	}
+}
+
+void Scaler::fixValue(double value, double result)
+{
+	ASSERT(result >= 0.0 && result <= 1.0, "Scaler::fixValue: result must be from [0.0; 1.0]");
+	m_fixedValue = rescale(value); m_fixedResult = result;
+	m_hasFixedValue = true;
 }
 
 double Scaler::rescale(double value)
@@ -46,15 +66,23 @@ double Scaler::rescale(double value)
 }
 
 
+void ColorMapperBase::get(double value, double* rgb)
+{
+	Color c = get(value);
+	rgb[0] = c.r;
+	rgb[1] = c.g;
+	rgb[2] = c.b;
+}
+
 LinearGradientColorMapper::LinearGradientColorMapper()
 {
 
 }
 
-IColorMapper::Color LinearGradientColorMapper::get(double value)
+ColorMapperBase::Color LinearGradientColorMapper::get(double value)
 {
 	if (m_colors.size() < 2)
-		return IColorMapper::green;
+		return ColorMapperBase::green;
 
 	size_t l = 0, r = m_colors.size()-1;
 	while (r-l != 1)
@@ -88,4 +116,11 @@ void LinearGradientColorMapper::addColor(double value, const Color& c)
 				return left.first < right.first;
 			}
 	);
+}
+
+void LinearGradientColorMapper::setBlueRed()
+{
+	m_colors.clear();
+	addColor(1.0, ColorMapperBase::red);
+	addColor(0.0, ColorMapperBase::blue);
 }
