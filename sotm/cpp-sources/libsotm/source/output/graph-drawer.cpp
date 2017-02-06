@@ -142,6 +142,7 @@ void GraphDrawer::WireframeBuffer::prepareWireframeActor()
 
 	mapper->SetInputData(polyData);
 	actor->SetMapper(mapper);
+	//actor->GetProperty()->SetLineWidth(5);
 }
 
 void GraphDrawer::swapBuffers()

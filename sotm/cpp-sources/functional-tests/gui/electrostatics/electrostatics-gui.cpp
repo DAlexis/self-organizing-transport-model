@@ -42,16 +42,20 @@ int main(int argc, char** argv)
 			[](double E) -> double
 			{
 				if (E > 0.5e6) // 20 kV/cm
-					return (E - 0.5e6)/2e6 * 400;
+					return (E - 0.5e6)/2e6 * 4e7;
 				if (E < -1e6) // 20 kV/cm
-					return (-E - 1e6)/2e6 * 400;
+					return (-E - 1e6)/2e6 * 4e7;
 				return 0.0;
 			}
 	);
 	physCont->connectionCriticalField = 0.3e6;
+	physCont->initialConductivity = 1e-5;
+	physCont->minimalConductivity = physCont->initialConductivity * 0.95;
+
 	physCont->chargeScaler.fixValue(0.0, 0.5);
 	physCont->chargeColorMapper.setBlueRed();
 	physCont->conductivityColorMapper.setBlueRed();
+	physCont->linkEta = 1e-4; // 1e-5;
 
 	//Vector<3> externalField{0.0, 0.0, 0.6e6};
 	Vector<3> externalField{0.0, 0.0, 0.2e6};
@@ -80,13 +84,13 @@ int main(int argc, char** argv)
 	RungeKuttaIterator continiousIterator;
 	TimeIterator iter(&c, &continiousIterator, &c);
 	iter.setTime(0.0);
-	iter.setStep(0.0000001);
-	iter.setStopTime(1.0);
+	iter.setStep(0.00000001);
+	iter.setStopTime(1e-4);
 	//iter.run();
 
 	// Running GUI
 	GUI gui(&c, &iter);
-	gui.setFrameOptions(0.000001, 1);
+	gui.setFrameOptions(0.0000001, 30);
 	gui.run(argc, argv);
 
 	cout << "Destroying graph" << endl;

@@ -59,7 +59,7 @@ public:
 	Parameter<double> smartBranchingMaxLen = 0.5;
 
 	Parameter<double> initialConductivity = 1e-5;
-	Parameter<double> minimalConductivity = 1e-5 / 3.0;
+	Parameter<double> minimalConductivity = initialConductivity*0.95;
 	Parameter<double> minimalCurrent = 0.0;//3e-7;
 
 	Parameter<double> connectionCriticalField;

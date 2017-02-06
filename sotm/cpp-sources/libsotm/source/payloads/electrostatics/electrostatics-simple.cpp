@@ -203,16 +203,16 @@ void ElectrostaticNodePayload::init()
 }
 
 void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, BranchingParameters& branchingParameters)
-{/*
-	ElectrostaticPhysicalContext* context = static_cast<ElectrostaticPhysicalContext*>(node->physicalContext());
+{
+	double radius = context()->nodeRadius;
 	double E1 = Const::Si::k*charge.current / sqr(radius);
 	DistributionResult<SphericalPoint> res = generateDischargeDirection(
 			dt,
 			radius,
 			externalField.len(),
 			E1,
-			context->m_dischargeProb,
-			context->m_integralOfProb->function()
+			context()->m_dischargeProb,
+			context()->m_integralOfProb->function()
 	);
 	branchingParameters.needBranching = res.isHappened;
 	if (branchingParameters.needBranching)
@@ -222,15 +222,15 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 
 		Vector<3> branchStartPoint = node->pos + branchingParameters.direction * (radius*1.00);
 		double len;
-		if (context->smartBranching)
+		if (context()->smartBranching)
 			len = calculateBranchLen(branchStartPoint, branchingParameters.direction, 0.5, 0.3);
 		else
-			len = context->branchingStep;
+			len = context()->branchingStep;
 		//cout << "branch len should be " << len << endl;
 
 		// Testing for collision with nearest nodes
 		Vector<3> newPlace = node->pos + branchingParameters.direction * len;
-		Node *nearest = context->m_model->graphRegister.getNearestNode(newPlace);
+		Node *nearest = context()->m_model->graphRegister.getNearestNode(newPlace);
 		double dist = (nearest->pos - newPlace).len();
 		if (nearest && dist < radius*2.0)
 		{
@@ -240,7 +240,7 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 
 		branchingParameters.length = len;
 		//cout << "Branching" << endl;
-	}*/
+	}
 }
 
 void ElectrostaticNodePayload::getColor(double* rgb)
