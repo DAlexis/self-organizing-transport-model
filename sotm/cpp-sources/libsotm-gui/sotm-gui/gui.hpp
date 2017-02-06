@@ -10,6 +10,7 @@
 
 #include "sotm/base/model-context.hpp"
 #include "sotm/base/time-iter.hpp"
+#include "sotm/output/render-preferences.hpp"
 
 #include <memory>
 
@@ -21,6 +22,7 @@ public:
 	virtual ~IGUIDriver() { }
 	virtual int run(int argc, char** argv) = 0;
 	virtual void setFrameOptions(double FramePeriod, double fps = 10) = 0;
+	virtual RenderPreferences* renderPreferences() = 0;
 };
 
 /**
@@ -33,6 +35,7 @@ public:
     GUI(ModelContext* modelContext, TimeIterator* timeIterator = nullptr);
 	int run(int argc, char** argv);
 	void setFrameOptions(double FramePeriod, double fps = 10);
+	RenderPreferences* renderPreferences();
 
 private:
 	ModelContext* m_modelContext;

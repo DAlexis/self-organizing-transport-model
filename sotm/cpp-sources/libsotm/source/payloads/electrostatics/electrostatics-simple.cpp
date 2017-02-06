@@ -358,6 +358,17 @@ void ElectrostaticLinkPayload::init()
 	conductivity.set(context()->initialConductivity);
 }
 
+void ElectrostaticLinkPayload::getColor(double* rgb)
+{
+	//rgb[0] = defaultColor[0]; rgb[1] = defaultColor[1]; rgb[2] = defaultColor[2];
+	static_cast<ColorMapperBase&>(context()->conductivityColorMapper).get(context()->conductivityScaler.scale(conductivity.previous), rgb);
+}
+
+double ElectrostaticLinkPayload::getSize()
+{
+	return 1.0;
+}
+
 std::string ElectrostaticLinkPayload::getFollowerText()
 {
 	std::ostringstream ss;

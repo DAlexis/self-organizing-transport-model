@@ -28,6 +28,11 @@ void GUI::setFrameOptions(double FramePeriod, double fps)
 	m_guiDriver->setFrameOptions(FramePeriod, fps);
 }
 
+RenderPreferences* GUI::renderPreferences()
+{
+	return m_guiDriver->renderPreferences();
+}
+
 QtGUI::QtGUI(ModelContext* modelContext, TimeIterator* timeIterator) :
     m_modelContext(modelContext),
     m_timeIterator(timeIterator),

@@ -21,12 +21,14 @@ public:
 	};
 
 	Scaler(Scale scale = Scale::linear);
+	void setScale(Scale scale);
 	double scale(double value);
 	void fixValue(double value, double result);
 
 	Scale getScale() { return m_scale; }
 
 private:
+	void reset();
 	double rescale(double value);
 	Scale m_scale;
 	double m_max = 0;
@@ -48,6 +50,7 @@ public:
 	static Color red;
 	static Color green;
 	static Color blue;
+	static Color yellow;
 
 	virtual ~ColorMapperBase() {}
 	virtual Color get(double value) = 0;
@@ -62,6 +65,7 @@ public:
 	void addColor(double value, const Color& c);
 
 	void setBlueRed();
+	void setGreenYellow();
 private:
 	using ColorPoint = std::pair<double, Color>;
 	std::vector<ColorPoint> m_colors;

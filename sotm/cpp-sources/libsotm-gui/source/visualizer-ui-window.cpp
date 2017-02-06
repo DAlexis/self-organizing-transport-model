@@ -251,7 +251,7 @@ void VisualizerUIWindow::on_horizontalSlider_valueChanged(int value)
     ss << fixed << setprecision(2) << gammaValue;
     labelGamma->setText(ss.str().c_str());
 
-    //m_gui->frameMaker()->renderPreferences()->gamma = gammaValue;
+    m_gui->renderPreferences()->gamma = gammaValue;
     renderCurrentFrame();
 }
 

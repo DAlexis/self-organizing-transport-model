@@ -105,10 +105,16 @@ void GraphDrawer::prepareBuffer(WireframeBuffer* buffer)
 
 void GraphDrawer::addActorsFromCurrentBuffer(vtkRenderer* renderer)
 {
-	renderer->AddActor(m_currentBuffer->actor);
+	if (m_renderPreferences->lineWidth)
+	{
+		for (auto& la : m_currentBuffer->lineActors)
+			renderer->AddActor(la);
+	} else {
+		renderer->AddActor(m_currentBuffer->actor);
+	}
 
 	for (auto& sd : m_currentBuffer->sphereDrawers)
-		sd.addActors(renderer);
+			sd.addActors(renderer);
 
 	for (auto& wl : m_currentBuffer->wireLabels)
 	{
@@ -117,7 +123,8 @@ void GraphDrawer::addActorsFromCurrentBuffer(vtkRenderer* renderer)
 	}
 }
 
-GraphDrawer::WireframeBuffer::WireframeBuffer()
+GraphDrawer::WireframeBuffer::WireframeBuffer(RenderPreferences *renderPreferences) :
+		m_renderPreferences(renderPreferences)
 {
 	clear();
 }
@@ -130,19 +137,23 @@ void GraphDrawer::WireframeBuffer::clear()
 	colors->Reset();
 	colors->SetNumberOfComponents(3);
 	lines.clear();
+	lineActors.clear();
 	sphereDrawers.clear();
 	wireLabels.clear();
 }
 
 void GraphDrawer::WireframeBuffer::prepareWireframeActor()
 {
-	polyData->SetPoints(points);
-	polyData->SetLines(linesCellArray);
-	polyData->GetCellData()->SetScalars(colors);
+	if (!m_renderPreferences->lineWidth)
+	{
+		polyData->SetPoints(points);
+		polyData->SetLines(linesCellArray);
+		polyData->GetCellData()->SetScalars(colors);
 
-	mapper->SetInputData(polyData);
-	actor->SetMapper(mapper);
-	//actor->GetProperty()->SetLineWidth(5);
+		mapper->SetInputData(polyData);
+		actor->SetMapper(mapper);
+		//actor->GetProperty()->SetLineWidth(5);
+	}
 }
 
 void GraphDrawer::swapBuffers()
@@ -154,30 +165,53 @@ void GraphDrawer::linkVisitor(sotm::Link* link, WireframeBuffer* buffer)
 {
 	auto& p1 = link->getNode1()->pos;
 	auto& p2 = link->getNode2()->pos;
-	vtkIdType id1 = buffer->points->InsertNextPoint( p1.x );
-	vtkIdType id2 = buffer->points->InsertNextPoint( p2.x );
-
 	Vector<3> center = (p1 + p2) / 2.0;
+	if (m_renderPreferences->lineWidth)
+	{
+		// Line-by-line rendering
+		vtkSmartPointer<vtkLineSource> lineSource = vtkSmartPointer<vtkLineSource>::New();
+		lineSource->SetPoint1(p1.x);
+		lineSource->SetPoint2(p2.x);
+		lineSource->Update();
 
-	vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
-	line->GetPointIds()->SetId(0, id1);
-	line->GetPointIds()->SetId(1, id2);
+		vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+		mapper->SetInputConnection(lineSource->GetOutputPort());
+		vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+		actor->SetMapper(mapper);
+		actor->GetProperty()->SetLineWidth(link->payload->getSize());
 
-	buffer->lines.push_back(line);
-
-	// Color source stub
-
-	double rgb[3] = {1.0, 1.0, 1.0};
-	link->payload->getColor(rgb);
-	unsigned char color_uchar[3] =
 		{
-			(unsigned char) ( pow(rgb[0], m_renderPreferences->gamma)*255 ),
-			(unsigned char) ( pow(rgb[1], m_renderPreferences->gamma)*255 ),
-			(unsigned char) ( pow(rgb[2], m_renderPreferences->gamma)*255 )
-		};
-	buffer->colors->InsertNextTypedTuple(color_uchar);
+			double rgb[3] = {1.0, 1.0, 1.0};
+			link->payload->getColor(rgb);
+			actor->GetProperty()->SetColor(rgb);
+		}
 
-	buffer->linesCellArray->InsertNextCell(line);
+		buffer->lineActors.push_back(actor);
+		// Line-by-line rendering end
+	} else {
+		vtkIdType id1 = buffer->points->InsertNextPoint( p1.x );
+		vtkIdType id2 = buffer->points->InsertNextPoint( p2.x );
+
+		vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
+		line->GetPointIds()->SetId(0, id1);
+		line->GetPointIds()->SetId(1, id2);
+
+		buffer->lines.push_back(line);
+		// Color source stub
+
+		double rgb[3] = {1.0, 1.0, 1.0};
+		link->payload->getColor(rgb);
+		unsigned char color_uchar[] =
+			{
+				(unsigned char) ( pow(rgb[0], m_renderPreferences->gamma)*255 ),
+				(unsigned char) ( pow(rgb[1], m_renderPreferences->gamma)*255 ),
+				(unsigned char) ( pow(rgb[2], m_renderPreferences->gamma)*255 ),
+			};
+		buffer->colors->InsertNextTypedTuple(color_uchar);
+		//buffer->colors->InsertNe
+
+		buffer->linesCellArray->InsertNextCell(line);
+	}
 
 	std::string linkFollowerText = link->payload->getFollowerText();
 

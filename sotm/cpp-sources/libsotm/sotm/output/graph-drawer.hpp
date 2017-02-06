@@ -51,7 +51,7 @@ public:
 
 private:
 	struct WireframeBuffer {
-		WireframeBuffer();
+		WireframeBuffer(RenderPreferences *renderPreferences);
 		void clear();
 		void prepareWireframeActor();
 
@@ -65,9 +65,13 @@ private:
 
 		std::vector< vtkSmartPointer<vtkLine> > lines;
 
+		std::vector< vtkSmartPointer<vtkActor> > lineActors;
+
 		std::vector<SphereDrawer> sphereDrawers;
 
 		std::vector< vtkSmartPointer<vtkFollower> > wireLabels;
+
+		RenderPreferences* m_renderPreferences;
 	};
 
 	void linkVisitor(sotm::Link* link, WireframeBuffer* buffer);
@@ -78,8 +82,8 @@ private:
 	sotm::ModelContext* m_modelContext;
 	RenderPreferences* m_renderPreferences;
 
-	WireframeBuffer m_buffer[2];
-	WireframeBuffer *m_nextBuffer = &(m_buffer[0]), *m_currentBuffer = &(m_buffer[1]);
+	WireframeBuffer m_buffer1{m_renderPreferences}, m_buffer2{m_renderPreferences};
+	WireframeBuffer *m_nextBuffer = &(m_buffer1), *m_currentBuffer = &(m_buffer2);
 };
 
 }

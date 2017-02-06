@@ -23,7 +23,7 @@ public:
 	ModelContext* context();
 	AsyncIteratorWrapper* asyncIteratorWrapper();
 	AsyncIteratorRunner* asyncIteratorRunner();
-	RenderPreferences* renderPreferences();
+	RenderPreferences* renderPreferences() override;
 	GraphDrawer* graphDrawer();
 	FrameOptions* frameOptions();
 

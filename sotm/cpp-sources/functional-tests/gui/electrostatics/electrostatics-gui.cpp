@@ -28,16 +28,7 @@ int main(int argc, char** argv)
 	c.parallelSettings.parallelBifurcationIteration.prepareBifurcation = true;
 
 	ElectrostaticPhysicalContext* physCont = static_cast<ElectrostaticPhysicalContext*>(c.physicalContext());
-	/*physCont->setDischargeFunc(
-			[](double E) -> double
-			{
-				double Eabs = fabs(E);
-				if (Eabs > 2e6) // 20 kV/cm
-					return (Eabs - 2e6)/2e6 * 400;
-				return 0.0;
-			}
-	);
-	*/
+
 	physCont->setDischargeFunc(
 			[](double E) -> double
 			{
@@ -48,14 +39,17 @@ int main(int argc, char** argv)
 				return 0.0;
 			}
 	);
+
 	physCont->connectionCriticalField = 0.3e6;
 	physCont->initialConductivity = 1e-5;
 	physCont->minimalConductivity = physCont->initialConductivity * 0.95;
 
 	physCont->chargeScaler.fixValue(0.0, 0.5);
 	physCont->chargeColorMapper.setBlueRed();
-	physCont->conductivityColorMapper.setBlueRed();
-	physCont->linkEta = 1e-4; // 1e-5;
+
+	physCont->conductivityScaler.setScale(Scaler::Scale::log);
+	physCont->conductivityColorMapper.setGreenYellow();
+	physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
 
 	//Vector<3> externalField{0.0, 0.0, 0.6e6};
 	Vector<3> externalField{0.0, 0.0, 0.2e6};
@@ -90,7 +84,8 @@ int main(int argc, char** argv)
 
 	// Running GUI
 	GUI gui(&c, &iter);
-	gui.setFrameOptions(0.0000001, 30);
+	gui.renderPreferences()->lineWidth = false;
+	gui.setFrameOptions(0.000001, 30);
 	gui.run(argc, argv);
 
 	cout << "Destroying graph" << endl;

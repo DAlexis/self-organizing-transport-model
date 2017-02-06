@@ -15,6 +15,7 @@ public:
 	double gamma = defaultGamma;
 	bool enableFollowers = true;
 	bool enableSpheres = true;
+	bool lineWidth = false;
 
 };
 

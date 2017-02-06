@@ -149,6 +149,8 @@ public:
 	void doBifurcation(double time, double dt) override;
 
 	void init() override;
+	void getColor(double* rgb) override;
+	double getSize() override;
 	std::string getFollowerText() override;
 
 

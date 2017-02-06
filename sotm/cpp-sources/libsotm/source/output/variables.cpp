@@ -5,16 +5,24 @@
 
 using namespace sotm;
 
-ColorMapperBase::Color ColorMapperBase::black(0.0, 0.0, 0.0);
-ColorMapperBase::Color ColorMapperBase::red  (1.0, 0.0, 0.0);
-ColorMapperBase::Color ColorMapperBase::green(0.0, 1.0, 0.0);
-ColorMapperBase::Color ColorMapperBase::blue (0.0, 0.0, 1.0);
+ColorMapperBase::Color ColorMapperBase::black (0.0, 0.0, 0.0);
+ColorMapperBase::Color ColorMapperBase::red   (1.0, 0.0, 0.0);
+ColorMapperBase::Color ColorMapperBase::green (0.0, 1.0, 0.0);
+ColorMapperBase::Color ColorMapperBase::blue  (0.0, 0.0, 1.0);
+ColorMapperBase::Color ColorMapperBase::yellow(1.0, 1.0, 0.0);
 
 
 Scaler::Scaler(Scale scale) :
 		m_scale(scale)
 {
 }
+
+void Scaler::setScale(Scale scale)
+{
+	m_scale = scale;
+	reset();
+}
+
 
 double Scaler::scale(double value)
 {
@@ -55,6 +63,14 @@ void Scaler::fixValue(double value, double result)
 	m_fixedValue = rescale(value); m_fixedResult = result;
 	m_hasFixedValue = true;
 }
+
+void Scaler::reset()
+{
+	m_max = 0;
+	m_min = 0;
+	m_initialized = false;
+}
+
 
 double Scaler::rescale(double value)
 {
@@ -123,4 +139,12 @@ void LinearGradientColorMapper::setBlueRed()
 	m_colors.clear();
 	addColor(1.0, ColorMapperBase::red);
 	addColor(0.0, ColorMapperBase::blue);
+}
+
+void LinearGradientColorMapper::setGreenYellow()
+{
+	m_colors.clear();
+	addColor(1.0, ColorMapperBase::yellow);
+	addColor(0.0, ColorMapperBase::Color(0.3, 0.0, 0.0));
+
 }
