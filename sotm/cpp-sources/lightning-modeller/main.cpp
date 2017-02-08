@@ -82,7 +82,7 @@ void initParameters2(ElectrostaticPhysicalContext* physCont, TimeIterator* iter)
 
 void initParameters3(ElectrostaticPhysicalContext* physCont, TimeIterator* iter)
 {
-	// something like stems?
+	// First is channel, than breakdown
 	physCont->setDischargeFunc(
 		[](double E) -> double
 		{
@@ -95,17 +95,53 @@ void initParameters3(ElectrostaticPhysicalContext* physCont, TimeIterator* iter)
 	);
 
 	physCont->nodeEffectiveRadiusCapacity = 0.05;
-	physCont->nodeEffectiveRadiusBranching = 0.09;
+	physCont->nodeEffectiveRadiusBranching = 0.13;
 
-	physCont->connectionCriticalField = 0.3e6;
-	physCont->initialConductivity = 2e-5;
+	physCont->connectionCriticalField = 0.5e6;
+	physCont->initialConductivity = 1e-5;
 	physCont->minimalConductivity = physCont->initialConductivity * 0.95;
 
 	physCont->branchingStep = 0.3;
 	physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
 	physCont->linkBeta = 1e4;
 
-	Vector<3> externalField{0.0, 0.0, 0.22e6};
+	Vector<3> externalField{0.0, 0.0, 0.2e6};
+	physCont->setExternalConstField(externalField);
+
+	iter->setTime(0.0);
+	iter->setStep(2e-7);
+	iter->setStopTime(1e-1);
+}
+
+void initParameters4(ElectrostaticPhysicalContext* physCont, TimeIterator* iter)
+{
+	Random::randomize(1);
+	physCont->setDischargeFunc(
+		[](double E) -> double
+		{
+			if (E > 0.5e6) // 20 kV/cm
+				return (E - 0.5e6)/2e6 * 3e5;
+			if (E < -1e6) // 20 kV/cm
+				return (-E - 1e6)/2e6 * 3e5;
+			return 0.0;
+		}
+	);
+
+	physCont->nodeEffectiveRadiusCapacity = 0.05;
+	physCont->nodeEffectiveRadiusBranching = 0.07;
+
+	physCont->connectionCriticalField = 0.4e6;
+	physCont->connectionMaximalLength = 1e6;
+
+	physCont->initialConductivity = 1e-5;
+	physCont->minimalConductivity = physCont->initialConductivity * 0.95;
+
+	physCont->branchingStep = 0.3;
+
+	physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
+	physCont->linkBeta = 1e4;
+
+	Vector<3> externalField{0.0, 0.0, 0.2e6};
 	physCont->setExternalConstField(externalField);
 
 	iter->setTime(0.0);
@@ -131,7 +167,8 @@ int main(int argc, char** argv)
 
 	//initParameters1(physCont, &iter);
 	//initParameters2(physCont, &iter);
-	initParameters3(physCont, &iter);
+	//initParameters3(physCont, &iter);
+	initParameters4(physCont, &iter);
 
 	physCont->chargeScaler.fixValue(0.0, 0.5);
 	physCont->chargeColorMapper.setBlueRed();

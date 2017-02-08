@@ -64,6 +64,7 @@ public:
 	Parameter<double> minimalConductivity{parameters, "minimalConductivity"};
 
 	Parameter<double> connectionCriticalField{parameters, "connectionCriticalField"};
+	Parameter<double> connectionMaximalLength{parameters, "connectionMaximalLength", -1.0}; // m
 
 	Parameter<double> nodeEffectiveRadiusCapacity{parameters, "nodeEffectiveRadiusCapacity"};
 	Parameter<double> nodeEffectiveRadiusBranching{parameters, "nodeEffectiveRadiusBranching"};

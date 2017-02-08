@@ -96,7 +96,9 @@ bool ElectrostaticPhysicalContext::testConnection(Node* n1, Node* n2)
 	double U = fabs(phi1 - phi2);
 	double l = (n1->pos - n2->pos).len();
 	// Filed is enough and we are not already connected. Second check is here for performance reason
-	if (U/l > connectionCriticalField && !n1->hasNeighbour(n2))
+	if (U/l > connectionCriticalField && !n1->hasNeighbour(n2)
+			&& (connectionMaximalLength < 0.0 || l <= connectionMaximalLength)
+		)
 		return true;
 	else
 		return false;
@@ -172,7 +174,6 @@ void ElectrostaticNodePayload::connectToTarget()
 {
 	if (m_connectTo != nullptr)
 	{
-
 		PtrWrap<Link> newLink = PtrWrap<Link>::make(context()->m_model);
 		newLink->connect(this->node, m_connectTo);
 		newLink->payload->init();
@@ -317,22 +318,28 @@ void ElectrostaticLinkPayload::calculateSecondaryValues(double time)
 
 void ElectrostaticLinkPayload::calculateRHS(double time)
 {
-	conductivity.rhs = (context()->linkEta * sqr(getVoltage()) - context()->linkBeta) * conductivity.current;
+	double U = getVoltage();
+
+	conductivity.rhs = (context()->linkEta * sqr(U) - context()->linkBeta) * conductivity.current;
+	temperature.rhs = getCurrent() * U / heatCapacity();
 }
 
 void ElectrostaticLinkPayload::addRHSToDelta(double m)
 {
 	conductivity.addRHSToDelta(m);
+	temperature.addRHSToDelta(m);
 }
 
 void ElectrostaticLinkPayload::makeSubIteration(double dt)
 {
 	conductivity.makeSubIteration(dt);
+	temperature.makeSubIteration(dt);
 }
 
 void ElectrostaticLinkPayload::step()
 {
 	conductivity.step();
+	temperature.step();
 }
 
 void ElectrostaticLinkPayload::doBifurcation(double time, double dt)
@@ -373,13 +380,14 @@ std::string ElectrostaticLinkPayload::getFollowerText()
 {
 	std::ostringstream ss;
 	ss << "  G = " << std::scientific << std::setprecision(2) << conductivity.current << endl;
-	ss << "  I = " << std::scientific << std::setprecision(2) << getCurrent() << endl;
+	//ss << "  I = " << std::scientific << std::setprecision(2) << getCurrent() << endl;
+	ss << "  T = " << std::scientific << std::setprecision(2) << temperature.current << endl;
 	return ss.str();
 }
 
 double ElectrostaticLinkPayload::getTotalConductivity()
 {
-	return conductivity.current * 2*Const::pi * context()->linkRadius * context()->linkRadius / link->length();
+	return conductivity.current * Const::pi * context()->linkRadius * context()->linkRadius / link->length();
 }
 
 double ElectrostaticLinkPayload::getCurrent()
@@ -412,7 +420,8 @@ double ElectrostaticLinkPayload::getTemperature()
 double ElectrostaticLinkPayload::heatCapacity()
 {
 	double l = link->lengthCached();
-	double volume = Const::pi/4.0*context()->linkRadius*context()->linkRadius*l;
+	double r = context()->linkRadius;
+	double volume = Const::pi * sqr(r) * l;
 	double heatCapacity = volume * Const::Si::SpecificHeat::air;
 	return heatCapacity;
 }
