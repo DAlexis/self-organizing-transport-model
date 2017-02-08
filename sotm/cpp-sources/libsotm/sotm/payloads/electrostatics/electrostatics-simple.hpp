@@ -9,6 +9,7 @@
 #define LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_SIMPLE_HPP_
 
 #include "sotm/base/physical-payload.hpp"
+#include "sotm/base/parameters.hpp"
 #include "sotm/math/integration.hpp"
 #include "sotm/output/variables.hpp"
 
@@ -49,25 +50,28 @@ public:
 		return static_cast<const ElectrostaticPhysicalContext*>(context);
 	}
 
+	ParametersGroup parameters;
 
-	Parameter<double> airTemperature = 300;
+	Parameter<double> airTemperature{parameters, "airTemperature", 300};
 
-	Parameter<double> branchingStep = 0.3;
+	Parameter<double> branchingStep{parameters, "branchingStep"};
 
-	Parameter<bool>   smartBranching = false;
-	Parameter<double> smartBranchingEDiff = 0.5;
-	Parameter<double> smartBranchingMaxLen = 0.5;
+	Parameter<bool>   smartBranching{parameters, "smartBranching", false};
+	Parameter<double> smartBranchingEDiff{parameters, "smartBranchingEDiff", 0.5};
+	Parameter<double> smartBranchingMaxLen{parameters, "smartBranchingMaxLen", 0.5};
 
-	Parameter<double> initialConductivity = 1e-5;
-	Parameter<double> minimalConductivity = initialConductivity*0.95;
-	Parameter<double> minimalCurrent = 0.0;//3e-7;
+	Parameter<double> initialConductivity{parameters, "initialConductivity"};
+	Parameter<double> minimalConductivity{parameters, "minimalConductivity"};
 
-	Parameter<double> connectionCriticalField;
+	Parameter<double> connectionCriticalField{parameters, "connectionCriticalField"};
 
-	Parameter<double> nodeRadius = 0.13;
+	Parameter<double> nodeEffectiveRadiusCapacity{parameters, "nodeEffectiveRadiusCapacity"};
+	Parameter<double> nodeEffectiveRadiusBranching{parameters, "nodeEffectiveRadiusBranching"};
 
-	Parameter<double> linkEta = 1e-4;
-	Parameter<double> linkBeta = 1e4;
+	Parameter<double> linkEta{parameters, "linkEta"};
+	Parameter<double> linkBeta{parameters, "linkBeta"};
+
+	Parameter<double> linkRadius{parameters, "linkRadius", 0.001}; // m
 
 	Scaler chargeScaler;
 	LinearGradientColorMapper chargeColorMapper;
@@ -156,6 +160,7 @@ public:
 
 	void setTemperature(double temp);
 	double getTemperature();
+	double getTotalConductivity();
 	double getCurrent();
 	double getVoltage();
 
@@ -163,10 +168,10 @@ public:
 
 	// Parameters
 	double radius = 0.01; // 1cm
-	//constexpr static Cp = 1.0
 
 	// Primary
-	Variable conductivity; // J
+	Variable conductivity; // Simens * m
+	Variable temperature; // K
 
 	// Secondary
 	//double current = 0;

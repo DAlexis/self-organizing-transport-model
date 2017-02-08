@@ -17,6 +17,7 @@ set(LIB_SOURCE
     ${PROJECT_SOURCE_DIR}/source/base/model-context.cpp
     ${PROJECT_SOURCE_DIR}/source/base/parallel.cpp
     ${PROJECT_SOURCE_DIR}/source/base/time-iter.cpp
+    ${PROJECT_SOURCE_DIR}/source/base/parameters.cpp
     ${PROJECT_SOURCE_DIR}/source/output/graph-drawer.cpp
     ${PROJECT_SOURCE_DIR}/source/output/variables.cpp
     ${PROJECT_SOURCE_DIR}/source/time-iter/euler-explicit.cpp
@@ -47,6 +48,7 @@ set(LIB_HPP
     ${PROJECT_SOURCE_DIR}/sotm/base/time-iter.hpp
     ${PROJECT_SOURCE_DIR}/sotm/base/physical-payload.hpp
     ${PROJECT_SOURCE_DIR}/sotm/base/transport-graph.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/base/parameters.hpp
 )
 
 # Include dirs that are used and will be exported 

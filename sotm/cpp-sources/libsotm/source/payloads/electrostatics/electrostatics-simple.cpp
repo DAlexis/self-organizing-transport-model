@@ -115,7 +115,7 @@ void ElectrostaticNodePayload::calculateSecondaryValues(double time)
 {
 	calculateExtFieldAndPhi();
 
-	double capacity = context()->nodeRadius / Const::Si::k;
+	double capacity = context()->nodeEffectiveRadiusCapacity / Const::Si::k;
 	externalField = externalField * 3;
 	phi += charge.current / capacity;
 }
@@ -204,7 +204,7 @@ void ElectrostaticNodePayload::init()
 
 void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, BranchingParameters& branchingParameters)
 {
-	double radius = context()->nodeRadius;
+	double radius = context()->nodeEffectiveRadiusBranching;
 	double E1 = Const::Si::k*charge.current / sqr(radius);
 	DistributionResult<SphericalPoint> res = generateDischargeDirection(
 			dt,
@@ -250,7 +250,7 @@ void ElectrostaticNodePayload::getColor(double* rgb)
 
 double ElectrostaticNodePayload::getSize()
 {
-	return context()->nodeRadius;
+	return context()->nodeEffectiveRadiusCapacity;
 }
 
 std::string ElectrostaticNodePayload::getFollowerText()
@@ -377,9 +377,14 @@ std::string ElectrostaticLinkPayload::getFollowerText()
 	return ss.str();
 }
 
+double ElectrostaticLinkPayload::getTotalConductivity()
+{
+	return conductivity.current * 2*Const::pi * context()->linkRadius * context()->linkRadius / link->length();
+}
+
 double ElectrostaticLinkPayload::getCurrent()
 {
-	return getVoltage() * conductivity.current;
+	return getVoltage() * getTotalConductivity();
 }
 
 double ElectrostaticLinkPayload::getVoltage()
@@ -395,7 +400,7 @@ double ElectrostaticLinkPayload::getVoltage()
 
 void ElectrostaticLinkPayload::setTemperature(double temp)
 {
-	//heatness.setInitial(temp*heatCapacity());
+	temperature.set(temp);
 }
 
 double ElectrostaticLinkPayload::getTemperature()
@@ -407,7 +412,7 @@ double ElectrostaticLinkPayload::getTemperature()
 double ElectrostaticLinkPayload::heatCapacity()
 {
 	double l = link->lengthCached();
-	double volume = Const::pi/4.0*radius*radius*l;
+	double volume = Const::pi/4.0*context()->linkRadius*context()->linkRadius*l;
 	double heatCapacity = volume * Const::Si::SpecificHeat::air;
 	return heatCapacity;
 }
