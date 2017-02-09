@@ -103,8 +103,8 @@ private:
 #endif
 };
 
-#define NP(parameterName) parameterName(STRINGIFICATE(parameterName))
-#define NPV(parameterName, value) parameterName(STRINGIFICATE(parameterName), value)
+#define NP(group, parameterName)         Parameter<double> parameterName{group, STRINGIFICATE(parameterName)}
+#define NPV(group, parameterName, value) Parameter<double> parameterName{group, STRINGIFICATE(parameterName), value}
 
 } // namespace sotm
 

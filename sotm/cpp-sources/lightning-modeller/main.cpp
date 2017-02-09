@@ -6,6 +6,7 @@
 #include "sotm/time-iter/euler-explicit.hpp"
 #include "sotm/time-iter/runge-kutta.hpp"
 #include "sotm/math/random.hpp"
+#include "sotm/utils/const.hpp"
 
 #include "sotm-gui/gui.hpp"
 #include <tbb/tbb.h>
@@ -13,6 +14,33 @@
 using namespace std;
 using namespace sotm;
 
+void initParameters(ElectrostaticPhysicalContext* physCont, TimeIterator* timeIter)
+{
+	physCont->setDischargeFunc(
+			[](double E) -> double
+			{
+				if (E > 0.5e6) // 20 kV/cm
+					return (E - 0.5e6)/2e6 * 4e7;
+				if (E < -1e6) // 20 kV/cm
+					return (-E - 1e6)/2e6 * 4e7;
+				return 0.0;
+			}
+	);
+
+	physCont->nodeRadius = 0.13;
+	physCont->linkRadius = 0.001;
+	physCont->branchingStep = 0.3;
+
+	physCont->connectionCriticalField = 0.3e6;
+	physCont->initialConductivity = 1e-5 / (Const::pi * physCont->linkRadius * physCont->linkRadius * physCont->branchingStep);
+	physCont->minimalConductivity = physCont->initialConductivity * 0.95;
+
+	physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
+	physCont->linkBeta = 1e4;
+	Vector<3> externalField{0.0, 0.0, 0.2e6};
+	physCont->setExternalConstField(externalField);
+
+}
 
 int main(int argc, char** argv)
 {
@@ -29,33 +57,16 @@ int main(int argc, char** argv)
 
 	ElectrostaticPhysicalContext* physCont = static_cast<ElectrostaticPhysicalContext*>(c.physicalContext());
 
-	physCont->setDischargeFunc(
-			[](double E) -> double
-			{
-				if (E > 0.5e6) // 20 kV/cm
-					return (E - 0.5e6)/2e6 * 4e7;
-				if (E < -1e6) // 20 kV/cm
-					return (-E - 1e6)/2e6 * 4e7;
-				return 0.0;
-			}
-	);
-
-	physCont->connectionCriticalField = 0.3e6;
-	physCont->initialConductivity = 1e-5;
-	physCont->minimalConductivity = physCont->initialConductivity * 0.95;
+	//EulerExplicitIterator continiousIterator;
+	RungeKuttaIterator continiousIterator;
+	TimeIterator iter(&c, &continiousIterator, &c);
+	initParameters(physCont, &iter);
 
 	physCont->chargeScaler.fixValue(0.0, 0.5);
 	physCont->chargeColorMapper.setBlueRed();
 
 	physCont->conductivityScaler.setScale(Scaler::Scale::log);
 	physCont->conductivityColorMapper.setGreenYellow();
-	physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
-
-	//Vector<3> externalField{0.0, 0.0, 0.6e6};
-	Vector<3> externalField{0.0, 0.0, 0.2e6};
-	physCont->setExternalConstField(externalField);
-
-	ElectrostaticNodePayload::setChargeColorLimits(0.0, 0.0);
 
 	{ // Scope to remove pointers
 
@@ -74,9 +85,7 @@ int main(int argc, char** argv)
 	c.initAllPhysicalPayloads();
 
 	// Time iteration
-	//EulerExplicitIterator continiousIterator;
-	RungeKuttaIterator continiousIterator;
-	TimeIterator iter(&c, &continiousIterator, &c);
+
 	iter.setTime(0.0);
 	iter.setStep(0.00000001);
 	iter.setStopTime(1e-4);

@@ -54,22 +54,22 @@ public:
 
 	Parameter<double> airTemperature{parameters, "airTemperature", 300};
 
-	Parameter<double> branchingStep{parameters, "branchingStep", 0.3};
+	Parameter<double> branchingStep{parameters, "branchingStep"};
 
 	Parameter<bool>   smartBranching{parameters, "smartBranching", false};
 	Parameter<double> smartBranchingEDiff{parameters, "smartBranchingEDiff", 0.5};
 	Parameter<double> smartBranchingMaxLen{parameters, "smartBranchingMaxLen", 0.5};
 
-	Parameter<double> initialConductivity{parameters, "initialConductivity", 1e-5};
-	Parameter<double> minimalConductivity{parameters, "minimalConductivity", initialConductivity*0.95};
-	Parameter<double> minimalCurrent{parameters, "minimalCurrent", 0.0};//3e-7;
+	Parameter<double> initialConductivity{parameters, "initialConductivity"};
+	Parameter<double> minimalConductivity{parameters, "minimalConductivity"};
 
 	Parameter<double> connectionCriticalField{parameters, "connectionCriticalField"};
 
-	Parameter<double> nodeRadius{parameters, "nodeRadius", 0.13};
+	Parameter<double> nodeRadius{parameters, "nodeRadius"};
+	Parameter<double> linkRadius{parameters, "linkRadius"};
 
-	Parameter<double> linkEta{parameters, "linkEta", 1e-4};
-	Parameter<double> linkBeta{parameters, "linkBeta", 1e4};
+	Parameter<double> linkEta{parameters, "linkEta"};
+	Parameter<double> linkBeta{parameters, "linkBeta"};
 
 	Scaler chargeScaler;
 	LinearGradientColorMapper chargeColorMapper;
@@ -159,6 +159,7 @@ public:
 	void setTemperature(double temp);
 	double getTemperature();
 	double getCurrent();
+	double getTotalConductivity();
 	double getVoltage();
 
 	double heatCapacity();

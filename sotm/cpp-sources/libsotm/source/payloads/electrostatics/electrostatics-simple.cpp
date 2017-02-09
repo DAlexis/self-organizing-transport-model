@@ -379,7 +379,12 @@ std::string ElectrostaticLinkPayload::getFollowerText()
 
 double ElectrostaticLinkPayload::getCurrent()
 {
-	return getVoltage() * conductivity.current;
+	return getVoltage() * getTotalConductivity();
+}
+
+double ElectrostaticLinkPayload::getTotalConductivity()
+{
+	return conductivity.current * Const::pi * context()->linkRadius * context()->linkRadius * link->lengthCached();
 }
 
 double ElectrostaticLinkPayload::getVoltage()
