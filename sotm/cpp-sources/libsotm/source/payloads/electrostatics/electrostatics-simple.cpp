@@ -354,7 +354,7 @@ void ElectrostaticLinkPayload::doBifurcation(double time, double dt)
 
 void ElectrostaticLinkPayload::init()
 {
-	setTemperature(300);
+	setTemperature(context()->airTemperature);
 	conductivity.set(context()->initialConductivity);
 }
 

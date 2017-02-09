@@ -40,43 +40,6 @@ struct Variable {
 	}
 };
 
-template<typename T>
-struct Parameter
-{
-	Parameter(T initValue) :
-		m_value(initValue)
-#ifdef DEBUG
-		, m_isInitialized(true)
-#endif
-	{ }
-
-	Parameter() :
-		m_value(0.0)
-#ifdef DEBUG
-		, m_isInitialized(false)
-#endif
-	{ }
-
-	SOTM_INLINE T operator=(T newValue)
-	{
-#ifdef DEBUG
-		m_isInitialized = true;
-#endif
-		return m_value = newValue;
-	}
-
-	SOTM_INLINE operator T() const
-	{
-		ASSERT(m_isInitialized, "Parameter usage without initialization!");
-		return m_value;
-	}
-private:
-	T m_value;
-#ifdef DEBUG
-	bool m_isInitialized;
-#endif
-};
-
 /**
  * This class represent some lines from system x'=f(time, x)
  * This interface suppose that users implementation contains those vectors (or may be named values):
