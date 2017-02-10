@@ -79,6 +79,11 @@ struct Parameter : public IAnyTypeParameter
 		return m_value = newValue;
 	}
 
+	SOTM_INLINE T& get()
+	{
+		return m_value;
+	}
+
 	SOTM_INLINE operator T() const
 	{
 		ASSERT(m_isInitialized, std::string("Parameter ") + m_name + " usage without initialization!");

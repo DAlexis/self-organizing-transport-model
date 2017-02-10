@@ -22,15 +22,18 @@ struct Variable {
 	double current;
 	double delta = 0.0;
 	double rhs = 0.0;
+	double lastDelta = 0.0;
 
 	SOTM_INLINE void makeSubIteration(double dt) { current = previous + rhs * dt; }
 	SOTM_INLINE void addRHSToDelta(double m) { delta += rhs * m; }
 	SOTM_INLINE void step()
 	{
 		current = previous = previous + delta;
+		lastDelta = delta;
 		delta = 0.0;
 	}
 	SOTM_INLINE void setInitial(double value) { previous = current = value; }
+	SOTM_INLINE double getDeltaDifference() { return delta - lastDelta; }
 
 	void set(double value)
 	{
@@ -80,6 +83,22 @@ public:
 	 * Makes xCurrent = xPrevious = xPrevious + xDelta; xDelta = 0;
 	 */
 	virtual void step() = 0;
+
+	/**
+	 * Function used for precision control.
+	 *
+	 * Get square of norm of difference between delta and last delta
+	 */
+	virtual double getDeltaDifferenceNormSqr() { return 0.0; };
+
+	/**
+	 * Function used for precision control.
+	 *
+	 * Get square of norm of difference between delta and last delta
+	 */
+	virtual double getDeltaNormSqr() { return 0.0; };
+
+
 };
 
 class IBifurcationTimeIterable

@@ -10,6 +10,7 @@
 
 #include "sotm-gui/gui.hpp"
 #include <tbb/tbb.h>
+#include <math.h>
 
 using namespace std;
 using namespace sotm;
@@ -27,19 +28,41 @@ void initParameters(ElectrostaticPhysicalContext* physCont, TimeIterator* timeIt
 			}
 	);
 
-	physCont->nodeRadius = 0.13;
+	physCont->nodeRadius = 0.05;
 	physCont->linkRadius = 0.001;
 	physCont->branchingStep = 0.3;
 
 	physCont->connectionCriticalField = 0.3e6;
-	physCont->initialConductivity = 1e-5 / (Const::pi * physCont->linkRadius * physCont->linkRadius * physCont->branchingStep);
+	physCont->connectionMaximalDist = physCont->branchingStep.get();
+
+	physCont->initialConductivity = 1e-5;
+	physCont->initialConductivity = 1e-2;
 	physCont->minimalConductivity = physCont->initialConductivity * 0.95;
+
+	physCont->conductivityLimit = 1e0;
+	physCont->ionizationOverheatingInstFunc = [](double temp) {
+		return (atan((temp-400)/400) + Const::pi/2) / Const::pi;
+	};
 
 	physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
 	physCont->linkBeta = 1e4;
 	Vector<3> externalField{0.0, 0.0, 0.2e6};
 	physCont->setExternalConstField(externalField);
 
+
+	timeIter->setTime(0.0);
+	timeIter->setStep(0.00000002);
+	timeIter->setStopTime(1e-3);
+}
+
+void initParameters1(ElectrostaticPhysicalContext* physCont, TimeIterator* timeIter)
+{
+	//physCont->linkBeta = 0;
+	physCont->nodeRadius = 0.03;
+	physCont->linkEta = 1e-4; // 1e-5;
+	physCont->initialConductivity = 1e-3;
+	physCont->minimalConductivity = physCont->initialConductivity * 0.95;
+	Vector<3> externalField{0.0, 0.0, 0.3e6};
 }
 
 int main(int argc, char** argv)
@@ -61,6 +84,7 @@ int main(int argc, char** argv)
 	RungeKuttaIterator continiousIterator;
 	TimeIterator iter(&c, &continiousIterator, &c);
 	initParameters(physCont, &iter);
+	initParameters1(physCont, &iter);
 
 	physCont->chargeScaler.fixValue(0.0, 0.5);
 	physCont->chargeColorMapper.setBlueRed();
@@ -86,9 +110,6 @@ int main(int argc, char** argv)
 
 	// Time iteration
 
-	iter.setTime(0.0);
-	iter.setStep(0.00000001);
-	iter.setStopTime(1e-4);
 	//iter.run();
 
 	// Running GUI

@@ -96,7 +96,10 @@ bool ElectrostaticPhysicalContext::testConnection(Node* n1, Node* n2)
 	double U = fabs(phi1 - phi2);
 	double l = (n1->pos - n2->pos).len();
 	// Filed is enough and we are not already connected. Second check is here for performance reason
-	if (U/l > connectionCriticalField && !n1->hasNeighbour(n2))
+	if (U/l > connectionCriticalField
+			&& !n1->hasNeighbour(n2)
+			&& (l < connectionMaximalDist || connectionMaximalDist <= 0.0)
+			)
 		return true;
 	else
 		return false;
@@ -172,7 +175,6 @@ void ElectrostaticNodePayload::connectToTarget()
 {
 	if (m_connectTo != nullptr)
 	{
-
 		PtrWrap<Link> newLink = PtrWrap<Link>::make(context()->m_model);
 		newLink->connect(this->node, m_connectTo);
 		newLink->payload->init();
@@ -232,7 +234,8 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 		Vector<3> newPlace = node->pos + branchingParameters.direction * len;
 		Node *nearest = context()->m_model->graphRegister.getNearestNode(newPlace);
 		double dist = (nearest->pos - newPlace).len();
-		if (nearest && dist < radius*2.0)
+		//if (nearest && dist < radius*2.0)
+		if (nearest && dist < context()->branchingStep*0.1)
 		{
 			//cout << "Branching disabled" << endl;
 			branchingParameters.needBranching = false;
@@ -317,22 +320,28 @@ void ElectrostaticLinkPayload::calculateSecondaryValues(double time)
 
 void ElectrostaticLinkPayload::calculateRHS(double time)
 {
-	conductivity.rhs = (context()->linkEta * sqr(getVoltage()) - context()->linkBeta) * conductivity.current;
+	double U = getVoltage();
+
+	conductivity.rhs = (context()->linkEta * sqr(U) - context()->linkBeta) * conductivity.current;
+	temperature.rhs = getCurrent() * U / getHeatCapacity();
 }
 
 void ElectrostaticLinkPayload::addRHSToDelta(double m)
 {
 	conductivity.addRHSToDelta(m);
+	temperature.addRHSToDelta(m);
 }
 
 void ElectrostaticLinkPayload::makeSubIteration(double dt)
 {
 	conductivity.makeSubIteration(dt);
+	temperature.makeSubIteration(dt);
 }
 
 void ElectrostaticLinkPayload::step()
 {
 	conductivity.step();
+	temperature.step();
 }
 
 void ElectrostaticLinkPayload::doBifurcation(double time, double dt)
@@ -355,7 +364,19 @@ void ElectrostaticLinkPayload::doBifurcation(double time, double dt)
 void ElectrostaticLinkPayload::init()
 {
 	setTemperature(context()->airTemperature);
+	
+	// Calculating middle field got set conductivity correctly
+	Vector<3> c = (link->getNode1()->pos + link->getNode2()->pos) * 0.5;
+
+	Vector<3> field;
+	double phi;
+	context()->getElectricField(c, field, phi);
+
+	double absE = field.len();
 	conductivity.set(context()->initialConductivity);
+	
+	// todo: add conductivity from temperature function
+	//conductivity.set(context()->initialConductivity * (1+absE / 0.2e5));
 }
 
 void ElectrostaticLinkPayload::getColor(double* rgb)
@@ -372,19 +393,26 @@ double ElectrostaticLinkPayload::getSize()
 std::string ElectrostaticLinkPayload::getFollowerText()
 {
 	std::ostringstream ss;
-	ss << "  G = " << std::scientific << std::setprecision(2) << conductivity.current << endl;
-	ss << "  I = " << std::scientific << std::setprecision(2) << getCurrent() << endl;
+	ss << "  G = " << std::scientific << std::setprecision(2) << getIOIEffectiveCondictivity() << endl;
+	//ss << "  I = " << std::scientific << std::setprecision(2) << getCurrent() << endl;
+	ss << "  T = " << std::scientific << std::setprecision(2) << temperature.current << endl;
 	return ss.str();
+}
+
+double ElectrostaticLinkPayload::getTotalConductivity()
+{
+	return getIOIEffectiveCondictivity() * Const::pi * context()->linkRadius * context()->linkRadius / link->length();
+}
+
+double ElectrostaticLinkPayload::getIOIEffectiveCondictivity()
+{
+	double factor = context()->ionizationOverheatingInstFunc(temperature.current);
+	return (1.0-factor)*conductivity.current + factor*context()->conductivityLimit;
 }
 
 double ElectrostaticLinkPayload::getCurrent()
 {
 	return getVoltage() * getTotalConductivity();
-}
-
-double ElectrostaticLinkPayload::getTotalConductivity()
-{
-	return conductivity.current * Const::pi * context()->linkRadius * context()->linkRadius * link->lengthCached();
 }
 
 double ElectrostaticLinkPayload::getVoltage()
@@ -400,7 +428,7 @@ double ElectrostaticLinkPayload::getVoltage()
 
 void ElectrostaticLinkPayload::setTemperature(double temp)
 {
-	//heatness.setInitial(temp*heatCapacity());
+	temperature.set(temp);
 }
 
 double ElectrostaticLinkPayload::getTemperature()
@@ -409,10 +437,11 @@ double ElectrostaticLinkPayload::getTemperature()
 	return 0.0;
 }
 
-double ElectrostaticLinkPayload::heatCapacity()
+double ElectrostaticLinkPayload::getHeatCapacity()
 {
 	double l = link->lengthCached();
-	double volume = Const::pi/4.0*radius*radius*l;
+	double r = context()->linkRadius;
+	double volume = Const::pi * sqr(r) * l;
 	double heatCapacity = volume * Const::Si::SpecificHeat::air;
 	return heatCapacity;
 }
