@@ -30,35 +30,26 @@ int main(int argc, char** argv)
 	ElectrostaticPhysicalContext* physCont = static_cast<ElectrostaticPhysicalContext*>(c.physicalContext());
 
 	physCont->setDischargeFunc(
-		[](double E) -> double
-		{
-			if (E > 0.5e6) // 20 kV/cm
-				return (E - 0.5e6)/2e6 * 4e5;
-			if (E < -1e6) // 20 kV/cm
-				return (-E - 1e6)/2e6 * 4e5;
-			return 0.0;
-		}
+			[](double E) -> double
+			{
+				if (E > 0.5e6) // 20 kV/cm
+					return (E - 0.5e6)/2e6 * 4e7;
+				if (E < -1e6) // 20 kV/cm
+					return (-E - 1e6)/2e6 * 4e7;
+				return 0.0;
+			}
 	);
 
-	physCont->nodeEffectiveRadiusCapacity = 0.05;
-	physCont->nodeEffectiveRadiusBranching = 0.13;
-
-	physCont->connectionCriticalField = 0.5e6;
+	physCont->connectionCriticalField = 0.3e6;
 	physCont->initialConductivity = 1e-5;
 	physCont->minimalConductivity = physCont->initialConductivity * 0.95;
-
-	physCont->branchingStep = 0.3;
-
-	physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
-	physCont->linkBeta = 1e4;
-
 
 	physCont->chargeScaler.fixValue(0.0, 0.5);
 	physCont->chargeColorMapper.setBlueRed();
 
 	physCont->conductivityScaler.setScale(Scaler::Scale::log);
 	physCont->conductivityColorMapper.setGreenYellow();
-
+	physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
 
 	//Vector<3> externalField{0.0, 0.0, 0.6e6};
 	Vector<3> externalField{0.0, 0.0, 0.2e6};
@@ -87,14 +78,14 @@ int main(int argc, char** argv)
 	RungeKuttaIterator continiousIterator;
 	TimeIterator iter(&c, &continiousIterator, &c);
 	iter.setTime(0.0);
-	iter.setStep(2e-7);
-	iter.setStopTime(1e-2);
+	iter.setStep(0.00000001);
+	iter.setStopTime(1e-4);
 	//iter.run();
 
 	// Running GUI
 	GUI gui(&c, &iter);
 	gui.renderPreferences()->lineWidth = false;
-	gui.setFrameOptions(0.0001, 30);
+	gui.setFrameOptions(0.000001, 30);
 	gui.run(argc, argv);
 
 	cout << "Destroying graph" << endl;
