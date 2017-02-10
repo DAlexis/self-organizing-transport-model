@@ -64,15 +64,16 @@ public:
 	Parameter<double> minimalConductivity{parameters, "minimalConductivity"};
 
 	Parameter<double> connectionCriticalField{parameters, "connectionCriticalField"};
-	Parameter<double> connectionMaximalLength{parameters, "connectionMaximalLength", -1.0}; // m
+	Parameter<double> connectionMaximalDist{parameters, "connectionMaximalDist"};
 
-	Parameter<double> nodeEffectiveRadiusCapacity{parameters, "nodeEffectiveRadiusCapacity"};
-	Parameter<double> nodeEffectiveRadiusBranching{parameters, "nodeEffectiveRadiusBranching"};
+	Parameter<double> nodeRadius{parameters, "nodeRadius"};
+	Parameter<double> linkRadius{parameters, "linkRadius"};
 
 	Parameter<double> linkEta{parameters, "linkEta"};
 	Parameter<double> linkBeta{parameters, "linkBeta"};
 
-	Parameter<double> linkRadius{parameters, "linkRadius", 0.001}; // m
+	Function1D ionizationOverheatingInstFunc{zero};
+	Parameter<double> conductivityLimit{parameters, "conductivityLimit"};
 
 	Scaler chargeScaler;
 	LinearGradientColorMapper chargeColorMapper;
@@ -83,6 +84,7 @@ public:
 private:
 	bool m_readyToDestroy = false;
 	Function1D m_dischargeProb{zero};
+	Function1D m_IOInstFunc{zero};
 	std::unique_ptr<DefinedIntegral> m_integralOfProb;
 	Vector<3> m_externalConstField;
 };
@@ -162,17 +164,18 @@ public:
 	void setTemperature(double temp);
 	double getTemperature();
 	double getTotalConductivity();
+	double getIOIEffectiveCondictivity();
 	double getCurrent();
 	double getVoltage();
 
-	double heatCapacity();
+	double getHeatCapacity();
 
 	// Parameters
 	double radius = 0.01; // 1cm
 
 	// Primary
-	Variable conductivity; // Simens * m
-	Variable temperature; // K
+	Variable conductivity; // Simens
+	Variable temperature;
 
 	// Secondary
 	//double current = 0;

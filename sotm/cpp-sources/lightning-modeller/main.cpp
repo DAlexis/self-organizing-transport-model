@@ -1,157 +1,74 @@
+#include <iostream>
+
 #include "sotm/base/transport-graph.hpp"
 #include "sotm/base/model-context.hpp"
 #include "sotm/payloads/electrostatics/electrostatics-simple.hpp"
 #include "sotm/time-iter/euler-explicit.hpp"
 #include "sotm/time-iter/runge-kutta.hpp"
 #include "sotm/math/random.hpp"
-#include "sotm-gui/gui.hpp"
+#include "sotm/utils/const.hpp"
 
-#include <boost/program_options.hpp>
+#include "sotm-gui/gui.hpp"
 #include <tbb/tbb.h>
-#include <iostream>
+#include <math.h>
 
 using namespace std;
 using namespace sotm;
 
-
-void initParameters1(ElectrostaticPhysicalContext* physCont, TimeIterator* iter)
+void initParameters(ElectrostaticPhysicalContext* physCont, TimeIterator* timeIter)
 {
 	physCont->setDischargeFunc(
-		[](double E) -> double
-		{
-			if (E > 0.5e6) // 20 kV/cm
-				return (E - 0.5e6)/2e6 * 1e6;
-			if (E < -1e6) // 20 kV/cm
-				return (-E - 1e6)/2e6 * 1e6;
-			return 0.0;
-		}
+			[](double E) -> double
+			{
+				if (E > 0.5e6) // 20 kV/cm
+					return (E - 0.5e6)/2e6 * 4e7;
+				if (E < -1e6) // 20 kV/cm
+					return (-E - 1e6)/2e6 * 4e7;
+				return 0.0;
+			}
 	);
 
-	physCont->nodeEffectiveRadiusCapacity  = 0.04;
-	physCont->nodeEffectiveRadiusBranching = 0.04;
-
-	physCont->connectionCriticalField = 0.7e6;
-	physCont->initialConductivity = 1e-5;
-	physCont->minimalConductivity = physCont->initialConductivity * 0.95;
-
-	physCont->branchingStep = 0.2;
-
-	physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
-	physCont->linkBeta = 1e4;
-
-	Vector<3> externalField{0.0, 0.0, 0.30e6};
-	physCont->setExternalConstField(externalField);
-
-	iter->setTime(0.0);
-	iter->setStep(1e-6);
-	iter->setStopTime(1e-2);
-}
-
-void initParameters2(ElectrostaticPhysicalContext* physCont, TimeIterator* iter)
-{
-	// something like stems?
-	physCont->setDischargeFunc(
-		[](double E) -> double
-		{
-			if (E > 0.5e6) // 20 kV/cm
-				return (E - 0.5e6)/2e6 * 4e5;
-			if (E < -1e6) // 20 kV/cm
-				return (-E - 1e6)/2e6 * 4e5;
-			return 0.0;
-		}
-	);
-
-	physCont->nodeEffectiveRadiusCapacity = 0.05;
-	physCont->nodeEffectiveRadiusBranching = 0.09;
-
-	physCont->connectionCriticalField = 0.5e6;
-	physCont->initialConductivity = 1e-5;
-	physCont->minimalConductivity = physCont->initialConductivity * 0.95;
-
+	physCont->nodeRadius = 0.05;
+	physCont->linkRadius = 0.001;
 	physCont->branchingStep = 0.3;
-	physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
-	physCont->linkBeta = 1e4;
 
-	Vector<3> externalField{0.0, 0.0, 0.22e6};
-	physCont->setExternalConstField(externalField);
+	physCont->connectionCriticalField = 0.3e6;
+	physCont->connectionMaximalDist = physCont->branchingStep.get();
 
-	iter->setTime(0.0);
-	iter->setStep(2e-7);
-	iter->setStopTime(1e-1);
-}
-
-void initParameters3(ElectrostaticPhysicalContext* physCont, TimeIterator* iter)
-{
-	// First is channel, than breakdown
-	physCont->setDischargeFunc(
-		[](double E) -> double
-		{
-			if (E > 0.5e6) // 20 kV/cm
-				return (E - 0.5e6)/2e6 * 4e5;
-			if (E < -1e6) // 20 kV/cm
-				return (-E - 1e6)/2e6 * 4e5;
-			return 0.0;
-		}
-	);
-
-	physCont->nodeEffectiveRadiusCapacity = 0.05;
-	physCont->nodeEffectiveRadiusBranching = 0.13;
-
-	physCont->connectionCriticalField = 0.5e6;
 	physCont->initialConductivity = 1e-5;
+	physCont->initialConductivity = 1e-2;
 	physCont->minimalConductivity = physCont->initialConductivity * 0.95;
 
-	physCont->branchingStep = 0.3;
+	physCont->conductivityLimit = 1e0;
+	physCont->ionizationOverheatingInstFunc = [](double temp) {
+		return (atan((temp-400)/400) + Const::pi/2) / Const::pi;
+	};
+
 	physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
 	physCont->linkBeta = 1e4;
-
 	Vector<3> externalField{0.0, 0.0, 0.2e6};
 	physCont->setExternalConstField(externalField);
 
-	iter->setTime(0.0);
-	iter->setStep(2e-7);
-	iter->setStopTime(1e-1);
+
+	timeIter->setTime(0.0);
+	timeIter->setStep(0.00000002);
+	timeIter->setStopTime(1e-3);
 }
 
-void initParameters4(ElectrostaticPhysicalContext* physCont, TimeIterator* iter)
+void initParameters1(ElectrostaticPhysicalContext* physCont, TimeIterator* timeIter)
 {
-	Random::randomize(1);
-	physCont->setDischargeFunc(
-		[](double E) -> double
-		{
-			if (E > 0.5e6) // 20 kV/cm
-				return (E - 0.5e6)/2e6 * 3e5;
-			if (E < -1e6) // 20 kV/cm
-				return (-E - 1e6)/2e6 * 3e5;
-			return 0.0;
-		}
-	);
-
-	physCont->nodeEffectiveRadiusCapacity = 0.05;
-	physCont->nodeEffectiveRadiusBranching = 0.07;
-
-	physCont->connectionCriticalField = 0.4e6;
-	physCont->connectionMaximalLength = 1e6;
-
-	physCont->initialConductivity = 1e-5;
+	//physCont->linkBeta = 0;
+	physCont->nodeRadius = 0.03;
+	physCont->linkEta = 1e-4; // 1e-5;
+	physCont->initialConductivity = 1e-3;
 	physCont->minimalConductivity = physCont->initialConductivity * 0.95;
-
-	physCont->branchingStep = 0.3;
-
-	physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
-	physCont->linkBeta = 1e4;
-
-	Vector<3> externalField{0.0, 0.0, 0.2e6};
-	physCont->setExternalConstField(externalField);
-
-	iter->setTime(0.0);
-	iter->setStep(2e-7);
-	iter->setStopTime(1e-1);
+	Vector<3> externalField{0.0, 0.0, 0.3e6};
 }
 
 int main(int argc, char** argv)
 {
-    Random::randomize(0);
+	//tbb::task_scheduler_init init(2);
+	Random::randomize(0);
 	ModelContext c;
 
 	c.setNodePayloadFactory(std::unique_ptr<INodePayloadFactory>(new ElectrostaticNodePayloadFactory()));
@@ -162,13 +79,12 @@ int main(int argc, char** argv)
 	c.parallelSettings.parallelBifurcationIteration.prepareBifurcation = true;
 
 	ElectrostaticPhysicalContext* physCont = static_cast<ElectrostaticPhysicalContext*>(c.physicalContext());
+
+	//EulerExplicitIterator continiousIterator;
 	RungeKuttaIterator continiousIterator;
 	TimeIterator iter(&c, &continiousIterator, &c);
-
-	//initParameters1(physCont, &iter);
-	//initParameters2(physCont, &iter);
-	//initParameters3(physCont, &iter);
-	initParameters4(physCont, &iter);
+	initParameters(physCont, &iter);
+	initParameters1(physCont, &iter);
 
 	physCont->chargeScaler.fixValue(0.0, 0.5);
 	physCont->chargeColorMapper.setBlueRed();
@@ -176,13 +92,11 @@ int main(int argc, char** argv)
 	physCont->conductivityScaler.setScale(Scaler::Scale::log);
 	physCont->conductivityColorMapper.setGreenYellow();
 
-	ElectrostaticNodePayload::setChargeColorLimits(0.0, 0.0);
-
 	{ // Scope to remove pointers
 
 		/// Building initial tree
-		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, Vector<3>(0.0, 0.0, -physCont->branchingStep / 2));
-		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, Vector<3>(0.0, 0.0, physCont->branchingStep / 2));
+		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, Vector<3>(0.0, 0.0, -0.2));
+		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, Vector<3>(0.0, 0.0, 0.2));
 
 		PtrWrap<Link> l = PtrWrap<Link>::make(&c);
 
@@ -195,15 +109,13 @@ int main(int argc, char** argv)
 	c.initAllPhysicalPayloads();
 
 	// Time iteration
-	//EulerExplicitIterator continiousIterator;
-
 
 	//iter.run();
 
 	// Running GUI
 	GUI gui(&c, &iter);
 	gui.renderPreferences()->lineWidth = false;
-	gui.setFrameOptions(0.0001, 30);
+	gui.setFrameOptions(0.000001, 30);
 	gui.run(argc, argv);
 
 	cout << "Destroying graph" << endl;
@@ -212,6 +124,4 @@ int main(int argc, char** argv)
 
 	cout << "Exiting" << endl;
 	return 0;
-
-    return 0;
 }

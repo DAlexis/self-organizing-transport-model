@@ -1,9 +1,3 @@
-/*
- * parameters.hpp
- *
- *  Created on: 8 февр. 2017 г.
- *      Author: dalexies
- */
 
 #ifndef LIBSOTM_SOTM_BASE_PARAMETERS_HPP_
 #define LIBSOTM_SOTM_BASE_PARAMETERS_HPP_
@@ -79,6 +73,11 @@ struct Parameter : public IAnyTypeParameter
 		return m_value = newValue;
 	}
 
+	SOTM_INLINE T& get()
+	{
+		return m_value;
+	}
+
 	SOTM_INLINE operator T() const
 	{
 		ASSERT(m_isInitialized, std::string("Parameter ") + m_name + " usage without initialization!");
@@ -103,8 +102,8 @@ private:
 #endif
 };
 
-#define NP(parameterName) parameterName(STRINGIFICATE(parameterName))
-#define NPV(parameterName, value) parameterName(STRINGIFICATE(parameterName), value)
+#define NP(group, parameterName)         Parameter<double> parameterName{group, STRINGIFICATE(parameterName)}
+#define NPV(group, parameterName, value) Parameter<double> parameterName{group, STRINGIFICATE(parameterName), value}
 
 } // namespace sotm
 
