@@ -8,6 +8,12 @@
 #include "exponent-time-iterable.hpp"
 #include "sotm/utils/macros.hpp"
 
+void Exponent::clearSubiteration()
+{
+	xCurrent = xPrevious;
+	delta = 0.0;
+}
+
 void Exponent::calculateSecondaryValues(double time)
 {
 	tmp = xCurrent;

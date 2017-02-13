@@ -25,11 +25,11 @@ public:
 	void destroyGraph();
 	bool readyToDestroy();
 
-	virtual void calculateSecondaryValues(double time) override;
-	virtual void calculateRHS(double time) override;
-	virtual void addRHSToDelta(double m) override;
-	virtual void makeSubIteration(double dt) override;
-	virtual void step() override;
+	void calculateSecondaryValues(double time) override;
+	void calculateRHS(double time) override;
+	void addRHSToDelta(double m) override;
+	void makeSubIteration(double dt) override;
+	void step() override;
 
 	void doBifurcation(double time, double dt) { UNUSED_ARG(time); UNUSED_ARG(dt); }
 
@@ -96,11 +96,14 @@ public:
 
 	SOTM_INLINE ElectrostaticPhysicalContext* context() { return static_cast<ElectrostaticPhysicalContext*>(node->physicalContext()); }
 
+	void clearSubiteration() override final;
 	void calculateSecondaryValues(double time) override;
 	void calculateRHS(double time) override;
 	void addRHSToDelta(double m) override;
 	void makeSubIteration(double dt) override;
 	void step() override;
+	double getMinimalStepsCount() override;
+
 	void prepareBifurcation(double time, double dt) override;
 	void doBifurcation(double time, double dt) override;
 	void init() override;
@@ -147,11 +150,13 @@ public:
 
 	SOTM_INLINE ElectrostaticPhysicalContext* context() { return static_cast<ElectrostaticPhysicalContext*>(link->physicalContext()); }
 
+	void clearSubiteration() override final;
 	void calculateSecondaryValues(double time) override;
 	void calculateRHS(double time) override;
 	void addRHSToDelta(double m) override;
 	void makeSubIteration(double dt) override;
 	void step() override;
+	double getMinimalStepsCount() override;
 
 	void doBifurcation(double time, double dt) override;
 

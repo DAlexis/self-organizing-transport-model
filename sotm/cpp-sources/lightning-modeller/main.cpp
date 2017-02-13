@@ -52,6 +52,8 @@ void initParameters(ElectrostaticPhysicalContext* physCont, TimeIterator* timeIt
 
 	timeIter->setTime(0.0);
 	timeIter->setStep(0.00000002);
+	timeIter->setStepBounds(0.000000002, 0.0000002);
+	timeIter->continiousIterParameters().autoStepAdjustment = true;
 	timeIter->setStopTime(1e-3);
 }
 

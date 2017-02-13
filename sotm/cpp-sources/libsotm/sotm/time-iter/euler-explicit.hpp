@@ -15,7 +15,7 @@ namespace sotm {
 class EulerExplicitIterator : public ContinuousTimeIteratorBase
 {
 public:
-	void iterate(double dt) override final;
+	double iterate(double dt) override final;
 };
 
 }  // namespace sotm

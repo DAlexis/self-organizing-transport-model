@@ -45,8 +45,6 @@ public slots:
 private slots:
   void on_pushButtonOneIteration_clicked();
 
-  void on_doubleSpinBoxTimestep_valueChanged(double arg1);
-
   void on_doubleSpinBoxIterateTo_valueChanged(double arg1);
 
   void on_doubleSpinBoxRedrawPeriod_valueChanged(double arg1);
@@ -63,13 +61,20 @@ private slots:
 
   void on_checkBoxSpheres_clicked();
 
+  void on_doubleSpinBoxMaxDt_valueChanged(double arg1);
+
+  void on_doubleSpinBoxMinDt_valueChanged(double arg1);
+
+  void on_doubleSpinBoxMinDt_editingFinished();
+
+  void on_doubleSpinBoxMaxDt_editingFinished();
+
+  void on_doubleSpinBoxCurrentDt_editingFinished();
+
 private:
     void updateEdiableFields();
     void stopFrameWaiting();
     bool shouldAnimationContinued();
-    void prepareNextFrame();
-    void startAnimation();
-    void stopAnimation();
     void updateModelInfo();
     void renderCurrentFrame();
 

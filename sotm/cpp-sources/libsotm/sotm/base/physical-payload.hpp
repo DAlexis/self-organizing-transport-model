@@ -23,11 +23,13 @@ public:
 	void add(AnyPhysicalPayloadBase* payload);
 	void remove(AnyPhysicalPayloadBase* payload);
 
+	void clearSubiteration() override final;
 	void calculateSecondaryValues(double time) override final;
 	void calculateRHS(double time) override final;
 	void addRHSToDelta(double m) override final;
 	void makeSubIteration(double dt) override final;
 	void step() override final;
+	double getMinimalStepsCount() override final;
 
 private:
 	void rebuildPayloadsVectorIfNeeded();
@@ -51,6 +53,8 @@ public:
 	 * todo: check real usage of this function
 	 */
 	virtual void init() { }
+
+	virtual void clearSubiteration() { }
 
 	virtual void calculateSecondaryValues(double time) { }
 
@@ -87,6 +91,7 @@ class PhysicalContextBase : public IPhysicalContext
 {
 public:
 	void connectModel(ModelContext* m) override { m_model = m; }
+	virtual void clearSubiteration() override { }
 	virtual void prepareBifurcation(double time, double dt) override { }
 
 protected:

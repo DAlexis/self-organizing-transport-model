@@ -59,7 +59,22 @@ void VisualizerUIWindow::updateEdiableFields()
         //groupBoxIterating->setWhatsThis("Iterating not avaliable when GUI initialized without TimeIterator object");
     } else {
         groupBoxIterating->setEnabled(true);
-        doubleSpinBoxTimestep->setValue(m_gui->timeIterator()->getStep());
+
+        doubleSpinBoxMinDt->setValue(m_gui->timeIterator()->getTimestepMin());
+        doubleSpinBoxMaxDt->setValue(m_gui->timeIterator()->getTimestepMax());
+        doubleSpinBoxCurrentDt->setValue(m_gui->timeIterator()->getStep());
+
+        if (m_gui->timeIterator()->continiousIterParameters().autoStepAdjustment)
+        {
+        	doubleSpinBoxCurrentDt->setEnabled(false);
+        	doubleSpinBoxMinDt->setEnabled(true);
+        	doubleSpinBoxMaxDt->setEnabled(true);
+        } else {
+        	doubleSpinBoxCurrentDt->setEnabled(true);
+			doubleSpinBoxMinDt->setEnabled(false);
+			doubleSpinBoxMaxDt->setEnabled(false);
+        }
+
         doubleSpinBoxTime->setValue(m_gui->timeIterator()->getTime());
         doubleSpinBoxIterateTo->setValue(m_gui->timeIterator()->getStopTime());
         doubleSpinBoxRedrawPeriod->setValue(m_gui->asyncIteratorWrapper()->getPeriod());
@@ -78,36 +93,6 @@ bool VisualizerUIWindow::shouldAnimationContinued()
     return m_gui->timeIterator()->getTime() < doubleSpinBoxIterateTo->value();
 }
 
-void VisualizerUIWindow::prepareNextFrame()
-{
-    updateModelInfo();
-    //m_gui->animationMaker()->iterateToNextFrame();
-    //m_gui->animationMaker()->drawNextFrame();
-    this->qvtkWidget->repaint();
-}
-
-void VisualizerUIWindow::startAnimation()
-{
-	//startFrameTimer();
-    prepareNextFrame();
-
-    pushButtonOneIteration->setEnabled(false);
-    pushButtonStartAnimation->setEnabled(false);
-
-    pushButtonPauseAnimation->setEnabled(true);
-    //pushButtonIterateToLimit
-}
-
-void VisualizerUIWindow::stopAnimation()
-{
-    //m_animationTimer->stop();
-
-    pushButtonOneIteration->setEnabled(true);
-    pushButtonStartAnimation->setEnabled(true);
-
-    pushButtonPauseAnimation->setEnabled(false);
-}
-
 void VisualizerUIWindow::updateModelInfo()
 {
     labelNodesCount->setText(std::to_string(m_gui->context()->graphRegister.nodesCount()).c_str());
@@ -115,6 +100,7 @@ void VisualizerUIWindow::updateModelInfo()
     if (!m_gui->isStaticGraph())
     {
         doubleSpinBoxTime->setValue(m_gui->timeIterator()->getTime());
+        doubleSpinBoxCurrentDt->setValue(m_gui->timeIterator()->getStep());
     }
 }
 
@@ -203,12 +189,6 @@ void VisualizerUIWindow::on_pushButtonOneIteration_clicked()
 	startNextFrameCalculating();
 }
 
-void VisualizerUIWindow::on_doubleSpinBoxTimestep_valueChanged(double arg1)
-{
-    if (!m_gui->isStaticGraph())
-		m_gui->timeIterator()->setStep(arg1);
-}
-
 void VisualizerUIWindow::on_doubleSpinBoxIterateTo_valueChanged(double arg1)
 {
     if (!m_gui->isStaticGraph())
@@ -265,4 +245,45 @@ void VisualizerUIWindow::on_checkBoxSpheres_clicked()
 {
 	m_gui->renderPreferences()->enableSpheres = checkBoxSpheres->isChecked();
 	renderCurrentFrame();
+}
+
+void VisualizerUIWindow::on_doubleSpinBoxMaxDt_valueChanged(double arg1)
+{
+}
+
+void VisualizerUIWindow::on_doubleSpinBoxMinDt_valueChanged(double arg1)
+{
+
+}
+
+void VisualizerUIWindow::on_doubleSpinBoxMinDt_editingFinished()
+{
+	if (!doubleSpinBoxMinDt->isEnabled())
+		return;
+
+	double min = doubleSpinBoxMinDt->value();
+	double max = doubleSpinBoxMaxDt->value();
+    if (min < max)
+    	m_gui->timeIterator()->setStepBounds(min, max);
+    else
+    	doubleSpinBoxMinDt->setValue(max);
+}
+
+void VisualizerUIWindow::on_doubleSpinBoxMaxDt_editingFinished()
+{
+	if (!doubleSpinBoxMaxDt->isEnabled())
+		return;
+
+	double min = doubleSpinBoxMinDt->value();
+	double max = doubleSpinBoxMaxDt->value();
+	if (min < max)
+		m_gui->timeIterator()->setStepBounds(min, max);
+	else
+		doubleSpinBoxMaxDt->setValue(min);
+}
+
+void VisualizerUIWindow::on_doubleSpinBoxCurrentDt_editingFinished()
+{
+    if (!m_gui->isStaticGraph())
+        m_gui->timeIterator()->setStep(doubleSpinBoxCurrentDt->value());
 }

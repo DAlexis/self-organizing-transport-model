@@ -31,6 +31,12 @@ LinkPayloadBase* ModelContext::createLinkPayload(Link* link)
 	return m_linkPayloadFactory->create(&payloadsRegister, link);
 }
 
+void ModelContext::clearSubiteration()
+{
+	m_physicalContext->clearSubiteration();
+	payloadsRegister.clearSubiteration();
+}
+
 void ModelContext::calculateSecondaryValues(double time)
 {
 	m_physicalContext->calculateSecondaryValues(time);
@@ -59,6 +65,11 @@ void ModelContext::step()
 {
 	m_physicalContext->step();
 	payloadsRegister.step();
+}
+
+double ModelContext::getMinimalStepsCount()
+{
+	return std::min(payloadsRegister.getMinimalStepsCount(), m_physicalContext->getMinimalStepsCount());
 }
 
 void ModelContext::prepareBifurcation(double time, double dt)

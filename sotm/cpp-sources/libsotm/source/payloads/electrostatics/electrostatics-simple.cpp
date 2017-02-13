@@ -114,6 +114,11 @@ ElectrostaticNodePayload::ElectrostaticNodePayload(PhysicalPayloadsRegister* reg
 {
 }
 
+void ElectrostaticNodePayload::clearSubiteration()
+{
+	charge.clearSubIteration();
+}
+
 void ElectrostaticNodePayload::calculateSecondaryValues(double time)
 {
 	calculateExtFieldAndPhi();
@@ -147,6 +152,11 @@ void ElectrostaticNodePayload::makeSubIteration(double dt)
 void ElectrostaticNodePayload::step()
 {
 	charge.step();
+}
+
+double ElectrostaticNodePayload::getMinimalStepsCount()
+{
+	return charge.getCurrentStepsCount();
 }
 
 void ElectrostaticNodePayload::calculateExtFieldAndPhi()
@@ -235,7 +245,7 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 		Node *nearest = context()->m_model->graphRegister.getNearestNode(newPlace);
 		double dist = (nearest->pos - newPlace).len();
 		//if (nearest && dist < radius*2.0)
-		if (nearest && dist < context()->branchingStep*0.1)
+		if (nearest && dist < context()->branchingStep*0.3)
 		{
 			//cout << "Branching disabled" << endl;
 			branchingParameters.needBranching = false;
@@ -314,6 +324,12 @@ ElectrostaticLinkPayload::ElectrostaticLinkPayload(PhysicalPayloadsRegister* reg
 }
 
 
+void ElectrostaticLinkPayload::clearSubiteration()
+{
+	conductivity.clearSubIteration();
+	temperature.clearSubIteration();
+}
+
 void ElectrostaticLinkPayload::calculateSecondaryValues(double time)
 {
 }
@@ -342,6 +358,11 @@ void ElectrostaticLinkPayload::step()
 {
 	conductivity.step();
 	temperature.step();
+}
+
+double ElectrostaticLinkPayload::getMinimalStepsCount()
+{
+	return std::min(conductivity.getCurrentStepsCount(), temperature.getCurrentStepsCount());
 }
 
 void ElectrostaticLinkPayload::doBifurcation(double time, double dt)
@@ -373,6 +394,7 @@ void ElectrostaticLinkPayload::init()
 	context()->getElectricField(c, field, phi);
 
 	double absE = field.len();
+	UNUSED_ARG(absE);
 	conductivity.set(context()->initialConductivity);
 	
 	// todo: add conductivity from temperature function

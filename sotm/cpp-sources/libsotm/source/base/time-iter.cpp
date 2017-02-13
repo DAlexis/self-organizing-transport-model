@@ -5,6 +5,8 @@
 
 using namespace sotm;
 
+const ContiniousIteratorParameters ContinuousTimeIteratorBase::defaultParameters;
+
 void ContinuousTimeIteratorBase::setIterable(IContinuousTimeIterable* target)
 {
 	m_target = target;
@@ -20,6 +22,29 @@ double ContinuousTimeIteratorBase::time()
 	return m_time;
 }
 
+void ContinuousTimeIteratorBase::setStepBounds(double min, double max)
+{
+	m_stepMin = min;
+	m_stepMax = max;
+}
+
+double ContinuousTimeIteratorBase::getMinStep()
+{
+	return m_stepMin;
+}
+
+double ContinuousTimeIteratorBase::getMaxStep()
+{
+	return m_stepMax;
+}
+
+void ContinuousTimeIteratorBase::setParameters(ContiniousIteratorParameters* parameters)
+{
+	if (parameters)
+		m_parameters = parameters;
+	else
+		m_parameters = &defaultParameters;
+}
 
 /////////////////////////
 // TimeIterator
@@ -36,6 +61,7 @@ TimeIterator::TimeIterator(
 	ASSERT(continiousIterable != nullptr, "continiousIterable cannot be a nullptr");
 	ASSERT(continiousIterator != nullptr, "continiousIterator cannot be a nullptr");
 	m_continiousIterator->setIterable(m_continiousIterable);
+	m_continiousIterator->setParameters(&m_contIteratorParameters);
 }
 
 void TimeIterator::setTime(double time)
@@ -52,6 +78,12 @@ void TimeIterator::setBifurcationRunPeriod(double bifurcationPeriod)
 void TimeIterator::setStep(double dt)
 {
 	m_dt = dt;
+	m_continiousIterator->setStepBounds(m_dt, m_dt);
+}
+
+void TimeIterator::setStepBounds(double min, double max)
+{
+	m_continiousIterator->setStepBounds(min, max);
 }
 
 void TimeIterator::setStopTime(double stopTime)
@@ -74,6 +106,16 @@ double TimeIterator::getStep()
 	return m_dt;
 }
 
+double TimeIterator::getTimestepMin()
+{
+	return m_continiousIterator->getMinStep();
+}
+
+double TimeIterator::getTimestepMax()
+{
+	return m_continiousIterator->getMaxStep();
+}
+
 double TimeIterator::getStopTime()
 {
 	return m_stopTime;
@@ -92,7 +134,7 @@ bool TimeIterator::isDone()
 void TimeIterator::iterate()
 {
 	double time = m_continiousIterator->time();
-	m_continiousIterator->iterate(m_dt);
+	m_dt = m_continiousIterator->iterate(m_dt);
 
 	if (
 			(m_bifurcationPeriod == 0.0 || time - m_lastBifurcationTime >= m_bifurcationPeriod) &&
@@ -146,4 +188,9 @@ void TimeIterator::run()
 void TimeIterator::stop()
 {
 	m_needStop = true;
+}
+
+ContiniousIteratorParameters& TimeIterator::continiousIterParameters()
+{
+	return m_contIteratorParameters;
 }

@@ -28,11 +28,13 @@ public:
 	NodePayloadBase* createNodePayload(Node* node);
 	LinkPayloadBase* createLinkPayload(Link* node);
 
+	void clearSubiteration() override final;
 	void calculateSecondaryValues(double time) override final;
 	void calculateRHS(double time) override final;
 	void addRHSToDelta(double m) override final;
 	void makeSubIteration(double dt) override final;
 	void step() override final;
+	double getMinimalStepsCount() override final;
 
 	void prepareBifurcation(double time, double dt) override final;
 	void doBifurcation(double time, double dt) override final;

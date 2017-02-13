@@ -41,6 +41,12 @@ void PhysicalPayloadsRegister::rebuildPayloadsVectorIfNeeded()
 	m_payloadsVectorDirty = false;
 }
 
+void PhysicalPayloadsRegister::clearSubiteration()
+{
+	for (auto &it :  m_payloads)
+		it->clearSubiteration();
+}
+
 void PhysicalPayloadsRegister::calculateSecondaryValues(double time)
 {
 	if (m_parallelSettings->parallelContiniousIteration.calculateSecondaryValues)
@@ -119,6 +125,18 @@ void PhysicalPayloadsRegister::step()
 		for (auto it = m_payloads.begin(); it != m_payloads.end(); ++it)
 			(*it)->step();
 	}
+}
+
+double PhysicalPayloadsRegister::getMinimalStepsCount()
+{
+	double minStepsCount = IContinuousTimeIterable::stepsCountNotMatter;
+	for (auto &it : m_payloads)
+	{
+		double msc = it->getMinimalStepsCount();
+		if (msc < minStepsCount)
+			minStepsCount = msc;
+	}
+	return minStepsCount;
 }
 
 AnyPhysicalPayloadBase::AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg) :

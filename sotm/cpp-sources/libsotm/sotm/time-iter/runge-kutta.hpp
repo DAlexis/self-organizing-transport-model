@@ -15,7 +15,10 @@ namespace sotm {
 class RungeKuttaIterator : public ContinuousTimeIteratorBase
 {
 public:
-	void iterate(double dt) override final;
+	double iterate(double dt) override final;
+
+private:
+	void makeSubiterations(double dt);
 };
 
 }  // namespace sotm

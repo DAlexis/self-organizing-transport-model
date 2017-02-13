@@ -10,38 +10,16 @@
 
 #include "sotm/utils/macros.hpp"
 #include "sotm/utils/assert.hpp"
+
 #include <vector>
+#include <limits>
 #include <cstddef>
+#include <cmath>
 
 namespace sotm
 {
 
-struct Variable {
-	Variable(double initValue = 0.0) : previous(initValue), current(initValue) { }
-	double previous;
-	double current;
-	double delta = 0.0;
-	double rhs = 0.0;
-	double lastDelta = 0.0;
-
-	SOTM_INLINE void makeSubIteration(double dt) { current = previous + rhs * dt; }
-	SOTM_INLINE void addRHSToDelta(double m) { delta += rhs * m; }
-	SOTM_INLINE void step()
-	{
-		current = previous = previous + delta;
-		lastDelta = delta;
-		delta = 0.0;
-	}
-	SOTM_INLINE void setInitial(double value) { previous = current = value; }
-	SOTM_INLINE double getDeltaDifference() { return delta - lastDelta; }
-
-	void set(double value)
-	{
-		previous = current = value;
-		delta = 0;
-		rhs = 0;
-	}
-};
+struct ContiniousIteratorParameters;
 
 /**
  * This class represent some lines from system x'=f(time, x)
@@ -56,7 +34,11 @@ struct Variable {
 class IContinuousTimeIterable
 {
 public:
+	constexpr static double stepsCountNotMatter = std::numeric_limits<double>::max();
 	virtual ~IContinuousTimeIterable() { }
+
+
+	virtual void clearSubiteration() = 0;
 
 	/** Calculate secondary values thats are trivial function of quantities and does not
 	 * contain any differential operators. This function should be called for all objects
@@ -89,16 +71,16 @@ public:
 	 *
 	 * Get square of norm of difference between delta and last delta
 	 */
-	virtual double getDeltaDifferenceNormSqr() { return 0.0; };
+	virtual double getDeltaDifferenceNormSqr() { return 0.0; }
 
 	/**
 	 * Function used for precision control.
 	 *
 	 * Get square of norm of difference between delta and last delta
 	 */
-	virtual double getDeltaNormSqr() { return 0.0; };
+	virtual double getDeltaNormSqr() { return 0.0; }
 
-
+	virtual double getMinimalStepsCount() { return stepsCountNotMatter; }
 };
 
 class IBifurcationTimeIterable
@@ -115,9 +97,17 @@ class IContinuousTimeIterator
 public:
 	virtual ~IContinuousTimeIterator() {}
 	virtual void setIterable(IContinuousTimeIterable* target) = 0;
-	virtual void iterate(double dt) = 0;
+	/**
+	 * Make one iteration. If timestep adaptation enabled, timestep may be changed
+	 * @return new timestep
+	 */
+	virtual double iterate(double dt) = 0;
 	virtual void setTime(double time) = 0;
 	virtual double time() = 0;
+	virtual void setStepBounds(double min, double max) = 0;
+	virtual double getMinStep() = 0;
+	virtual double getMaxStep() = 0;
+	virtual void setParameters(ContiniousIteratorParameters* parameters) = 0;
 };
 
 class ITimeHook
@@ -126,6 +116,63 @@ public:
 	virtual ~ITimeHook() {}
 	virtual void runHook(double time) = 0;
 	virtual double getNextTime() = 0;
+};
+
+class Variable
+{
+public:
+	Variable(double initValue = 0.0) :
+		previous(initValue), current(initValue)
+	{
+		updateMaxAbs();
+	}
+
+	SOTM_INLINE void clearSubIteration() { current = previous; delta = 0.0;}
+	SOTM_INLINE void makeSubIteration(double dt) { current = previous + rhs * dt; }
+	SOTM_INLINE void addRHSToDelta(double m) { delta += rhs * m; }
+	SOTM_INLINE void step()
+	{
+		current = previous = previous + delta;
+		delta = 0.0;
+		updateMaxAbs();
+	}
+	SOTM_INLINE void setInitial(double value) { previous = current = value; }
+
+	SOTM_INLINE double getCurrentStepsCount()
+	{
+		if (maxAbs == 0.0)
+			return IContinuousTimeIterable::stepsCountNotMatter;
+		return maxAbs / fabs(delta);
+	}
+
+	void set(double value)
+	{
+		previous = current = value;
+		delta = 0;
+		rhs = 0;
+	}
+
+	double previous;
+	double current;
+	double delta = 0.0;
+	double rhs = 0.0;
+
+private:
+	double maxAbs = 0.0;
+
+	SOTM_INLINE void updateMaxAbs()
+	{
+		double abs = fabs(previous);
+		if (abs > maxAbs)
+			maxAbs = abs;
+	}
+};
+
+struct ContiniousIteratorParameters
+{
+	bool autoStepAdjustment = false;
+	double iterationsPerAmplitudeMin = 3;
+	double iterationsPerAmplitudeMax = 20;
 };
 
 class TimeHookPeriodic : public ITimeHook
@@ -149,10 +196,17 @@ public:
 	void setIterable(IContinuousTimeIterable* target) override;
 	void setTime(double time) override;
 	double time() override;
+	void setStepBounds(double min, double max) override;
+	double getMinStep() override;
+	double getMaxStep() override;
+	void setParameters(ContiniousIteratorParameters* parameters) override;
 
 protected:
 	double m_time = 0;
 	IContinuousTimeIterable* m_target = nullptr;
+	double m_stepMin = 0.0, m_stepMax = 0.0;
+	static const ContiniousIteratorParameters defaultParameters;
+	const ContiniousIteratorParameters *m_parameters = &defaultParameters;
 };
 
 class TimeIterator
@@ -167,10 +221,13 @@ public:
 	void setTime(double time);
 	void setBifurcationRunPeriod(double bifurcationPeriod);
 	void setStep(double dt);
+	void setStepBounds(double min, double max);
 	void setStopTime(double stopTime);
 	void addHook(ITimeHook* hook);
 
 	double getStep();
+	double getTimestepMin();
+	double getTimestepMax();
 	double getStopTime();
 	double getTime();
 
@@ -184,6 +241,8 @@ public:
 	 */
 	void stop();
 
+	ContiniousIteratorParameters& continiousIterParameters();
+
 private:
 	void callHook();
 	void findNextHook();
@@ -196,6 +255,8 @@ private:
 	double m_nextHookTime = 0;
 	size_t m_nextHook = 0;
 	bool m_needStop = false;
+
+	ContiniousIteratorParameters m_contIteratorParameters;
 
 	IContinuousTimeIterable* m_continiousIterable;
 	IContinuousTimeIterator* m_continiousIterator;
