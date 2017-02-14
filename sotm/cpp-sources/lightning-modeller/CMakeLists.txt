@@ -6,6 +6,8 @@ find_package (Boost COMPONENTS date_time program_options REQUIRED)
 
 set(EXE_SOURCES
     main.cpp
+    modeller.hpp
+    modeller.cpp
 )
 
 include_directories(
