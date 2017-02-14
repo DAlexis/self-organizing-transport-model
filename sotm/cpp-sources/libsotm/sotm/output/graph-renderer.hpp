@@ -40,13 +40,14 @@ private:
 	vtkSmartPointer<vtkFollower> m_label = nullptr;
 };
 
-class GraphDrawer
+class GraphRenderer
 {
 public:
-	GraphDrawer(ModelContext* modelContext, RenderPreferences* renderPreferences);
+	GraphRenderer(ModelContext* modelContext, RenderPreferences* renderPreferences);
 	void prepareNextBuffer();
 	void prepareCurrentBuffer();
 	void addActorsFromCurrentBuffer(vtkRenderer* renderer);
+	void writeCurrentBufferToFile(const std::string& filename);
 	void swapBuffers();
 
 private:

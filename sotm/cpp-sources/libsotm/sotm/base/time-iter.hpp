@@ -20,6 +20,7 @@ namespace sotm
 {
 
 struct ContiniousIteratorParameters;
+struct ContiniousIteratorMetrics;
 
 /**
  * This class represent some lines from system x'=f(time, x)
@@ -80,6 +81,12 @@ public:
 	 */
 	virtual double getDeltaNormSqr() { return 0.0; }
 
+	/**
+	 * Function used for precision control.
+	 *
+	 * Get minimal steps count needed to reach zero from maximal value
+	 * for any variable
+	 */
 	virtual double getMinimalStepsCount() { return stepsCountNotMatter; }
 };
 
@@ -108,6 +115,7 @@ public:
 	virtual double getMinStep() = 0;
 	virtual double getMaxStep() = 0;
 	virtual void setParameters(ContiniousIteratorParameters* parameters) = 0;
+	virtual const ContiniousIteratorMetrics& metrics() = 0;
 };
 
 class ITimeHook
@@ -140,7 +148,7 @@ public:
 
 	SOTM_INLINE double getCurrentStepsCount()
 	{
-		if (maxAbs == 0.0)
+		if (maxAbs == 0.0 || delta*previous > 0)
 			return IContinuousTimeIterable::stepsCountNotMatter;
 		return maxAbs / fabs(delta);
 	}
@@ -175,15 +183,23 @@ struct ContiniousIteratorParameters
 	double iterationsPerAmplitudeMax = 20;
 };
 
+struct ContiniousIteratorMetrics
+{
+	size_t totalStepCalculations = 0;
+	size_t timeIterations = 0;
+
+    double adaptationEfficiency() { return double(timeIterations) / totalStepCalculations; }
+};
+
 class TimeHookPeriodic : public ITimeHook
 {
 public:
-	void runHook(double time) override final { m_lastRun = time; hook(); }
+	void runHook(double time) override final { m_lastRun = time; hook(time); }
 	double getNextTime() override final { return m_lastRun + m_period; }
 
 	void setPeriod(double period) { m_period = period; }
 	double getPeriod() { return m_period; }
-	virtual void hook() = 0;
+	virtual void hook(double time) = 0;
 
 private:
 	double m_lastRun = 0.0;
@@ -200,6 +216,7 @@ public:
 	double getMinStep() override;
 	double getMaxStep() override;
 	void setParameters(ContiniousIteratorParameters* parameters) override;
+	const ContiniousIteratorMetrics& metrics() override;
 
 protected:
 	double m_time = 0;
@@ -207,6 +224,7 @@ protected:
 	double m_stepMin = 0.0, m_stepMax = 0.0;
 	static const ContiniousIteratorParameters defaultParameters;
 	const ContiniousIteratorParameters *m_parameters = &defaultParameters;
+	ContiniousIteratorMetrics m_metrics;
 };
 
 class TimeIterator
@@ -269,7 +287,7 @@ class PeriodicStopHook : public TimeHookPeriodic
 {
 public:
 	PeriodicStopHook(TimeIterator* iterator) : m_iterator(iterator) {}
-	void hook() override { m_iterator->stop(); }
+	void hook(double time) override { UNUSED_ARG(time); m_iterator->stop(); }
 
 private:
 	TimeIterator* m_iterator;

@@ -18,7 +18,8 @@ set(LIB_SOURCE
     ${PROJECT_SOURCE_DIR}/source/base/parallel.cpp
     ${PROJECT_SOURCE_DIR}/source/base/time-iter.cpp
     ${PROJECT_SOURCE_DIR}/source/base/parameters.cpp
-    ${PROJECT_SOURCE_DIR}/source/output/graph-drawer.cpp
+    ${PROJECT_SOURCE_DIR}/source/output/graph-renderer.cpp
+    ${PROJECT_SOURCE_DIR}/source/output/graph-file-writer.cpp
     ${PROJECT_SOURCE_DIR}/source/output/variables.cpp
     ${PROJECT_SOURCE_DIR}/source/time-iter/euler-explicit.cpp
     ${PROJECT_SOURCE_DIR}/source/time-iter/runge-kutta.cpp
@@ -38,7 +39,8 @@ set(LIB_HPP
     ${PROJECT_SOURCE_DIR}/sotm/math/generic.hpp
     ${PROJECT_SOURCE_DIR}/sotm/math/geometry.hpp
     ${PROJECT_SOURCE_DIR}/sotm/math/distrib-gen.hpp
-    ${PROJECT_SOURCE_DIR}/sotm/output/graph-drawer.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/output/graph-renderer.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/output/graph-file-writer.hpp
     ${PROJECT_SOURCE_DIR}/sotm/utils/memory.hpp
     ${PROJECT_SOURCE_DIR}/sotm/utils/assert.hpp
     ${PROJECT_SOURCE_DIR}/sotm/utils/macros.hpp

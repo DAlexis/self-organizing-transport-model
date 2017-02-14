@@ -5,10 +5,11 @@
  *      Author: dalexies
  */
 
-#include "sotm/output/graph-drawer.hpp"
+#include <sotm/output/graph-renderer.hpp>
 #include <vtk/vtkCellData.h>
 #include <vtk/vtkProperty.h>
 #include <vtk/vtkVectorText.h>
+#include <vtk/vtkXMLPolyDataWriter.h>
 
 #include <cmath>
 
@@ -65,23 +66,23 @@ void SphereDrawer::addActors(vtkRenderer* renderer)
 
 }
 
-GraphDrawer::GraphDrawer(sotm::ModelContext* modelContext, RenderPreferences* renderPreferences) :
+GraphRenderer::GraphRenderer(sotm::ModelContext* modelContext, RenderPreferences* renderPreferences) :
 	m_modelContext(modelContext),
 	m_renderPreferences(renderPreferences)
 {
 }
 
-void GraphDrawer::prepareNextBuffer()
+void GraphRenderer::prepareNextBuffer()
 {
 	prepareBuffer(m_nextBuffer);
 }
 
-void GraphDrawer::prepareCurrentBuffer()
+void GraphRenderer::prepareCurrentBuffer()
 {
 	prepareBuffer(m_currentBuffer);
 }
 
-void GraphDrawer::prepareBuffer(WireframeBuffer* buffer)
+void GraphRenderer::prepareBuffer(WireframeBuffer* buffer)
 {
 	buffer->clear();
 
@@ -103,7 +104,7 @@ void GraphDrawer::prepareBuffer(WireframeBuffer* buffer)
 	buffer->prepareWireframeActor();
 }
 
-void GraphDrawer::addActorsFromCurrentBuffer(vtkRenderer* renderer)
+void GraphRenderer::addActorsFromCurrentBuffer(vtkRenderer* renderer)
 {
 	if (m_renderPreferences->lineWidth)
 	{
@@ -123,13 +124,21 @@ void GraphDrawer::addActorsFromCurrentBuffer(vtkRenderer* renderer)
 	}
 }
 
-GraphDrawer::WireframeBuffer::WireframeBuffer(RenderPreferences *renderPreferences) :
+void GraphRenderer::writeCurrentBufferToFile(const std::string& filename)
+{
+	vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+	writer->SetInputData(m_currentBuffer->polyData);
+	writer->SetFileName("Line.vtp");
+	writer->Write();
+}
+
+GraphRenderer::WireframeBuffer::WireframeBuffer(RenderPreferences *renderPreferences) :
 		m_renderPreferences(renderPreferences)
 {
 	clear();
 }
 
-void GraphDrawer::WireframeBuffer::clear()
+void GraphRenderer::WireframeBuffer::clear()
 {
 	points->Reset();
 	linesCellArray->Reset();
@@ -142,7 +151,7 @@ void GraphDrawer::WireframeBuffer::clear()
 	wireLabels.clear();
 }
 
-void GraphDrawer::WireframeBuffer::prepareWireframeActor()
+void GraphRenderer::WireframeBuffer::prepareWireframeActor()
 {
 	if (!m_renderPreferences->lineWidth)
 	{
@@ -156,12 +165,12 @@ void GraphDrawer::WireframeBuffer::prepareWireframeActor()
 	}
 }
 
-void GraphDrawer::swapBuffers()
+void GraphRenderer::swapBuffers()
 {
 	std::swap(m_nextBuffer, m_currentBuffer);
 }
 
-void GraphDrawer::linkVisitor(sotm::Link* link, WireframeBuffer* buffer)
+void GraphRenderer::linkVisitor(sotm::Link* link, WireframeBuffer* buffer)
 {
 	auto& p1 = link->getNode1()->pos;
 	auto& p2 = link->getNode2()->pos;
@@ -237,7 +246,7 @@ void GraphDrawer::linkVisitor(sotm::Link* link, WireframeBuffer* buffer)
 	}
 }
 
-void GraphDrawer::nodeVisitor(sotm::Node* node, WireframeBuffer* buffer)
+void GraphRenderer::nodeVisitor(sotm::Node* node, WireframeBuffer* buffer)
 {
 	double rgb[3];
 	node->payload->getColor(rgb);

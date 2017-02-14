@@ -46,6 +46,11 @@ void ContinuousTimeIteratorBase::setParameters(ContiniousIteratorParameters* par
 		m_parameters = &defaultParameters;
 }
 
+const ContiniousIteratorMetrics& ContinuousTimeIteratorBase::metrics()
+{
+	return m_metrics;
+}
+
 /////////////////////////
 // TimeIterator
 
@@ -94,11 +99,7 @@ void TimeIterator::setStopTime(double stopTime)
 void TimeIterator::addHook(ITimeHook* hook)
 {
 	m_timeHooks.push_back(hook);
-	if (m_timeHooks.size() == 1)
-	{
-		m_nextHookTime = hook->getNextTime();
-		m_nextHook = 0;
-	}
+	findNextHook();
 }
 
 double TimeIterator::getStep()
@@ -170,7 +171,7 @@ void TimeIterator::findNextHook()
 	for (size_t i=1; i<m_timeHooks.size(); i++)
 	{
 		double candidatTime = m_timeHooks[i]->getNextTime();
-		if (candidatTime < m_nextHook) {
+		if (candidatTime < m_nextHookTime) {
 			m_nextHook = i;
 			m_nextHookTime = candidatTime;
 		}
@@ -181,6 +182,7 @@ void TimeIterator::run()
 {
 	m_needStop = false;
 	findNextHook();
+	std::cout << "Next hook: " << m_nextHookTime << std::endl;
 	while (!isDone() && !m_needStop)
 		iterate();
 }

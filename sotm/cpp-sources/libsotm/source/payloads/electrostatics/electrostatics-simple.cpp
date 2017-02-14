@@ -421,6 +421,13 @@ std::string ElectrostaticLinkPayload::getFollowerText()
 	return ss.str();
 }
 
+void ElectrostaticLinkPayload::getParametersVector(double* parameters)
+{
+	parameters[0] = getIOIEffectiveCondictivity();
+	parameters[1] = temperature.current;
+	parameters[2] = 0.0;
+}
+
 double ElectrostaticLinkPayload::getTotalConductivity()
 {
 	return getIOIEffectiveCondictivity() * Const::pi * context()->linkRadius * context()->linkRadius / link->length();

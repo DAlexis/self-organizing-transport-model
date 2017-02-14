@@ -61,6 +61,9 @@ public:
 	/// Get object color for visualization purpose. Color is RGB array. Each color is from interval [0.0; 1.0]
 	virtual void getColor(double* rgb);
 
+	/// Get vector of 3 parameters. It may be one vector or 3 scalar things
+	virtual void getParametersVector(double* parameters);
+
 	/// Get object size for visualization purpose. Normal size if 1.0
 	virtual double getSize();
 

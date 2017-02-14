@@ -164,6 +164,7 @@ public:
 	void getColor(double* rgb) override;
 	double getSize() override;
 	std::string getFollowerText() override;
+	void getParametersVector(double* parameters) override;
 
 
 	void setTemperature(double temp);

@@ -12,6 +12,7 @@
 
 #include <QThread>
 #include <iostream>
+
 namespace sotm {
 
 struct FrameOptions
@@ -27,12 +28,6 @@ public:
 	void setPeriod(double period);
 	double getPeriod();
 
-	static void printThreadId()
-	{
-		std::string s;
-		s += "id = " + std::to_string( (unsigned long int) QThread::currentThreadId());
-		std::cout << s << std::endl;
-	}
 signals:
     void frameDone();
 

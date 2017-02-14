@@ -1,9 +1,8 @@
 #ifndef LIBSOTM_GUI_SOTM_GUI_INTERNAL_GUI_INTERNAL_HPP_
 #define LIBSOTM_GUI_SOTM_GUI_INTERNAL_GUI_INTERNAL_HPP_
 
+#include <sotm/output/graph-renderer.hpp>
 #include "sotm/output/render-preferences.hpp"
-#include "sotm/output/graph-drawer.hpp"
-
 #include "sotm-gui/gui.hpp"
 #include "sotm-gui-internal/async-iteration.hpp"
 
@@ -24,14 +23,14 @@ public:
 	AsyncIteratorWrapper* asyncIteratorWrapper();
 	AsyncIteratorRunner* asyncIteratorRunner();
 	RenderPreferences* renderPreferences() override;
-	GraphDrawer* graphDrawer();
+	GraphRenderer* graphDrawer();
 	FrameOptions* frameOptions();
 
 private:
 	ModelContext* m_modelContext;
 	TimeIterator* m_timeIterator;
 
-	GraphDrawer m_drawer;
+	GraphRenderer m_drawer;
 
     AsyncIteratorWrapper m_asynIterationWrapper;
     AsyncIteratorRunner m_asyncIterationRunner{m_asynIterationWrapper};

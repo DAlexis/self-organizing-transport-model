@@ -25,6 +25,7 @@ double RungeKuttaIterator::iterate(double dt)
 
 	cout << "Selecting time step..." << endl;
 	for(;;) {
+		m_metrics.totalStepCalculations++;
 		makeSubiterations(dt);
 
 		// If step adjustment disabled
@@ -44,7 +45,7 @@ double RungeKuttaIterator::iterate(double dt)
 			if (dt == m_stepMin)
 				break;
 
-			dt *= 0.8;
+            dt *= 0.6;
 			cout << "Deacreasing step to " << dt << endl;
 			if (dt < m_stepMin)
 				dt = m_stepMin;
@@ -57,7 +58,7 @@ double RungeKuttaIterator::iterate(double dt)
 			if (dt == m_stepMax)
 				break;
 
-			dt *= 1.2;
+            dt *= 1.5;
 			cout << "Increasing step to " << dt << endl;
 			if (dt > m_stepMax)
 				dt = m_stepMax;
@@ -67,7 +68,10 @@ double RungeKuttaIterator::iterate(double dt)
 		}
 		break;
 	}
+
 	m_target->step();
+	m_metrics.timeIterations++;
+	cout << "Efficiency: " << m_metrics.adaptationEfficiency() << endl;
 	m_time += dt;
 	return dt;
 }

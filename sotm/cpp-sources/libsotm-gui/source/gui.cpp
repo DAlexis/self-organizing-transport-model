@@ -1,4 +1,4 @@
-#include "sotm/output/graph-drawer.hpp"
+#include <sotm/output/graph-renderer.hpp>
 #include "sotm-gui/gui.hpp"
 #include "sotm-gui-internal/gui-internal.hpp"
 
@@ -90,7 +90,7 @@ RenderPreferences* QtGUI::renderPreferences()
 	return &m_renderPreferences;
 }
 
-GraphDrawer* QtGUI::graphDrawer()
+GraphRenderer* QtGUI::graphDrawer()
 {
 	return &m_drawer;
 }

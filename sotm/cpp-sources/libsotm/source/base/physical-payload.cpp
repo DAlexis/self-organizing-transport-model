@@ -156,6 +156,11 @@ void AnyPhysicalPayloadBase::getColor(double* rgb)
 	rgb[0] = defaultColor[0]; rgb[1] = defaultColor[1]; rgb[2] = defaultColor[2];
 }
 
+void AnyPhysicalPayloadBase::getParametersVector(double* parameters)
+{
+	parameters[0] = parameters[1] = parameters[2] = 0.0;
+}
+
 double AnyPhysicalPayloadBase::getSize()
 {
 	return 1.0;
