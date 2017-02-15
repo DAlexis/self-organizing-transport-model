@@ -33,6 +33,20 @@ private:
 	double m_precision;
 };
 
+class SmoothedLocalStepFunction
+{
+public:
+	SmoothedLocalStepFunction(double stepPoint, double radius);
+
+	Function1D get();
+
+	double get(double arg);
+	double operator()(double arg);
+private:
+	double m_stepPoint, m_radius;
+};
+
+
 }  // namespace sotm
 
 

@@ -23,7 +23,6 @@ double RungeKuttaIterator::iterate(double dt)
 			dt = m_stepMax;
 	}
 
-	cout << "Selecting time step..." << endl;
 	for(;;) {
 		m_metrics.totalStepCalculations++;
 		makeSubiterations(dt);
@@ -31,7 +30,6 @@ double RungeKuttaIterator::iterate(double dt)
 		// If step adjustment disabled
 		if (!m_parameters->autoStepAdjustment)
 			break;
-
 
 		double iterationsCount = m_target->getMinimalStepsCount();
 

@@ -6,6 +6,7 @@
 #include "sotm/utils/const.hpp"
 
 #include <iostream>
+#include <sstream>
 #include <cmath>
 
 using namespace sotm;
@@ -68,7 +69,7 @@ void Modeller::run()
 	initParameters1(physCont, &iter);
 
 	FileWriteHook fwh(&c, nullptr, iter.getTimestepMax()*10);
-	fwh.setFilenamePrefix("lightmod");
+	fwh.setFilenamePrefix(std::string("lightmod_") + getTimeStr());
 	iter.addHook(&fwh);
 
 	physCont->chargeScaler.fixValue(0.0, 0.5);
@@ -133,14 +134,15 @@ void Modeller::initParameters(ElectrostaticPhysicalContext* physCont, TimeIterat
 			[](double E) -> double
 			{
 				if (E > 0.5e6) // 20 kV/cm
-					return (E - 0.5e6)/2e6 * 1e8;
+					return (E - 0.5e6)/2e6 * 5e7;
 				if (E < -1e6) // 20 kV/cm
-					return (-E - 1e6)/2e6 * 1e8;
+					return (-E - 1e6)/2e6 * 5e7;
 				return 0.0;
 			}
 	);
 
-	physCont->nodeRadius = 0.05;
+	physCont->nodeRadiusConductivity = 0.05;
+	physCont->nodeRadiusBranching = 0.05;
 	physCont->linkRadius = 0.001;
 	physCont->branchingStep = 0.3;
 
@@ -148,13 +150,15 @@ void Modeller::initParameters(ElectrostaticPhysicalContext* physCont, TimeIterat
 	physCont->connectionMaximalDist = physCont->branchingStep.get();
 
 	physCont->initialConductivity = 1e-5;
-	physCont->initialConductivity = 1e-2;
 	physCont->minimalConductivity = physCont->initialConductivity * 0.95;
 
 	physCont->conductivityLimit = 1e0;
+	/*
 	physCont->ionizationOverheatingInstFunc = [](double temp) {
-		return (atan((temp-400)/400) + Const::pi/2) / Const::pi;
-	};
+		return (atan((temp-400)/40) + Const::pi/2) / Const::pi;
+	};*/
+	//SmoothedLocalStepFunction step(600, 100);
+	physCont->ionizationOverheatingInstFunc = SmoothedLocalStepFunction(1000, 50);
 
 	physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
 	physCont->linkBeta = 1e4;
@@ -167,16 +171,25 @@ void Modeller::initParameters(ElectrostaticPhysicalContext* physCont, TimeIterat
     //timeIter->setStepBounds(0.0000000002, 0.0000002);
     timeIter->setStepBounds(0.0, 1e-7);
 	timeIter->continiousIterParameters().autoStepAdjustment = true;
-	timeIter->setStopTime(5e-5); //timeIter->setStopTime(1e-3);
+	timeIter->setStopTime(1e-1);
 }
 
 void Modeller::initParameters1(ElectrostaticPhysicalContext* physCont, TimeIterator* timeIter)
 {
-	physCont->nodeRadius = 0.03;
-	physCont->linkEta = 1e-4; // 1e-5;
-    physCont->linkBeta = 5e4;
+	physCont->nodeRadiusConductivity = 0.03;
+	physCont->linkEta = 2e-5; // 1e-5;
+    physCont->linkBeta = 3e4;
     //physCont->linkBeta = 1e5;
-	physCont->initialConductivity = 1e-3;
+	physCont->initialConductivity = 1e-5;
 	physCont->minimalConductivity = physCont->initialConductivity * 0.95;
 	Vector<3> externalField{0.0, 0.0, 0.3e6};
+}
+
+std::string Modeller::getTimeStr()
+{
+	auto t = std::time(nullptr);
+	auto tm = *std::localtime(&t);
+	std::ostringstream oss;
+	oss << std::put_time(&tm, "%d-%m-%Y_%H-%M-%S");
+	return oss.str();
 }

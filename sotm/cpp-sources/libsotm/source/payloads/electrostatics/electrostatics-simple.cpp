@@ -123,7 +123,7 @@ void ElectrostaticNodePayload::calculateSecondaryValues(double time)
 {
 	calculateExtFieldAndPhi();
 
-	double capacity = context()->nodeRadius / Const::Si::k;
+	double capacity = context()->nodeRadiusConductivity / Const::Si::k;
 	externalField = externalField * 3;
 	phi += charge.current / capacity;
 }
@@ -216,7 +216,7 @@ void ElectrostaticNodePayload::init()
 
 void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, BranchingParameters& branchingParameters)
 {
-	double radius = context()->nodeRadius;
+	double radius = context()->nodeRadiusBranching;
 	double E1 = Const::Si::k*charge.current / sqr(radius);
 	DistributionResult<SphericalPoint> res = generateDischargeDirection(
 			dt,
@@ -263,7 +263,7 @@ void ElectrostaticNodePayload::getColor(double* rgb)
 
 double ElectrostaticNodePayload::getSize()
 {
-	return context()->nodeRadius;
+	return context()->nodeRadiusConductivity;
 }
 
 std::string ElectrostaticNodePayload::getFollowerText()

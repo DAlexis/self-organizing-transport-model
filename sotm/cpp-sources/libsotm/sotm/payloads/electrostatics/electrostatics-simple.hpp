@@ -66,7 +66,8 @@ public:
 	Parameter<double> connectionCriticalField{parameters, "connectionCriticalField"};
 	Parameter<double> connectionMaximalDist{parameters, "connectionMaximalDist"};
 
-	Parameter<double> nodeRadius{parameters, "nodeRadius"};
+	Parameter<double> nodeRadiusConductivity{parameters, "nodeRadiusConductivity"};
+	Parameter<double> nodeRadiusBranching{parameters, "nodeRadiusBranching"};
 	Parameter<double> linkRadius{parameters, "linkRadius"};
 
 	Parameter<double> linkEta{parameters, "linkEta"};

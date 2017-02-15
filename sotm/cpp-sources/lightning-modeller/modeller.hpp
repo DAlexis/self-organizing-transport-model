@@ -27,6 +27,7 @@ private:
 	void initParameters(sotm::ElectrostaticPhysicalContext* physCont, sotm::TimeIterator* timeIter);
 	void initParameters1(sotm::ElectrostaticPhysicalContext* physCont, sotm::TimeIterator* timeIter);
 
+	static std::string getTimeStr();
 
 	boost::program_options::variables_map m_cmdLineOptions;
 	int m_argc;
