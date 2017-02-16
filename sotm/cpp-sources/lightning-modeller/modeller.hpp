@@ -14,8 +14,10 @@
 #include "sotm/time-iter/euler-explicit.hpp"
 #include "sotm/time-iter/runge-kutta.hpp"
 #include "sotm/math/random.hpp"
+#include "sotm/output/graph-file-writer.hpp"
 
 #include <boost/program_options.hpp>
+#include <memory>
 
 class Modeller
 {
@@ -24,10 +26,16 @@ public:
 	void run();
 
 private:
-	void initParameters(sotm::ElectrostaticPhysicalContext* physCont, sotm::TimeIterator* timeIter);
-	void initParameters1(sotm::ElectrostaticPhysicalContext* physCont, sotm::TimeIterator* timeIter);
+	void initFileOutput();
+	void initParameters();
+	void initParameters1();
 
 	static std::string getTimeStr();
+
+	sotm::ModelContext c;
+	sotm::ElectrostaticPhysicalContext* m_physCont;
+	std::unique_ptr<sotm::TimeIterator> m_timeIter;
+	std::unique_ptr<sotm::FileWriteHook> m_fileWriteHook;
 
 	boost::program_options::variables_map m_cmdLineOptions;
 	int m_argc;

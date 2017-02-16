@@ -26,10 +26,12 @@ set(LIB_SOURCE
     ${PROJECT_SOURCE_DIR}/source/payloads/demo/empty-payloads.cpp
     ${PROJECT_SOURCE_DIR}/source/payloads/demo/absolute-random-graph.cpp
     ${PROJECT_SOURCE_DIR}/source/payloads/electrostatics/electrostatics-simple.cpp
+    ${PROJECT_SOURCE_DIR}/source/payloads/electrostatics/electrostatics-scaler.cpp
 )
 
 set(LIB_HPP
     ${PROJECT_SOURCE_DIR}/sotm/payloads/electrostatics/electrostatics-simple.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/payloads/electrostatics/electrostatics-scaler.hpp
     ${PROJECT_SOURCE_DIR}/sotm/payloads/demo/empty-payloads.hpp
     ${PROJECT_SOURCE_DIR}/sotm/payloads/demo/absolute-random-graph.hpp
     ${PROJECT_SOURCE_DIR}/sotm/time-iter/runge-kutta.hpp
