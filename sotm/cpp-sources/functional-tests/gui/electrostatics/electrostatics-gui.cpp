@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 
 	//Vector<3> externalField{0.0, 0.0, 0.6e6};
 	Vector<3> externalField{0.0, 0.0, 0.2e6};
-	physCont->setExternalConstField(externalField);
+	physCont->externalConstField = externalField;
 
 	ElectrostaticNodePayload::setChargeColorLimits(0.0, 0.0);
 

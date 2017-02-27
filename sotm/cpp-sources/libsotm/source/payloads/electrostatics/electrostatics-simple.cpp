@@ -56,15 +56,10 @@ void ElectrostaticPhysicalContext::setDischargeFunc(Function1D func)
 	m_integralOfProb.reset(new DefinedIntegral(m_dischargeProb, -20e6, 20e6, 10000));
 }
 
-void ElectrostaticPhysicalContext::setExternalConstField(Vector<3> field)
-{
-	m_externalConstField = field;
-}
-
 void ElectrostaticPhysicalContext::getElectricField(const Vector<3>& point, Vector<3>& outField, double& outPotential, const Node* exclude)
 {
-	outPotential = - (point ^ m_externalConstField);
-	outField = m_externalConstField;
+	outPotential = - (point ^ externalConstField);
+	outField = externalConstField;
 
 	GraphRegister::NodeVisitor nodeVisitor = [&point, exclude, &outPotential, &outField](const Node* node) {
 
@@ -337,8 +332,7 @@ void ElectrostaticLinkPayload::calculateSecondaryValues(double time)
 void ElectrostaticLinkPayload::calculateRHS(double time)
 {
 	double U = getVoltage();
-
-	conductivity.rhs = (context()->linkEta * sqr(U) - context()->linkBeta) * conductivity.current;
+	conductivity.rhs = (context()->linkEta * sqr(U / link->length()) - context()->linkBeta) * conductivity.current;
 	temperature.rhs = getCurrent() * U / getHeatCapacity();
 }
 

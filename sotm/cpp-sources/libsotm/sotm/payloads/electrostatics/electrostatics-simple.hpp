@@ -34,7 +34,6 @@ public:
 	void doBifurcation(double time, double dt) { UNUSED_ARG(time); UNUSED_ARG(dt); }
 
 	void setDischargeFunc(Function1D func);
-	void setExternalConstField(Vector<3> field);
 
 	void getElectricField(const Vector<3>& point, Vector<3>& outField, double& outPotential, const Node* excludeNode = nullptr);
 
@@ -76,6 +75,8 @@ public:
 	Function1D ionizationOverheatingInstFunc{zero};
 	Parameter<double> conductivityLimit{parameters, "conductivityLimit"};
 
+	Vector<3> externalConstField;
+
 	Scaler chargeScaler;
 	LinearGradientColorMapper chargeColorMapper;
 
@@ -87,7 +88,7 @@ private:
 	Function1D m_dischargeProb{zero};
 	Function1D m_IOInstFunc{zero};
 	std::unique_ptr<DefinedIntegral> m_integralOfProb;
-	Vector<3> m_externalConstField;
+
 };
 
 class ElectrostaticNodePayload : public NodePayloadBase

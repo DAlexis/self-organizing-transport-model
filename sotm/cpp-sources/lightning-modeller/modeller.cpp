@@ -116,7 +116,7 @@ void Modeller::run()
 		// Running GUI
 		GUI gui(&c, m_timeIter.get());
 		gui.renderPreferences()->lineWidth = false;
-		gui.setFrameOptions(0.000001, 30);
+		gui.setFrameOptions(0.0000001, 30);
 		gui.run(m_argc, m_argv);
 	} else {
 		m_timeIter->run();
@@ -162,17 +162,12 @@ void Modeller::initParameters()
 	m_physCont->minimalConductivity = m_physCont->initialConductivity * 0.95;
 
 	m_physCont->conductivityLimit = 1e0;
-	/*
-	physCont->ionizationOverheatingInstFunc = [](double temp) {
-		return (atan((temp-400)/40) + Const::pi/2) / Const::pi;
-	};*/
-	//SmoothedLocalStepFunction step(600, 100);
 	m_physCont->ionizationOverheatingInstFunc = SmoothedLocalStepFunction(1000, 50);
 
 	m_physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
 	m_physCont->linkBeta = 1e4;
 	Vector<3> externalField{0.0, 0.0, 0.2e6};
-	m_physCont->setExternalConstField(externalField);
+	m_physCont->externalConstField = externalField;
 
 
 	m_timeIter->setTime(0.0);
@@ -186,13 +181,16 @@ void Modeller::initParameters()
 
 void Modeller::initParameters1()
 {
-	m_physCont->nodeRadiusConductivity = 0.03;
-	m_physCont->linkEta = 2e-5; // 1e-5;
-	m_physCont->linkBeta = 3e4;
-    //physCont->linkBeta = 1e5;
-	m_physCont->initialConductivity = 1e-5;
-	m_physCont->minimalConductivity = m_physCont->initialConductivity * 0.95;
 	Vector<3> externalField{0.0, 0.0, 0.3e6};
+	m_physCont->externalConstField = externalField;
+	m_physCont->nodeRadiusConductivity = 0.03;
+
+	double betaDominationFactor = 1.5;
+	m_physCont->linkBeta = 2e7;
+	m_physCont->linkEta = m_physCont->linkBeta / sqr(m_physCont->externalConstField[2]) * betaDominationFactor;
+
+	m_physCont->initialConductivity = 1e-10;
+	m_physCont->minimalConductivity = m_physCont->initialConductivity * 0.95;
 }
 
 std::string Modeller::getTimeStr()
