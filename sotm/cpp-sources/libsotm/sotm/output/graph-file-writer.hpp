@@ -20,6 +20,8 @@
 #include <vtk/vtkSmartPointer.h>
 #include <vtk/vtkDoubleArray.h>
 
+#include <sstream>
+
 namespace sotm {
 
 class FileWriter
@@ -30,6 +32,8 @@ public:
 	void write(const std::string& filename);
 
 private:
+	void writeLinks(const std::string& filename);
+	void writeNodes(const std::string& filename);
 
 	void buildLinks();
 
@@ -45,6 +49,8 @@ private:
 
 	ModelContext* m_modelContext;
 	RenderPreferences* m_renderPreferences;
+
+	std::ostringstream m_oss;
 };
 
 class FileWriteHook : public TimeHookPeriodic

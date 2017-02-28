@@ -269,6 +269,11 @@ std::string ElectrostaticNodePayload::getFollowerText()
 	return ss.str();
 }
 
+void ElectrostaticNodePayload::getParametersVector(double* parameters)
+{
+	parameters[0] = charge.current;
+}
+
 void ElectrostaticNodePayload::setCharge(double charge)
 {
 	this->charge.setInitial(charge);

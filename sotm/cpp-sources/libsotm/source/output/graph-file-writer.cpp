@@ -3,6 +3,7 @@
 #include <vtk/vtkCellData.h>
 #include <vtk/vtkXMLPolyDataWriter.h>
 
+#include <iostream>
 #include <sstream>
 
 using namespace sotm;
@@ -17,13 +18,39 @@ FileWriter::FileWriter(ModelContext* modelContext, RenderPreferences* renderPref
 void FileWriter::write(const std::string& filename)
 {
 	clear();
-	buildLinks();
 
+	writeLinks(filename + ".vtp");
+	writeNodes(filename + ".csv");
+}
+
+void FileWriter::writeLinks(const std::string& filename)
+{
+	buildLinks();
 	vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
 	writer->SetInputData(polyData);
-	std::string fullFilename = filename + ".vtp";
-	writer->SetFileName(fullFilename.c_str());
+	writer->SetFileName(filename.c_str());
 	writer->Write();
+}
+
+void FileWriter::writeNodes(const std::string& filename)
+{
+	m_oss << "x, y, z, parameter1, parameter2, parameter3" << std::endl;
+
+	std::ofstream output(filename.c_str(), std::ios::out);
+	if (!output.is_open())
+	{
+		std::cerr << "Cannot open file " << filename << std::endl;
+		return;
+	}
+
+	m_modelContext->graphRegister.applyNodeVisitor(
+		[this] (sotm::Node* node)
+		{
+			nodeVisitor(node);
+		}
+	);
+
+	output << m_oss.str();
 }
 
 void FileWriter::buildLinks()
@@ -61,6 +88,14 @@ void FileWriter::linkVisitor(sotm::Link* link)
 
 void FileWriter::nodeVisitor(sotm::Node* node)
 {
+	double parameters[3] = {0.0, 0.0, 0.0};
+	node->payload->getParametersVector(parameters);
+	m_oss << node->pos.x[0] << ", "
+		<< node->pos.x[1] << ", "
+		<< node->pos.x[2] << ", "
+		<< parameters[0] << ", "
+		<< parameters[1] << ", "
+		<< parameters[2] << std::endl;
 }
 
 void FileWriter::clear()
@@ -70,6 +105,8 @@ void FileWriter::clear()
 	polyData->Reset();
 	linesDoubleArray->Reset();
 	linesDoubleArray->SetNumberOfComponents(3);
+	m_oss.clear();
+	m_oss.str("");
 }
 
 //////////////////////////////////////////////////////////

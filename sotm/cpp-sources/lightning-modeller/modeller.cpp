@@ -161,7 +161,7 @@ void Modeller::initParameters()
 	m_physCont->initialConductivity = 1e-5;
 	m_physCont->minimalConductivity = m_physCont->initialConductivity * 0.95;
 
-	m_physCont->conductivityLimit = 1e0;
+	m_physCont->conductivityLimit = 1e2;
 	m_physCont->ionizationOverheatingInstFunc = SmoothedLocalStepFunction(1000, 50);
 
 	m_physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
