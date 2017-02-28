@@ -367,7 +367,7 @@ double ElectrostaticLinkPayload::getMinimalStepsCount()
 void ElectrostaticLinkPayload::doBifurcation(double time, double dt)
 {
 	double current = getCurrent();
-	if (current != 0.0 && conductivity.current < context()->minimalConductivity)
+	if (current != 0.0 && getTotalConductivity() < context()->minimalConductivity)
 	{
 		onDeletePayload();
 		return;

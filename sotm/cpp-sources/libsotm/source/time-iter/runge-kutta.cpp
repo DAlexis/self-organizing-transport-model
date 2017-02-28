@@ -31,6 +31,7 @@ double RungeKuttaIterator::iterate(double dt)
 		if (!m_parameters->autoStepAdjustment)
 			break;
 
+		// Now checking step to be optimal
 		double iterationsCount = m_target->getMinimalStepsCount();
 
 		cout << "MinStepsCount = " << iterationsCount << endl;
@@ -40,6 +41,7 @@ double RungeKuttaIterator::iterate(double dt)
 
 		if (iterationsCount < m_parameters->iterationsPerAmplitudeMin)
 		{
+			// Step is too big
 			if (dt == m_stepMin)
 				break;
 
@@ -53,16 +55,18 @@ double RungeKuttaIterator::iterate(double dt)
 		}
 		if (iterationsCount > m_parameters->iterationsPerAmplitudeMax)
 		{
+			// Step is smaller then enough
 			if (dt == m_stepMax)
 				break;
 
             dt *= 1.5;
-			cout << "Increasing step to " << dt << endl;
 			if (dt > m_stepMax)
 				dt = m_stepMax;
+			cout << "Increasing step to " << dt << endl;
 
-			m_target->clearSubiteration();
-			continue;
+			// But we should not recompute this iteration, it is done with step precise then enough
+			//m_target->clearSubiteration();
+			//continue;
 		}
 		break;
 	}
