@@ -57,6 +57,7 @@ endmacro()
 add_subdirectory(libsotm)
 add_subdirectory(lightning-modeller)
 add_subdirectory(libsotm-gui)
+add_subdirectory(utilities)
 
 # To enable ctest usage
 enable_testing()

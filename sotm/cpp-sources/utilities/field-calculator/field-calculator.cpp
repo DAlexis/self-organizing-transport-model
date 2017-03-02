@@ -1,0 +1,184 @@
+#include "field-calculator.hpp"
+#include <iostream>
+#include <fstream>
+#include <string>
+#include "grid-builder.hpp"
+
+using namespace std;
+
+bool FieldCalculator::parseCmdLineArgs(int argc, char** argv)
+{
+	namespace po = boost::program_options;
+	po::options_description generalOptions("General options");
+	generalOptions.add_options()
+		("help,h", "Print help message")
+		("file,f", po::value<std::string>(), "Input file name")
+		("nx", po::value<unsigned int>()->default_value(1), "Points per x")
+		("ny", po::value<unsigned int>()->default_value(10), "Points per y")
+		("nz", po::value<unsigned int>()->default_value(10), "Points per z")
+		("zone-begin,b", po::value<std::string>(), "Zone begin coords (x, y, z)")
+		("zone-end,e", po::value<std::string>(), "Zone end coords (x, y, z)");
+
+	po::options_description allOptions("Allowed options");
+	allOptions
+		.add(generalOptions);
+
+	try
+	{
+		po::store(po::parse_command_line(argc, argv, allOptions), m_cmdLineOptions);
+		po::notify(m_cmdLineOptions);
+
+		m_nx = m_cmdLineOptions["nx"].as<unsigned int>();
+		m_ny = m_cmdLineOptions["ny"].as<unsigned int>();
+		m_nz = m_cmdLineOptions["nz"].as<unsigned int>();
+	}
+	catch (po::error& e)
+	{
+		cerr << "Command line parsing error: " << e.what() << endl;
+		return false;
+	}
+
+	if (m_cmdLineOptions.count("help"))
+	{
+		cout << allOptions << endl;
+		return false;
+	}
+
+	if (m_cmdLineOptions.count("file") == 0)
+	{
+		cerr << "File not specified" << endl;
+		return false;
+	}
+
+	return true;
+}
+
+void FieldCalculator::run()
+{
+	m_hasCorners = getCornersFromCmdline();
+
+	if (!readPoints())
+	{
+		cerr << "Error wile loading points from file" << endl;
+		return;
+	}
+
+	// @todo Calculations
+
+	write();
+}
+
+bool FieldCalculator::parsePoint(sotm::Vector<3>& v, const std::string& str)
+{
+	std::istringstream iss(str);
+	char tmp;
+	try
+	{
+		iss >> tmp;
+		if (tmp != '(')
+			return false;
+		iss >> v[0];
+		iss >> tmp;
+		if(tmp != ',')
+			return false;
+		iss >> v[1];
+		iss >> tmp;
+		if(tmp != ',')
+			return false;
+
+		iss >> v[2];
+		iss >> tmp;
+		if(tmp != ')')
+			return false;
+	} catch(std::exception& ex)
+	{
+		cerr << "Invalid point '" << str << "', parsing error: " << ex.what();
+		return false;
+	}
+	return true;
+}
+
+bool FieldCalculator::getCornersFromCmdline()
+{
+	if (m_cmdLineOptions.count("zone-begin") != 0 && m_cmdLineOptions.count("zone-end") != 0)
+	{
+		return parsePoint(m_c1, m_cmdLineOptions["zone-begin"].as<std::string>())
+				&& parsePoint(m_c2, m_cmdLineOptions["zone-end"].as<std::string>());
+	}
+	return false;
+}
+
+void FieldCalculator::fixCorners()
+{
+	if (m_hasCorners)
+	{
+		for (int i=0; i<3; i++)
+			if (m_c1[i] > m_c2[i])
+				std::swap(m_c1[i], m_c2[i]);
+	}
+}
+
+
+bool FieldCalculator::readPoints()
+{
+	std::ifstream file(m_cmdLineOptions["file"].as<std::string>().c_str(), std::ios::in);
+
+	if (!file.is_open())
+	{
+		cerr << "Cannot open file " << m_cmdLineOptions["file"].as<std::string>() << "!" << endl;
+		return false;
+	}
+
+	std::string line;
+	std::getline(file, line);
+	bool firstLine = true;
+	while(std::getline(file, line))
+	{
+		Charge newCharge;
+		try
+		{
+			std::istringstream iss(line);
+			char tmp;
+			iss >> newCharge.pos[0] >> tmp;
+			iss >> newCharge.pos[1] >> tmp;
+			iss >> newCharge.pos[2] >> tmp;
+			iss >> newCharge.charge;
+			cout << newCharge.pos[0] << " " << newCharge.pos[1] << " " << newCharge.pos[2] << " " << newCharge.charge << endl;
+			if (!m_hasCorners)
+			{
+				// Auto scaling
+				for (int i=0; i<3; i++)
+				{
+					if (firstLine || m_c1[i] > newCharge.pos[i])
+						m_c1[i] = newCharge.pos[i];
+
+					if (firstLine || m_c2[i] < newCharge.pos[i])
+						m_c2[i] = newCharge.pos[i];
+				}
+
+			}
+			firstLine = false;
+		} catch(std::exception& ex)
+		{
+			cerr << "File parsing error: " << ex.what() << endl;
+			return false;
+		}
+		m_charges.push_back(newCharge);
+	}
+
+	return true;
+}
+
+bool FieldCalculator::write()
+{
+	GridBuilder w(m_nx, m_ny, m_nz,
+			m_c1[0], m_c1[1], m_c1[2],
+			m_c2[0], m_c2[1], m_c2[2]);
+	for (auto it=w.valuePoints().begin(); it != w.valuePoints().end(); ++it)
+	{
+		it->value = it->point.len();
+	}
+	w.writeFile("output");
+	return true;
+}
+
