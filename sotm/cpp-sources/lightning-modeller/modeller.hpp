@@ -44,6 +44,7 @@ private:
 	double m_conductivityCriticalField = 0.0;
 	double m_field = 0.0;
 	double m_ioiTemp = 0.0;
+	double m_condLimit = 0.0;
 
 	boost::program_options::variables_map m_cmdLineOptions;
 	int m_argc;

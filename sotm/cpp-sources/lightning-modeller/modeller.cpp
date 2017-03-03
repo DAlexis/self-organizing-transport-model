@@ -26,6 +26,7 @@ bool Modeller::parseCmdLineArgs(int argc, char** argv)
 		("field,e", po::value<double>()->default_value(0.3e6), "External field")
 		("beta", po::value<double>()->default_value(2e7), "Conductivity relaxation coefficient")
 		("ioi-temp", po::value<double>()->default_value(1500), "IOI critical temperature")
+		("cond-limit", po::value<double>()->default_value(1e1), "Condictivity limit")
 		("cond-critical-field", po::value<double>()->default_value(0.24e6), "Critical field that maintain glow discharge");
 
 	po::options_description allOptions("Allowed options");
@@ -41,6 +42,7 @@ bool Modeller::parseCmdLineArgs(int argc, char** argv)
 		m_conductivityCriticalField = m_cmdLineOptions["cond-critical-field"].as<double>();
 		m_field = m_cmdLineOptions["field"].as<double>();
 		m_ioiTemp = m_cmdLineOptions["ioi-temp"].as<double>();
+		m_condLimit = m_cmdLineOptions["cond-limit"].as<double>();
 	}
 	catch (po::error& e)
 	{
@@ -189,11 +191,12 @@ void Modeller::initParameters()
 	m_physCont->initialConductivity = 1e-10;
 	m_physCont->minimalConductivity = m_physCont->initialConductivity * 0.95;
 
-	m_physCont->conductivityLimit = 1e1;
+	m_physCont->conductivityLimit = m_condLimit;
 	m_physCont->ionizationOverheatingInstFunc = SmoothedLocalStepFunction(m_ioiTemp, 50);
 
 	Vector<3> externalField{0.0, 0.0, m_field};
 	m_physCont->externalConstField = externalField;
+	m_physCont->externalFieldValue = m_field;
 
 	generateCondEvoParams();
 
