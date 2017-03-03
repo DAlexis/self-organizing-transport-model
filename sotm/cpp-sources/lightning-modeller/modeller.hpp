@@ -27,6 +27,8 @@ public:
 
 private:
 	void initFileOutput(const std::string& prefix);
+	void createParametersFile(const std::string& prefix);
+	void createProgramCofigurationFile(const std::string& prefix);
 	void initScalersAndColors();
 	void initParameters();
 	void generateCondEvoParams();

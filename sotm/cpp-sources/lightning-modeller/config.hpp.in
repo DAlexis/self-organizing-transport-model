@@ -1,0 +1,22 @@
+/*
+ * config.hpp
+ *
+ *  Created on: 3 мар. 2017 г.
+ *      Author: dalexies
+ */
+
+#ifndef LIGHTNING_MODELLER_CONFIG_HPP_
+#define LIGHTNING_MODELLER_CONFIG_HPP_
+
+namespace Config
+{
+	namespace Build
+	{
+		constexpr static char commitTag[] = "unknown-tag";
+		constexpr static char build[] = "unknown-build";
+		constexpr static char buildTime[] = "unknown-time";
+	}
+
+}
+
+#endif /* LIGHTNING_MODELLER_CONFIG_HPP_ */

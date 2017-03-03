@@ -1,4 +1,5 @@
 #include "modeller.hpp"
+#include "config.hpp"
 
 #include "sotm/output/graph-file-writer.hpp"
 #include "sotm-gui/gui.hpp"
@@ -74,14 +75,12 @@ void Modeller::run()
 	m_timeIter.reset(new TimeIterator(&c, &continiousIterator, &c));
 
 	initParameters();
-
-	std::string filenamePrefix = std::string("lightmod_") + getTimeStr();
-
-	initFileOutput(filenamePrefix);
-
 	initScalersAndColors();
 
-	m_physCont->parameters.save(filenamePrefix + "_parameters.txt");
+	std::string filenamePrefix = std::string("lightmod_") + getTimeStr();
+	initFileOutput(filenamePrefix);
+	createParametersFile(filenamePrefix);
+	createProgramCofigurationFile(filenamePrefix);
 
 	{ // Scope to remove pointers
 /*
@@ -137,6 +136,24 @@ void Modeller::initFileOutput(const std::string& prefix)
 	m_fileWriteHook.reset(new FileWriteHook(&c, nullptr, m_timeIter->getTimestepMax()*10));
 	m_fileWriteHook->setFilenamePrefix(prefix);
 	m_timeIter->addHook(m_fileWriteHook.get());
+}
+
+void Modeller::createParametersFile(const std::string& prefix)
+{
+	m_physCont->parameters.save(prefix + "_parameters.txt");
+}
+
+void Modeller::createProgramCofigurationFile(const std::string& prefix)
+{
+	string name = prefix+"_config.txt";
+	ofstream outputFile(name.c_str(), ios::out);
+	if (!outputFile.is_open())
+	{
+		cerr << "ERROR: Cannot save config file " << name << endl;
+	}
+	outputFile << "git_commit = " << Config::Build::commitTag << endl;
+	outputFile << "build = " << Config::Build::build << endl;
+	outputFile << "build_time = " << Config::Build::buildTime << endl;
 }
 
 void Modeller::initScalersAndColors()

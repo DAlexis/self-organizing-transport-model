@@ -23,3 +23,9 @@ target_link_libraries (${PROJECT_NAME}
     ${Boost_PROGRAM_OPTIONS_LIBRARY} # For command line options parsing for example
 )
 
+add_custom_target(
+    gen-config
+    COMMAND ${PROJECT_SOURCE_DIR}/gen-config.sh ${PROJECT_SOURCE_DIR}
+)
+
+add_dependencies(${PROJECT_NAME} gen-config)
