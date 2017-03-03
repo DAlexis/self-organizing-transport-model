@@ -21,7 +21,11 @@ bool Modeller::parseCmdLineArgs(int argc, char** argv)
 	po::options_description generalOptions("General options");
 	generalOptions.add_options()
 		("help,h", "Print help message")
-		("no-gui,g", "Print help message");
+		("no-gui,g", "Print help message")
+		("field,e", po::value<double>()->default_value(0.3e6), "External field")
+		("beta", po::value<double>()->default_value(2e7), "Conductivity relaxation coefficient")
+		("ioi-temp", po::value<double>()->default_value(1500), "IOI critical temperature")
+		("cond-critical-field", po::value<double>()->default_value(0.24e6), "Critical field that maintain glow discharge");
 
 	po::options_description allOptions("Allowed options");
 	allOptions
@@ -32,6 +36,10 @@ bool Modeller::parseCmdLineArgs(int argc, char** argv)
 	{
 		po::store(po::parse_command_line(argc, argv, allOptions), m_cmdLineOptions);
 		po::notify(m_cmdLineOptions);
+		m_beta = m_cmdLineOptions["beta"].as<double>();
+		m_conductivityCriticalField = m_cmdLineOptions["cond-critical-field"].as<double>();
+		m_field = m_cmdLineOptions["field"].as<double>();
+		m_ioiTemp = m_cmdLineOptions["ioi-temp"].as<double>();
 	}
 	catch (po::error& e)
 	{
@@ -61,23 +69,19 @@ void Modeller::run()
 
 	m_physCont = static_cast<ElectrostaticPhysicalContext*>(c.physicalContext());
 
-	//EulerExplicitIterator continiousIterator;
 	RungeKuttaIterator continiousIterator;
-	//TimeIterator m_timeIter(&c, &continiousIterator, &c);
+
 	m_timeIter.reset(new TimeIterator(&c, &continiousIterator, &c));
 
 	initParameters();
-	initParameters1();
 
-	FileWriteHook fwh(&c, nullptr, m_timeIter->getTimestepMax()*10);
-	fwh.setFilenamePrefix(std::string("lightmod_") + getTimeStr());
-	m_timeIter->addHook(&fwh);
+	std::string filenamePrefix = std::string("lightmod_") + getTimeStr();
 
-	m_physCont->chargeScaler.fixValue(0.0, 0.5);
-	m_physCont->chargeColorMapper.setBlueRed();
+	initFileOutput(filenamePrefix);
 
-	m_physCont->conductivityScaler.setScale(Scaler::Scale::log);
-	m_physCont->conductivityColorMapper.setGreenYellow();
+	initScalersAndColors();
+
+	m_physCont->parameters.save(filenamePrefix + "_parameters.txt");
 
 	{ // Scope to remove pointers
 /*
@@ -128,14 +132,21 @@ void Modeller::run()
 	cout << "Exiting" << endl;
 }
 
-void Modeller::initFileOutput()
+void Modeller::initFileOutput(const std::string& prefix)
 {
 	m_fileWriteHook.reset(new FileWriteHook(&c, nullptr, m_timeIter->getTimestepMax()*10));
-	m_fileWriteHook->setFilenamePrefix(std::string("lightmod_") + getTimeStr());
+	m_fileWriteHook->setFilenamePrefix(prefix);
 	m_timeIter->addHook(m_fileWriteHook.get());
 }
 
+void Modeller::initScalersAndColors()
+{
+	m_physCont->chargeScaler.fixValue(0.0, 0.5);
+	m_physCont->chargeColorMapper.setBlueRed();
 
+	m_physCont->conductivityScaler.setScale(Scaler::Scale::log);
+	m_physCont->conductivityColorMapper.setGreenYellow();
+}
 
 void Modeller::initParameters()
 {
@@ -150,7 +161,7 @@ void Modeller::initParameters()
 			}
 	);
 
-	m_physCont->nodeRadiusConductivity = 0.05;
+	m_physCont->nodeRadiusConductivity = 0.03;
 	m_physCont->nodeRadiusBranching = 0.05;
 	m_physCont->linkRadius = 0.001;
 	m_physCont->branchingStep = 0.3;
@@ -158,39 +169,28 @@ void Modeller::initParameters()
 	m_physCont->connectionCriticalField = 0.3e6;
 	m_physCont->connectionMaximalDist = m_physCont->branchingStep.get();
 
-	m_physCont->initialConductivity = 1e-5;
+	m_physCont->initialConductivity = 1e-10;
 	m_physCont->minimalConductivity = m_physCont->initialConductivity * 0.95;
 
 	m_physCont->conductivityLimit = 1e1;
-	m_physCont->ionizationOverheatingInstFunc = SmoothedLocalStepFunction(1000, 50);
+	m_physCont->ionizationOverheatingInstFunc = SmoothedLocalStepFunction(m_ioiTemp, 50);
 
-	m_physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
-	m_physCont->linkBeta = 1e4;
-	Vector<3> externalField{0.0, 0.0, 0.2e6};
+	Vector<3> externalField{0.0, 0.0, m_field};
 	m_physCont->externalConstField = externalField;
 
+	generateCondEvoParams();
 
 	m_timeIter->setTime(0.0);
 	m_timeIter->setStep(1e-8);
-    //timeIter->setStepBounds(0.0000000002, 0.0000002);
 	m_timeIter->setStepBounds(0.0, 1e-7);
 	m_timeIter->continiousIterParameters().autoStepAdjustment = true;
 	m_timeIter->setStopTime(1e-1);
-	//m_timeIter->setStopTime(7e-4);
 }
 
-void Modeller::initParameters1()
+void Modeller::generateCondEvoParams()
 {
-	Vector<3> externalField{0.0, 0.0, 0.3e6};
-	m_physCont->externalConstField = externalField;
-	m_physCont->nodeRadiusConductivity = 0.03;
-
-	double betaDominationFactor = 1.5;
-	m_physCont->linkBeta = 2e7;
-	m_physCont->linkEta = m_physCont->linkBeta / sqr(m_physCont->externalConstField[2]) * betaDominationFactor;
-
-	m_physCont->initialConductivity = 1e-10;
-	m_physCont->minimalConductivity = m_physCont->initialConductivity * 0.95;
+	m_physCont->linkBeta = m_beta;
+	m_physCont->linkEta = m_physCont->linkBeta / sqr(m_conductivityCriticalField);
 }
 
 std::string Modeller::getTimeStr()

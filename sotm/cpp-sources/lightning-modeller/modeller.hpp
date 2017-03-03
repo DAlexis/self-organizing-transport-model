@@ -26,9 +26,10 @@ public:
 	void run();
 
 private:
-	void initFileOutput();
+	void initFileOutput(const std::string& prefix);
+	void initScalersAndColors();
 	void initParameters();
-	void initParameters1();
+	void generateCondEvoParams();
 
 	static std::string getTimeStr();
 
@@ -36,6 +37,11 @@ private:
 	sotm::ElectrostaticPhysicalContext* m_physCont;
 	std::unique_ptr<sotm::TimeIterator> m_timeIter;
 	std::unique_ptr<sotm::FileWriteHook> m_fileWriteHook;
+
+	double m_beta = 0.0;
+	double m_conductivityCriticalField = 0.0;
+	double m_field = 0.0;
+	double m_ioiTemp = 0.0;
 
 	boost::program_options::variables_map m_cmdLineOptions;
 	int m_argc;

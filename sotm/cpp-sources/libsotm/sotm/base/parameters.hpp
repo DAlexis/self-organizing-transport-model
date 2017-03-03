@@ -16,7 +16,8 @@ class IAnyTypeParameter
 public:
 	virtual ~IAnyTypeParameter() {}
 	virtual void setFromString(const std::string& str) = 0;
-	virtual const std::string& name() = 0;
+	virtual std::string toString() const = 0;
+	virtual const std::string& name() const = 0;
 };
 
 class ParametersGroup
@@ -84,7 +85,7 @@ struct Parameter : public IAnyTypeParameter
 		return m_value;
 	}
 
-	const std::string& name() override { return m_name; }
+	const std::string& name() const override { return m_name; }
 
 	void setFromString(const std::string& str) override
 	{
@@ -92,6 +93,11 @@ struct Parameter : public IAnyTypeParameter
 #ifdef DEBUG
 		m_isInitialized = true;
 #endif
+	}
+
+	std::string toString() const override
+	{
+		return std::to_string(m_value);
 	}
 
 private:

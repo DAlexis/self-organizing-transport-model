@@ -44,22 +44,19 @@ void ParametersGroup::load(const std::string& filename)
 	{
 		throw std::runtime_error(std::string("Unknown parsing error in ") + filename);
 	}
-
-/*
-
-	for (ptree::iterator pos = pt.begin(); pos != pt.end();) {
-	  cout << indent(level+1) << "\"" << pos->first << "\": ";
-
-	  printTree(pos->second, level + 1);
-	  ++pos;
-	  if (pos != pt.end()) {
-		  cout << ",";
-	  }
-	  cout << endl;
-	}*/
 }
 
 void ParametersGroup::save(const std::string& filename)
 {
+	ofstream outputFile(filename.c_str(), std::ios::out);
+	if (!outputFile.is_open())
+	{
+		cerr << "ERROR: Cannot open file " << filename << " to write current parameters!" << endl;
+		return;
+	}
+	for (auto &it : m_parameters)
+	{
+		outputFile << it.first << " = " << it.second->toString() << endl;
+	}
 }
 
