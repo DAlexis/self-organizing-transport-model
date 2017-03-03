@@ -24,7 +24,7 @@ private:
 	bool getCornersFromCmdline();
 	void fixCorners();
 	bool readPoints();
-	bool write();
+	bool createGrid();
 
 	struct Charge
 	{
@@ -38,6 +38,7 @@ private:
 	sotm::Vector<3> m_c1, m_c2; // Corners
 
 	size_t m_nx = 0, m_ny = 0, m_nz = 0;
+	double m_minDist = 0.0;
 	std::vector<double> m_potential;
 };
 

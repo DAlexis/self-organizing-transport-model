@@ -5,6 +5,7 @@
 #include <vtk/vtkXMLStructuredGridWriter.h>
 #include <vtk/vtkStructuredGrid.h>
 #include <vtk/vtkCellData.h>
+#include <vtk/vtkPointData.h>
 
 GridBuilder::GridBuilder(
 	size_t nx,
@@ -32,12 +33,9 @@ GridBuilder::GridBuilder(
 
 				m_points->InsertNextPoint(x, y, z);
 
-				if (ix != m_nx && iy != m_ny && iz != m_nz)
-				{
-					ValuePoint p;
-					p.point = sotm::Vector<3>(x + dx*0.5, y + dy*0.5, z + dz*0.5);
-					m_valuePoints.push_back(p);
-				}
+				ValuePoint p;
+				p.point = sotm::Vector<3>(x, y, z);
+				m_valuePoints.push_back(p);
 			}
 }
 
@@ -45,26 +43,6 @@ void GridBuilder::writeFile(const std::string& filename)
 {
 	vtkSmartPointer<vtkStructuredGrid> structuredGrid =
 			vtkSmartPointer<vtkStructuredGrid>::New();
-/*
-	points->InsertNextPoint(0, 0, 0);
-	points->InsertNextPoint(1, 0, 0);
-
-	points->InsertNextPoint(0, 1, 0);
-	points->InsertNextPoint(1, 1, 0);
-
-	points->InsertNextPoint(0, 2, 0);
-	points->InsertNextPoint(1, 2, 0);
-
-
-
-	points->InsertNextPoint(0, 0, 3);
-	points->InsertNextPoint(1, 0, 3);
-
-	points->InsertNextPoint(0, 1, 3);
-	points->InsertNextPoint(1, 1, 3);
-
-	points->InsertNextPoint(0, 2, 3);
-	points->InsertNextPoint(1, 2, 3);*/
 
 	for (auto& it : m_valuePoints)
 		m_doubleArray->InsertNextTuple1(it.value);
@@ -72,8 +50,8 @@ void GridBuilder::writeFile(const std::string& filename)
 	// Specify the dimensions of the grid
 	structuredGrid->SetDimensions(m_nx+1, m_ny+1, m_nz+1);
 	structuredGrid->SetPoints(m_points);
-	structuredGrid->GetCellData()->SetNumberOfTuples(2);
-	structuredGrid->GetCellData()->SetScalars(m_doubleArray);
+	structuredGrid->GetPointData()->SetScalars(m_doubleArray);
+	//structuredGrid->GetCellData()->SetScalars(m_doubleArray);
 
 
 	// Write file

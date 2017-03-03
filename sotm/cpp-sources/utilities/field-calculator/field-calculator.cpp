@@ -1,8 +1,11 @@
 #include "field-calculator.hpp"
+#include "grid-builder.hpp"
+
+#include "sotm/utils/const.hpp"
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "grid-builder.hpp"
+
 
 using namespace std;
 
@@ -16,6 +19,7 @@ bool FieldCalculator::parseCmdLineArgs(int argc, char** argv)
 		("nx", po::value<unsigned int>()->default_value(1), "Points per x")
 		("ny", po::value<unsigned int>()->default_value(10), "Points per y")
 		("nz", po::value<unsigned int>()->default_value(10), "Points per z")
+		("min-dist,d", po::value<double>()->default_value(0.05), "Charges closer to grid point than this value will be rejected")
 		("zone-begin,b", po::value<std::string>(), "Zone begin coords (x, y, z)")
 		("zone-end,e", po::value<std::string>(), "Zone end coords (x, y, z)");
 
@@ -31,6 +35,7 @@ bool FieldCalculator::parseCmdLineArgs(int argc, char** argv)
 		m_nx = m_cmdLineOptions["nx"].as<unsigned int>();
 		m_ny = m_cmdLineOptions["ny"].as<unsigned int>();
 		m_nz = m_cmdLineOptions["nz"].as<unsigned int>();
+		m_minDist = m_cmdLineOptions["min-dist"].as<double>();
 	}
 	catch (po::error& e)
 	{
@@ -63,9 +68,7 @@ void FieldCalculator::run()
 		return;
 	}
 
-	// @todo Calculations
-
-	write();
+	createGrid();
 }
 
 bool FieldCalculator::parsePoint(sotm::Vector<3>& v, const std::string& str)
@@ -169,14 +172,25 @@ bool FieldCalculator::readPoints()
 	return true;
 }
 
-bool FieldCalculator::write()
+bool FieldCalculator::createGrid()
 {
 	GridBuilder w(m_nx, m_ny, m_nz,
 			m_c1[0], m_c1[1], m_c1[2],
 			m_c2[0], m_c2[1], m_c2[2]);
+
 	for (auto it=w.valuePoints().begin(); it != w.valuePoints().end(); ++it)
 	{
-		it->value = it->point.len();
+		double potential = 0;
+
+		for (auto &jt : m_charges)
+		{
+			double dist = (jt.pos - it->point).len();
+			if (dist < m_minDist)
+				continue;
+			potential += sotm::Const::Si::k * jt.charge / dist;
+		}
+
+		it->value = potential;
 	}
 	w.writeFile("output");
 	return true;
