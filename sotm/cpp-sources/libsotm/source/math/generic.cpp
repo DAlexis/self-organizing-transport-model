@@ -34,23 +34,27 @@ double MonotonicFunctionSolver::operator()(double x)
 	double fr = m_func(right);
 	double fl = m_func(left);
 	double center = (right+left)/2.0;
-	if (fr > fl)
+	double prevCenter = center;
+
+	double sig = fr > fl ? 1.0 : -1.0;
+
+	while (right - left > m_precision)
 	{
-		while (right - left > m_precision)
+		double f = m_func(center);
+		if ((f - x) * sig < 0)
+			left = center;
+		else
+			right = center;
+
+		center = (right+left)/2.0;
+
+		if (prevCenter == center)
 		{
-			double f = m_func(center);
-			if (f-x < 0.0) left = center;
-			if (f-x > 0.0) right = center;
-			center = (right+left)/2.0;
+			// We have excess of precision: center is numerically equal its old value
+			break;
 		}
-	} else {
-		while (right - left > m_precision)
-		{
-			double f = m_func(center);
-			if (f-x > 0.0) left = center;
-			if (f-x < 0.0) right = center;
-			center = (right+left)/2.0;
-		}
+
+		prevCenter = center;
 	}
 	return center;
 }
