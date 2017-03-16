@@ -32,6 +32,7 @@ private:
 	void initScalersAndColors();
 	void initParameters();
 	void generateCondEvoParams();
+	void genSeeds();
 
 	static std::string getTimeStr();
 
@@ -50,6 +51,7 @@ private:
 	sotm::Parameter<unsigned int> m_seedsNumber{m_parameters, "seedsNumber"};
 	sotm::Parameter<double> m_seedsZoneHeight{m_parameters, "seedsZoneHeight"};
 	sotm::Parameter<double> m_seedsZoneDia{m_parameters, "seedsZoneDia"};
+	sotm::Parameter<double> m_seedsMinDist{m_parameters, "seedsMinDist"};
 
 	boost::program_options::variables_map m_cmdLineOptions;
 	int m_argc;

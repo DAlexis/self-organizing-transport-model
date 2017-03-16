@@ -28,8 +28,9 @@ bool Modeller::parseCmdLineArgs(int argc, char** argv)
 		("ioi-temp", po::value<double>()->default_value(1500), "IOI critical temperature")
 		("cond-limit", po::value<double>()->default_value(1e1), "Condictivity limit")
 		("seeds-number,n", po::value<unsigned int>()->default_value(1), "Count of seed objects")
-		("seeds-zone-height,H", po::value<double>()->default_value(15), "Height of zone where seed objects will be generated")
-		("seeds-zone-dia,D", po::value<double>()->default_value(5), "Diameter of zone where seed objects will be generated")
+		("seeds-zone-height,H", po::value<double>()->default_value(15.0), "Height of zone where seed objects will be generated")
+		("seeds-zone-dia,D", po::value<double>()->default_value(5.0), "Diameter of zone where seed objects will be generated")
+		("seeds-min-dist,L", po::value<double>()->default_value(1.0), "Minimal distance between seeds")
 		("cond-critical-field", po::value<double>()->default_value(0.24e6), "Critical field that maintain glow discharge");
 
 	po::options_description allOptions("Allowed options");
@@ -50,6 +51,7 @@ bool Modeller::parseCmdLineArgs(int argc, char** argv)
 		m_seedsNumber = m_cmdLineOptions["seeds-number"].as<unsigned int>();
 		m_seedsZoneHeight = m_cmdLineOptions["seeds-zone-height"].as<double>();
 		m_seedsZoneDia = m_cmdLineOptions["seeds-zone-dia"].as<double>();
+		m_seedsMinDist = m_cmdLineOptions["seeds-min-dist"].as<double>();
 	}
 	catch (po::error& e)
 	{
@@ -91,31 +93,7 @@ void Modeller::run()
 	createParametersFile(filenamePrefix);
 	createProgramCofigurationFile(filenamePrefix);
 
-	{ // Scope to remove pointers
-/*
-		for (int i=0; i<10; i++)
-		{
-			double x = Random::uniform(-2, 2);
-			double y = Random::uniform(-2, 2);
-			double z = Random::uniform(-3, 3);
-
-			/// Building initial tree
-			PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, Vector<3>(x, y, z-0.2));
-			PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, Vector<3>(x, y, z+0.2));
-
-			PtrWrap<Link> l = PtrWrap<Link>::make(&c);
-
-			l->connect(n1, n2);
-		}*/
-		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, Vector<3>(0, 0, -0.2));
-		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, Vector<3>(0, 0, +0.2));
-
-		PtrWrap<Link> l = PtrWrap<Link>::make(&c);
-
-		l->connect(n1, n2);
-		//static_cast<ElectrostaticNodePayload*>(n1->payload.get())->setCharge(4e-6);
-		//static_cast<ElectrostaticNodePayload*>(n2->payload.get())->setCharge(4e-6);
-	}
+	genSeeds();
 
 	c.initAllPhysicalPayloads();
 
@@ -227,6 +205,44 @@ void Modeller::generateCondEvoParams()
 {
 	m_physCont->linkBeta = m_beta.get();
 	m_physCont->linkEta = m_physCont->linkBeta / sqr(m_conductivityCriticalField.get());
+}
+
+void Modeller::genSeeds()
+{
+	if (m_seedsNumber == 1)
+	{
+		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, Vector<3>(0, 0, -0.2));
+		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, Vector<3>(0, 0, +0.2));
+
+		PtrWrap<Link> l = PtrWrap<Link>::make(&c);
+
+		l->connect(n1, n2);
+	} else {
+		for (unsigned int i=0; i<m_seedsNumber; i++)
+		{
+			double d=0.0;
+			Vector<3> p;
+			do
+			{
+				p[0] = Random::uniform(-m_seedsZoneDia, m_seedsZoneDia);
+				p[1] = Random::uniform(-m_seedsZoneDia, m_seedsZoneDia);
+				p[2] = Random::uniform(-m_seedsZoneHeight, m_seedsZoneHeight);
+
+				auto nearest = c.graphRegister.getNearestNode(p);
+				if (nearest == nullptr)
+					break;
+				d = (nearest->pos-p).len();
+			} while (d < m_seedsMinDist);
+
+			/// Building initial tree
+			PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, Vector<3>(p[0], p[1], p[2]-0.2));
+			PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, Vector<3>(p[0], p[1], p[2]+0.2));
+
+			PtrWrap<Link> l = PtrWrap<Link>::make(&c);
+
+			l->connect(n1, n2);
+		}
+	}
 }
 
 std::string Modeller::getTimeStr()
