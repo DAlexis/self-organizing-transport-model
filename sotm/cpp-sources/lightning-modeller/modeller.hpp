@@ -40,11 +40,16 @@ private:
 	std::unique_ptr<sotm::TimeIterator> m_timeIter;
 	std::unique_ptr<sotm::FileWriteHook> m_fileWriteHook;
 
-	double m_beta = 0.0;
-	double m_conductivityCriticalField = 0.0;
-	double m_field = 0.0;
-	double m_ioiTemp = 0.0;
-	double m_condLimit = 0.0;
+	sotm::ParametersGroup m_parameters{"LightningModellerCommandLine"};
+	sotm::Parameter<double> m_beta{m_parameters, "beta"};
+	sotm::Parameter<double> m_conductivityCriticalField{m_parameters, "conductivityCriticalField"};
+	sotm::Parameter<double> m_field{m_parameters, "field"};
+	sotm::Parameter<double> m_ioiTemp{m_parameters, "ioiTemp"};
+	sotm::Parameter<double> m_condLimit{m_parameters, "condLimit"};
+
+	sotm::Parameter<unsigned int> m_seedsNumber{m_parameters, "seedsNumber"};
+	sotm::Parameter<double> m_seedsZoneHeight{m_parameters, "seedsZoneHeight"};
+	sotm::Parameter<double> m_seedsZoneDia{m_parameters, "seedsZoneDia"};
 
 	boost::program_options::variables_map m_cmdLineOptions;
 	int m_argc;

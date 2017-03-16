@@ -8,6 +8,7 @@
 
 #include <string>
 #include <map>
+#include <ostream>
 
 namespace sotm {
 
@@ -23,13 +24,18 @@ public:
 class ParametersGroup
 {
 public:
+	ParametersGroup(const std::string& name = "UnknownGroup");
 	void add(IAnyTypeParameter& par);
 	void load(const std::string& filename);
 	void save(const std::string& filename);
 
+	friend std::ostream& operator<<(std::ostream& stream, const ParametersGroup& pg);
 private:
+	const std::string m_name;
 	std::map<const std::string, IAnyTypeParameter*> m_parameters;
 };
+
+std::ostream& operator<<(std::ostream& stream, const ParametersGroup& pg);
 
 template<typename T>
 struct Parameter : public IAnyTypeParameter
@@ -98,6 +104,15 @@ struct Parameter : public IAnyTypeParameter
 	std::string toString() const override
 	{
 		return std::to_string(m_value);
+	}
+
+	Parameter& operator=(const Parameter& right)
+	{
+#ifdef DEBUG
+		m_isInitialized = true;
+#endif
+		m_value = right.m_value;
+		return *this;
 	}
 
 private:

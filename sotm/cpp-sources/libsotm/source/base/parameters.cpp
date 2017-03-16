@@ -9,6 +9,10 @@ using namespace std;
 
 using namespace sotm;
 
+ParametersGroup::ParametersGroup(const std::string& name) :
+		m_name(name)
+{
+}
 
 void ParametersGroup::add(IAnyTypeParameter& par)
 {
@@ -54,9 +58,17 @@ void ParametersGroup::save(const std::string& filename)
 		cerr << "ERROR: Cannot open file " << filename << " to write current parameters!" << endl;
 		return;
 	}
-	for (auto &it : m_parameters)
+
+	outputFile << *this;
+}
+
+std::ostream& sotm::operator<<(std::ostream& stream, const ParametersGroup& pg)
+{
+	stream << "[" << pg.m_name << "]" << std::endl;
+	for (auto &it : pg.m_parameters)
 	{
-		outputFile << it.first << " = " << it.second->toString() << endl;
+		stream << it.first << " = " << it.second->toString() << std::endl;
 	}
+	return stream;
 }
 

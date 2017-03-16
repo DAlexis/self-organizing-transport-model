@@ -27,6 +27,9 @@ bool Modeller::parseCmdLineArgs(int argc, char** argv)
 		("beta", po::value<double>()->default_value(2e7), "Conductivity relaxation coefficient")
 		("ioi-temp", po::value<double>()->default_value(1500), "IOI critical temperature")
 		("cond-limit", po::value<double>()->default_value(1e1), "Condictivity limit")
+		("seeds-number,n", po::value<unsigned int>()->default_value(1), "Count of seed objects")
+		("seeds-zone-height,H", po::value<double>()->default_value(15), "Height of zone where seed objects will be generated")
+		("seeds-zone-dia,D", po::value<double>()->default_value(5), "Diameter of zone where seed objects will be generated")
 		("cond-critical-field", po::value<double>()->default_value(0.24e6), "Critical field that maintain glow discharge");
 
 	po::options_description allOptions("Allowed options");
@@ -43,6 +46,10 @@ bool Modeller::parseCmdLineArgs(int argc, char** argv)
 		m_field = m_cmdLineOptions["field"].as<double>();
 		m_ioiTemp = m_cmdLineOptions["ioi-temp"].as<double>();
 		m_condLimit = m_cmdLineOptions["cond-limit"].as<double>();
+
+		m_seedsNumber = m_cmdLineOptions["seeds-number"].as<unsigned int>();
+		m_seedsZoneHeight = m_cmdLineOptions["seeds-zone-height"].as<double>();
+		m_seedsZoneDia = m_cmdLineOptions["seeds-zone-dia"].as<double>();
 	}
 	catch (po::error& e)
 	{
@@ -142,7 +149,16 @@ void Modeller::initFileOutput(const std::string& prefix)
 
 void Modeller::createParametersFile(const std::string& prefix)
 {
-	m_physCont->parameters.save(prefix + "_parameters.txt");
+	std::string filename = prefix + "_parameters.txt";
+	ofstream outputFile(filename.c_str(), std::ios::out);
+	if (!outputFile.is_open())
+	{
+		cerr << "ERROR: Cannot open file " << filename << " to write current parameters!" << endl;
+		return;
+	}
+	outputFile << m_physCont->parameters;
+	outputFile << std::endl;
+	outputFile << m_parameters;
 }
 
 void Modeller::createProgramCofigurationFile(const std::string& prefix)
@@ -209,8 +225,8 @@ void Modeller::initParameters()
 
 void Modeller::generateCondEvoParams()
 {
-	m_physCont->linkBeta = m_beta;
-	m_physCont->linkEta = m_physCont->linkBeta / sqr(m_conductivityCriticalField);
+	m_physCont->linkBeta = m_beta.get();
+	m_physCont->linkEta = m_physCont->linkBeta / sqr(m_conductivityCriticalField.get());
 }
 
 std::string Modeller::getTimeStr()

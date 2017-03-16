@@ -49,7 +49,7 @@ public:
 		return static_cast<const ElectrostaticPhysicalContext*>(context);
 	}
 
-	ParametersGroup parameters;
+	ParametersGroup parameters{"ElectrostaticPhysicalContext"};
 
 	Parameter<double> airTemperature{parameters, "airTemperature", 300};
 
