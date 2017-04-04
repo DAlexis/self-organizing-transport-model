@@ -29,11 +29,14 @@ private:
 	void initFileOutput(const std::string& prefix);
 	void createParametersFile(const std::string& prefix);
 	void createProgramCofigurationFile(const std::string& prefix);
+	void initExternalPotential();
 	void initScalersAndColors();
 	void initParameters();
 	void initTimeIterator();
 	void generateCondEvoParams();
 	void genSeeds();
+
+	double getPotential(double z);
 
 	static std::string getTimeStr();
 
@@ -42,6 +45,7 @@ private:
 	std::unique_ptr<sotm::TimeIterator> m_timeIter;
 	std::unique_ptr<sotm::FileWriteHook> m_fileWriteHook;
 	std::unique_ptr<sotm::RungeKuttaIterator> m_rkIterator;
+	std::unique_ptr<sotm::Field<1, 3>> m_externalPotential;
 
 	sotm::ContiniousIteratorParameters m_timeIterParams;
 

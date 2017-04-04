@@ -16,6 +16,8 @@ using namespace sotm;
 double ElectrostaticNodePayload::chargeMin = 0.0;
 double ElectrostaticNodePayload::chargeMax = 0.0;
 
+FieldScalarZero<3> ElectrostaticPhysicalContext::zeroField;
+
 void ElectrostaticPhysicalContext::destroyGraph()
 {
 	m_readyToDestroy = true;
@@ -58,8 +60,10 @@ void ElectrostaticPhysicalContext::setDischargeFunc(Function1D func)
 
 void ElectrostaticPhysicalContext::getElectricField(const Vector<3>& point, Vector<3>& outField, double& outPotential, const Node* exclude)
 {
-	outPotential = - (point ^ externalConstField);
-	outField = externalConstField;
+	//outPotential = - (point ^ externalConstField);
+	//outField = externalConstField;
+	outPotential = (*externalPotential) (point);
+	outField = - GradientFixedStep<3>(*externalPotential, 1e-2) (point);
 
 	GraphRegister::NodeVisitor nodeVisitor = [&point, exclude, &outPotential, &outField](const Node* node) {
 

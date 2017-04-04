@@ -149,7 +149,7 @@ public:
     }
     
     /// Vector product
-    Vector<dim> operator*(double right)
+    Vector<dim> operator*(double right) const
     {
         Vector<dim> result;
         for (int i=0; i<dim; ++i)
@@ -167,7 +167,7 @@ public:
     	return result;
     }
 
-    Vector<dim> operator*(const Vector<dim>& right)
+    Vector<dim> operator*(const Vector<dim>& right) const
     {
     	Vector<dim> result;
     	result[0] =   (*this)[1] * right[2] - (*this)[2] * right[1];

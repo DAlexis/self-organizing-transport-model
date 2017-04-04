@@ -11,6 +11,7 @@
 #include "sotm/base/physical-payload.hpp"
 #include "sotm/base/parameters.hpp"
 #include "sotm/math/integration.hpp"
+#include "sotm/math/field.hpp"
 #include "sotm/output/variables.hpp"
 
 #include <memory>
@@ -78,7 +79,7 @@ public:
 	Function1D ionizationOverheatingInstFunc{zero};
 	Parameter<double> conductivityLimit{parameters, "conductivityLimit"};
 
-	Vector<3> externalConstField;
+	//Vector<3> externalConstField;
 
 	Scaler chargeScaler;
 	LinearGradientColorMapper chargeColorMapper;
@@ -86,12 +87,14 @@ public:
 	Scaler conductivityScaler;
 	LinearGradientColorMapper conductivityColorMapper;
 
+	Field<1, 3> *externalPotential = &zeroField;
+
 private:
 	bool m_readyToDestroy = false;
 	Function1D m_dischargeProb{zero};
 	Function1D m_IOInstFunc{zero};
 	std::unique_ptr<DefinedIntegral> m_integralOfProb;
-
+	static FieldScalarZero<3> zeroField;
 };
 
 class ElectrostaticNodePayload : public NodePayloadBase

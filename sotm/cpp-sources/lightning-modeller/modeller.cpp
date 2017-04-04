@@ -82,7 +82,7 @@ void Modeller::run()
 	m_physCont = static_cast<ElectrostaticPhysicalContext*>(c.physicalContext());
 
 	initTimeIterator();
-
+	initExternalPotential();
 	initParameters();
 	initScalersAndColors();
 
@@ -150,6 +150,16 @@ void Modeller::createProgramCofigurationFile(const std::string& prefix)
 	outputFile << "build_time = " << Config::Build::buildTime << endl;
 }
 
+void Modeller::initExternalPotential()
+{
+	m_externalPotential.reset(
+		new FieldScalar1D<3>(
+			[this](double z) { return getPotential(z); },
+			{0.0, 0.0, 1.0}
+		)
+	);
+}
+
 void Modeller::initScalersAndColors()
 {
 	m_physCont->chargeScaler.fixValue(0.0, 0.5);
@@ -187,7 +197,7 @@ void Modeller::initParameters()
 	m_physCont->ionizationOverheatingInstFunc = SmoothedLocalStepFunction(m_ioiTemp, 50);
 
 	Vector<3> externalField{0.0, 0.0, m_field};
-	m_physCont->externalConstField = externalField;
+	m_physCont->externalPotential = m_externalPotential.get();
 	m_physCont->externalFieldValue = m_field;
 
 	generateCondEvoParams();
@@ -249,6 +259,11 @@ void Modeller::genSeeds()
 			l->connect(n1, n2);
 		}
 	}
+}
+
+double Modeller::getPotential(double z)
+{
+	return -z*m_field;
 }
 
 std::string Modeller::getTimeStr()
