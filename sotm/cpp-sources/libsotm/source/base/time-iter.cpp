@@ -182,7 +182,7 @@ void TimeIterator::run()
 {
 	m_needStop = false;
 	findNextHook();
-	std::cout << "Next hook: " << m_nextHookTime << std::endl;
+	// std::cout << "Next hook: " << m_nextHookTime << std::endl;
 	while (!isDone() && !m_needStop)
 		iterate();
 }

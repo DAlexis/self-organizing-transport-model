@@ -181,6 +181,10 @@ struct ContiniousIteratorParameters
 	bool autoStepAdjustment = false;
 	double iterationsPerAmplitudeMin = 3;
 	double iterationsPerAmplitudeMax = 20;
+	enum class VerboseLevel {
+		none = 0, less, more
+	};
+	VerboseLevel outputVerboseLevel = VerboseLevel::none;
 };
 
 struct ContiniousIteratorMetrics

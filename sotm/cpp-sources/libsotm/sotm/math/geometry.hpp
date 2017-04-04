@@ -148,6 +148,7 @@ public:
         return ! (*this == right);
     }
     
+    /// Vector product
     Vector<dim> operator*(double right)
     {
         Vector<dim> result;
@@ -156,6 +157,7 @@ public:
         return result;
     }
     
+    /// Scalar product
     double operator^(const Vector<dim>& right) const
     {
     	double result = 0;

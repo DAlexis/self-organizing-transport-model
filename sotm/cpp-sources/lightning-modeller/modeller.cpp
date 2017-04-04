@@ -81,9 +81,7 @@ void Modeller::run()
 
 	m_physCont = static_cast<ElectrostaticPhysicalContext*>(c.physicalContext());
 
-	RungeKuttaIterator continiousIterator;
-
-	m_timeIter.reset(new TimeIterator(&c, &continiousIterator, &c));
+	initTimeIterator();
 
 	initParameters();
 	initScalersAndColors();
@@ -199,6 +197,14 @@ void Modeller::initParameters()
 	m_timeIter->setStepBounds(0.0, 1e-7);
 	m_timeIter->continiousIterParameters().autoStepAdjustment = true;
 	m_timeIter->setStopTime(1e-1);
+}
+
+void Modeller::initTimeIterator()
+{
+	m_rkIterator.reset(new RungeKuttaIterator());
+	m_rkIterator->setParameters(&m_timeIterParams);
+	m_timeIter.reset(new TimeIterator(&c, m_rkIterator.get(), &c));
+	m_timeIter->continiousIterParameters().outputVerboseLevel = ContiniousIteratorParameters::VerboseLevel::more;
 }
 
 void Modeller::generateCondEvoParams()

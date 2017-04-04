@@ -30,16 +30,7 @@ double AsyncIteratorWrapper::getPeriod()
 void AsyncIteratorWrapper::calculateFrame()
 {
 	m_timeIterator->run();
-	/*
-	unsigned int d = 123;
-	cout << "Begin" << endl;
-	printThreadId();
-	for (size_t i = 0; i<1000000000; i++)
-	{
-		d = d*63542 + 12345;
-	}
-*/
-	cout << "End" << endl;
+	//cout << "End" << endl;
 	emit frameDone();
 }
 

@@ -31,6 +31,7 @@ private:
 	void createProgramCofigurationFile(const std::string& prefix);
 	void initScalersAndColors();
 	void initParameters();
+	void initTimeIterator();
 	void generateCondEvoParams();
 	void genSeeds();
 
@@ -40,6 +41,9 @@ private:
 	sotm::ElectrostaticPhysicalContext* m_physCont;
 	std::unique_ptr<sotm::TimeIterator> m_timeIter;
 	std::unique_ptr<sotm::FileWriteHook> m_fileWriteHook;
+	std::unique_ptr<sotm::RungeKuttaIterator> m_rkIterator;
+
+	sotm::ContiniousIteratorParameters m_timeIterParams;
 
 	sotm::ParametersGroup m_parameters{"LightningModellerCommandLine"};
 	sotm::Parameter<double> m_beta{m_parameters, "beta"};
