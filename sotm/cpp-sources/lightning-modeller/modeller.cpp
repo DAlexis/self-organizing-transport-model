@@ -23,9 +23,20 @@ bool Modeller::parseCmdLineArgs(int argc, char** argv)
 	generalOptions.add_options()
 		("help,h", "Print help message")
 		("no-gui,g", "Print help message")
+		("step-min", po::value<double>()->default_value(0.0), "Minimal integration step")
+		("step-max", po::value<double>()->default_value(1e-7), "Maximal integration step")
+		("frame-duration", po::value<double>()->default_value(1e-6), "File output frame duration")
+		("stop-time", po::value<double>()->default_value(1), "integration time limit");
+
+	po::options_description dischargeOptions("Gas discharge options");
+	dischargeOptions.add_options()
 		("beta", po::value<double>()->default_value(2e7), "Conductivity relaxation coefficient")
 		("ioi-temp", po::value<double>()->default_value(1500), "IOI critical temperature")
-		("cond-limit", po::value<double>()->default_value(1e1), "Condictivity limit")
+		("cond-limit", po::value<double>()->default_value(1e1), "Conductivity limit")
+		("field-cond-critical", po::value<double>()->default_value(0.24e6), "Critical field that maintain glow discharge");
+
+	po::options_description seedsOptions("Seeds options");
+	seedsOptions.add_options()
 		("seeds-number,n", po::value<unsigned int>()->default_value(1), "Count of seed objects")
 		("seeds-zone-height,H", po::value<double>()->default_value(15.0), "Height of zone where seed objects will be generated")
 		("seeds-zone-dia,D", po::value<double>()->default_value(5.0), "Diameter of zone where seed objects will be generated")
@@ -34,13 +45,14 @@ bool Modeller::parseCmdLineArgs(int argc, char** argv)
 	po::options_description fieldOptions("Field options");
 	fieldOptions.add_options()
 		("field,e", po::value<double>()->default_value(0.3e6), "External field")
-		("field-cond-critical", po::value<double>()->default_value(0.24e6), "Critical field that maintain glow discharge")
 		("field-z-size", po::value<double>()->default_value(1000), "Field vertical size")
 		("field-z-recession", po::value<double>()->default_value(1000), "Field recession size");
 
 	po::options_description allOptions("Allowed options");
 	allOptions
 		.add(generalOptions)
+		.add(dischargeOptions)
+		.add(seedsOptions)
 		.add(fieldOptions);
 
 
@@ -48,6 +60,11 @@ bool Modeller::parseCmdLineArgs(int argc, char** argv)
 	{
 		po::store(po::parse_command_line(argc, argv, allOptions), m_cmdLineOptions);
 		po::notify(m_cmdLineOptions);
+		m_stepMin = m_cmdLineOptions["step-min"].as<double>();
+		m_stepMax = m_cmdLineOptions["step-max"].as<double>();
+		m_frameDuration = m_cmdLineOptions["frame-duration"].as<double>();
+		m_stopTime = m_cmdLineOptions["stop-time"].as<double>();
+
 		m_beta = m_cmdLineOptions["beta"].as<double>();
 		m_conductivityCriticalField = m_cmdLineOptions["field-cond-critical"].as<double>();
 		m_field = m_cmdLineOptions["field"].as<double>();
@@ -127,7 +144,7 @@ void Modeller::run()
 
 void Modeller::initFileOutput(const std::string& prefix)
 {
-	m_fileWriteHook.reset(new FileWriteHook(&c, nullptr, m_timeIter->getTimestepMax()*10));
+	m_fileWriteHook.reset(new FileWriteHook(&c, nullptr, m_frameDuration));
 	m_fileWriteHook->setFilenamePrefix(prefix);
 	m_timeIter->addHook(m_fileWriteHook.get());
 }
@@ -213,10 +230,10 @@ void Modeller::initParameters()
 	generateCondEvoParams();
 
 	m_timeIter->setTime(0.0);
-	m_timeIter->setStep(1e-8);
-	m_timeIter->setStepBounds(0.0, 1e-7);
+	m_timeIter->setStep(m_stepMax / 100);
+	m_timeIter->setStepBounds(m_stepMin, m_stepMax);
 	m_timeIter->continiousIterParameters().autoStepAdjustment = true;
-	m_timeIter->setStopTime(1e-1);
+	m_timeIter->setStopTime(m_stopTime);
 }
 
 void Modeller::initTimeIterator()

@@ -50,6 +50,12 @@ private:
 	sotm::ContiniousIteratorParameters m_timeIterParams;
 
 	sotm::ParametersGroup m_parameters{"LightningModellerCommandLine"};
+	sotm::Parameter<double> m_frameDuration{m_parameters, "frameDuration"};
+	sotm::Parameter<double> m_stepMin{m_parameters, "stepMin"};
+	sotm::Parameter<double> m_stepMax{m_parameters, "stepMax"};
+	sotm::Parameter<double> m_stopTime{m_parameters, "stopTime"};
+
+
 	sotm::Parameter<double> m_beta{m_parameters, "beta"};
 	sotm::Parameter<double> m_ioiTemp{m_parameters, "ioiTemp"};
 	sotm::Parameter<double> m_condLimit{m_parameters, "condLimit"};
