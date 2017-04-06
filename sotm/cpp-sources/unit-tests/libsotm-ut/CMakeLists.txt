@@ -15,6 +15,7 @@ set(EXE_SOURCES
     math/integration-ut.cpp
     math/distrib-gen-ut.cpp
     math/field-ut.cpp
+    math/functions-ut.cpp
     base/transport-graph-ut.cpp
     output/variables-ut.cpp
     utils/memory-ut.cpp

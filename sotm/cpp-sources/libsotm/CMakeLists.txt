@@ -12,6 +12,7 @@ set(LIB_SOURCE
     ${PROJECT_SOURCE_DIR}/source/math/random.cpp
     ${PROJECT_SOURCE_DIR}/source/math/integration.cpp
     ${PROJECT_SOURCE_DIR}/source/math/distrib-gen.cpp
+    ${PROJECT_SOURCE_DIR}/source/math/functions.cpp
     ${PROJECT_SOURCE_DIR}/source/base/transport-graph.cpp
     ${PROJECT_SOURCE_DIR}/source/base/physical-payload.cpp
     ${PROJECT_SOURCE_DIR}/source/base/model-context.cpp
@@ -41,6 +42,7 @@ set(LIB_HPP
     ${PROJECT_SOURCE_DIR}/sotm/math/generic.hpp
     ${PROJECT_SOURCE_DIR}/sotm/math/geometry.hpp
     ${PROJECT_SOURCE_DIR}/sotm/math/distrib-gen.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/math/functions.hpp
     ${PROJECT_SOURCE_DIR}/sotm/output/graph-renderer.hpp
     ${PROJECT_SOURCE_DIR}/sotm/output/graph-file-writer.hpp
     ${PROJECT_SOURCE_DIR}/sotm/utils/memory.hpp

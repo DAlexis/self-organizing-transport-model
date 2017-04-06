@@ -23,19 +23,25 @@ bool Modeller::parseCmdLineArgs(int argc, char** argv)
 	generalOptions.add_options()
 		("help,h", "Print help message")
 		("no-gui,g", "Print help message")
-		("field,e", po::value<double>()->default_value(0.3e6), "External field")
 		("beta", po::value<double>()->default_value(2e7), "Conductivity relaxation coefficient")
 		("ioi-temp", po::value<double>()->default_value(1500), "IOI critical temperature")
 		("cond-limit", po::value<double>()->default_value(1e1), "Condictivity limit")
 		("seeds-number,n", po::value<unsigned int>()->default_value(1), "Count of seed objects")
 		("seeds-zone-height,H", po::value<double>()->default_value(15.0), "Height of zone where seed objects will be generated")
 		("seeds-zone-dia,D", po::value<double>()->default_value(5.0), "Diameter of zone where seed objects will be generated")
-		("seeds-min-dist,L", po::value<double>()->default_value(1.0), "Minimal distance between seeds")
-		("cond-critical-field", po::value<double>()->default_value(0.24e6), "Critical field that maintain glow discharge");
+		("seeds-min-dist,L", po::value<double>()->default_value(1.0), "Minimal distance between seeds");
+
+	po::options_description fieldOptions("Field options");
+	fieldOptions.add_options()
+		("field,e", po::value<double>()->default_value(0.3e6), "External field")
+		("field-cond-critical", po::value<double>()->default_value(0.24e6), "Critical field that maintain glow discharge")
+		("field-z-size", po::value<double>()->default_value(1000), "Field vertical size")
+		("field-z-recession", po::value<double>()->default_value(1000), "Field recession size");
 
 	po::options_description allOptions("Allowed options");
 	allOptions
-		.add(generalOptions);
+		.add(generalOptions)
+		.add(fieldOptions);
 
 
 	try
@@ -43,10 +49,13 @@ bool Modeller::parseCmdLineArgs(int argc, char** argv)
 		po::store(po::parse_command_line(argc, argv, allOptions), m_cmdLineOptions);
 		po::notify(m_cmdLineOptions);
 		m_beta = m_cmdLineOptions["beta"].as<double>();
-		m_conductivityCriticalField = m_cmdLineOptions["cond-critical-field"].as<double>();
+		m_conductivityCriticalField = m_cmdLineOptions["field-cond-critical"].as<double>();
 		m_field = m_cmdLineOptions["field"].as<double>();
 		m_ioiTemp = m_cmdLineOptions["ioi-temp"].as<double>();
 		m_condLimit = m_cmdLineOptions["cond-limit"].as<double>();
+
+		m_fieldScale = m_cmdLineOptions["field-z-size"].as<double>();
+		m_fieldRecession = m_cmdLineOptions["field-z-recession"].as<double>();
 
 		m_seedsNumber = m_cmdLineOptions["seeds-number"].as<unsigned int>();
 		m_seedsZoneHeight = m_cmdLineOptions["seeds-zone-height"].as<double>();
@@ -152,9 +161,10 @@ void Modeller::createProgramCofigurationFile(const std::string& prefix)
 
 void Modeller::initExternalPotential()
 {
+	m_trapezoid.reset(new TrapezoidFunc(-m_field, m_fieldScale, m_fieldRecession));
 	m_externalPotential.reset(
 		new FieldScalar1D<3>(
-			[this](double z) { return getPotential(z); },
+			[this](double z) { return (*m_trapezoid)(z); },
 			{0.0, 0.0, 1.0}
 		)
 	);
@@ -259,11 +269,6 @@ void Modeller::genSeeds()
 			l->connect(n1, n2);
 		}
 	}
-}
-
-double Modeller::getPotential(double z)
-{
-	return -z*m_field;
 }
 
 std::string Modeller::getTimeStr()
