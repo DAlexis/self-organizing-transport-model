@@ -61,7 +61,7 @@ public:
 	void setFilenamePrefix(const std::string& prefix);
 
 private:
-	void hook(double time) override;
+	void hook(double time, double wantedTime) override;
 	FileWriter m_writer;
 	std::string m_prefix;
 };

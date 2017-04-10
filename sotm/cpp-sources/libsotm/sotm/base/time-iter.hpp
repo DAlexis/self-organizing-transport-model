@@ -198,14 +198,21 @@ struct ContiniousIteratorMetrics
 class TimeHookPeriodic : public ITimeHook
 {
 public:
-	void runHook(double time) override final { m_lastRun = time; hook(time); }
-	double getNextTime() override final { return m_lastRun + m_period; }
+	void runHook(double time) override final;
+	double getNextTime() override final;
 
-	void setPeriod(double period) { m_period = period; }
-	double getPeriod() { return m_period; }
-	virtual void hook(double time) = 0;
+	void setPeriod(double period);
+	double getPeriod();
+
+	/**
+	 * Real hook function that should be defined in derived class.
+	 * @param realTime Model time of calling hook
+	 * @param wantedTime Time hook was planned to run. Usually lesser than realTime
+	 */
+	virtual void hook(double realTime, double wantedTime) = 0;
 
 private:
+	double m_nextRun = 0;
 	double m_lastRun = 0.0;
 	double m_period = 1.0;
 };
@@ -291,7 +298,7 @@ class PeriodicStopHook : public TimeHookPeriodic
 {
 public:
 	PeriodicStopHook(TimeIterator* iterator) : m_iterator(iterator) {}
-	void hook(double time) override { UNUSED_ARG(time); m_iterator->stop(); }
+	void hook(double time, double wantedTime) override { UNUSED_ARG(time); UNUSED_ARG(wantedTime); m_iterator->stop(); }
 
 private:
 	TimeIterator* m_iterator;

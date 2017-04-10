@@ -7,6 +7,33 @@ using namespace sotm;
 
 const ContiniousIteratorParameters ContinuousTimeIteratorBase::defaultParameters;
 
+void TimeHookPeriodic::runHook(double time)
+{
+	std::cout << "Next run: " << m_nextRun << std::endl;
+	//m_lastRun = time;
+	hook(time, m_nextRun);
+	m_nextRun += m_period;
+}
+
+double TimeHookPeriodic::getNextTime()
+{
+	return m_nextRun;
+}
+
+void TimeHookPeriodic::setPeriod(double period)
+{
+	m_period = period;
+	m_nextRun = m_period;
+}
+
+double TimeHookPeriodic::getPeriod()
+{
+	return m_period;
+}
+
+////////////////////////////////
+// ContinuousTimeIteratorBase
+
 void ContinuousTimeIteratorBase::setIterable(IContinuousTimeIterable* target)
 {
 	m_target = target;

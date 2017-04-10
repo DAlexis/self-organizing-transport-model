@@ -122,8 +122,9 @@ void FileWriteHook::setFilenamePrefix(const std::string& prefix)
 	m_prefix = prefix;
 }
 
-void FileWriteHook::hook(double time)
+void FileWriteHook::hook(double time, double wantedTime)
 {
+	UNUSED_ARG(wantedTime);
 	std::ostringstream ss;
 	ss << m_prefix << "_t=" << std::fixed << std::setprecision(10) << time;
 	m_writer.write(ss.str().c_str());
