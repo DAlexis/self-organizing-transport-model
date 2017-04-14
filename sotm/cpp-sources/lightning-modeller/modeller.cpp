@@ -23,30 +23,31 @@ bool Modeller::parseCmdLineArgs(int argc, char** argv)
 	generalOptions.add_options()
 		("help,h", "Print help message")
 		("no-gui,g", "Print help message")
-		("step-min", po::value<double>()->default_value(0.0), "Minimal integration step")
-		("step-max", po::value<double>()->default_value(1e-7), "Maximal integration step")
-		("frame-duration", po::value<double>()->default_value(1e-6), "File output frame duration")
-		("stop-time", po::value<double>()->default_value(1), "integration time limit");
+		(m_stepMin.name().c_str(),       po::value<double>()->default_value(0.0), "Minimal integration step")
+		(m_stepMax.name().c_str(),       po::value<double>()->default_value(1e-7), "Maximal integration step")
+		(m_frameDuration.name().c_str(), po::value<double>()->default_value(1e-6), "File output frame duration")
+		(m_stopTime.name().c_str(),      po::value<double>()->default_value(1), "integration time limit");
 
 	po::options_description dischargeOptions("Gas discharge options");
 	dischargeOptions.add_options()
-		("beta", po::value<double>()->default_value(2e7), "Conductivity relaxation coefficient")
-		("ioi-temp", po::value<double>()->default_value(1500), "IOI critical temperature")
-		("cond-limit", po::value<double>()->default_value(1e1), "Conductivity limit")
-		("field-cond-critical", po::value<double>()->default_value(0.24e6), "Critical field that maintain glow discharge");
+		(m_beta.name().c_str(), po::value<double>()->default_value(2e7), "Conductivity relaxation coefficient")
+		(m_ioiTemp.name().c_str(), po::value<double>()->default_value(1500), "IOI critical temperature")
+		(m_condLimit.name().c_str(), po::value<double>()->default_value(1e1), "Conductivity limit")
+		(m_conductivityCriticalField.name().c_str(), po::value<double>()->default_value(0.24e6), "Critical field that maintain glow discharge");
 
 	po::options_description seedsOptions("Seeds options");
 	seedsOptions.add_options()
-		("seeds-number,n", po::value<unsigned int>()->default_value(1), "Count of seed objects")
-		("seeds-zone-height,H", po::value<double>()->default_value(15.0), "Height of zone where seed objects will be generated")
-		("seeds-zone-dia,D", po::value<double>()->default_value(5.0), "Diameter of zone where seed objects will be generated")
-		("seeds-min-dist,L", po::value<double>()->default_value(1.0), "Minimal distance between seeds");
+		(m_seedsNumber.name().c_str(),     po::value<unsigned int>()->default_value(1), "Count of seed objects")
+		(m_seedsZoneHeight.name().c_str(), po::value<double>()->default_value(15.0), "Height of zone where seed objects will be generated")
+		(m_seedsZoneDia.name().c_str(),    po::value<double>()->default_value(5.0), "Diameter of zone where seed objects will be generated")
+		(m_seedsZUniform.name().c_str(),   "Place seeds uniformly by z, without random")
+		(m_seedsMinDist.name().c_str(),    po::value<double>()->default_value(1.0), "Minimal distance between seeds");
 
 	po::options_description fieldOptions("Field options");
 	fieldOptions.add_options()
-		("field,e", po::value<double>()->default_value(0.3e6), "External field")
-		("field-z-size", po::value<double>()->default_value(1000), "Field vertical size")
-		("field-z-recession", po::value<double>()->default_value(1000), "Field recession size");
+		(m_field.name().c_str(),      po::value<double>()->default_value(0.3e6), "External field")
+		(m_fieldScale.name().c_str(), po::value<double>()->default_value(1000), "Field vertical size")
+		(m_fieldRecession.name().c_str(), po::value<double>()->default_value(1000), "Field recession size");
 
 	po::options_description allOptions("Allowed options");
 	allOptions
@@ -60,24 +61,25 @@ bool Modeller::parseCmdLineArgs(int argc, char** argv)
 	{
 		po::store(po::parse_command_line(argc, argv, allOptions), m_cmdLineOptions);
 		po::notify(m_cmdLineOptions);
-		m_stepMin = m_cmdLineOptions["step-min"].as<double>();
-		m_stepMax = m_cmdLineOptions["step-max"].as<double>();
-		m_frameDuration = m_cmdLineOptions["frame-duration"].as<double>();
-		m_stopTime = m_cmdLineOptions["stop-time"].as<double>();
+		m_stepMin = m_cmdLineOptions[m_stepMin.name().c_str()].as<double>();
+		m_stepMax = m_cmdLineOptions[m_stepMax.name().c_str()].as<double>();
+		m_frameDuration = m_cmdLineOptions[m_frameDuration.name().c_str()].as<double>();
+		m_stopTime = m_cmdLineOptions[m_stopTime.name().c_str()].as<double>();
 
-		m_beta = m_cmdLineOptions["beta"].as<double>();
-		m_conductivityCriticalField = m_cmdLineOptions["field-cond-critical"].as<double>();
-		m_field = m_cmdLineOptions["field"].as<double>();
-		m_ioiTemp = m_cmdLineOptions["ioi-temp"].as<double>();
-		m_condLimit = m_cmdLineOptions["cond-limit"].as<double>();
+		m_beta = m_cmdLineOptions[m_beta.name().c_str()].as<double>();
+		m_conductivityCriticalField = m_cmdLineOptions[m_conductivityCriticalField.name().c_str()].as<double>();
+		m_field = m_cmdLineOptions[m_field.name().c_str()].as<double>();
+		m_ioiTemp = m_cmdLineOptions[m_ioiTemp.name().c_str()].as<double>();
+		m_condLimit = m_cmdLineOptions[m_condLimit.name().c_str()].as<double>();
 
-		m_fieldScale = m_cmdLineOptions["field-z-size"].as<double>();
-		m_fieldRecession = m_cmdLineOptions["field-z-recession"].as<double>();
+		m_fieldScale = m_cmdLineOptions[m_fieldScale.name().c_str()].as<double>();
+		m_fieldRecession = m_cmdLineOptions[m_fieldRecession.name().c_str()].as<double>();
 
-		m_seedsNumber = m_cmdLineOptions["seeds-number"].as<unsigned int>();
-		m_seedsZoneHeight = m_cmdLineOptions["seeds-zone-height"].as<double>();
-		m_seedsZoneDia = m_cmdLineOptions["seeds-zone-dia"].as<double>();
-		m_seedsMinDist = m_cmdLineOptions["seeds-min-dist"].as<double>();
+		m_seedsNumber = m_cmdLineOptions[m_seedsNumber.name().c_str()].as<unsigned int>();
+		m_seedsZoneHeight = m_cmdLineOptions[m_seedsZoneHeight.name().c_str()].as<double>();
+		m_seedsZoneDia = m_cmdLineOptions[m_seedsZoneDia.name().c_str()].as<double>();
+		m_seedsMinDist = m_cmdLineOptions[m_seedsMinDist.name().c_str()].as<double>();
+		m_seedsZUniform = m_cmdLineOptions.count(m_seedsZUniform.name());
 	}
 	catch (po::error& e)
 	{
@@ -269,7 +271,10 @@ void Modeller::genSeeds()
 			{
 				p[0] = Random::uniform(-m_seedsZoneDia, m_seedsZoneDia);
 				p[1] = Random::uniform(-m_seedsZoneDia, m_seedsZoneDia);
-				p[2] = Random::uniform(-m_seedsZoneHeight, m_seedsZoneHeight);
+				if (m_seedsZUniform)
+					p[2] = -m_seedsZoneHeight + 2*m_seedsZoneHeight / (m_seedsNumber-1) * i;
+				else
+					p[2] = Random::uniform(-m_seedsZoneHeight, m_seedsZoneHeight);
 
 				auto nearest = c.graphRegister.getNearestNode(p);
 				if (nearest == nullptr)

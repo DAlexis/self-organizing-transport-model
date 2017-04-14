@@ -50,25 +50,26 @@ private:
 	sotm::ContiniousIteratorParameters m_timeIterParams;
 
 	sotm::ParametersGroup m_parameters{"LightningModellerCommandLine"};
-	sotm::Parameter<double> m_frameDuration{m_parameters, "frameDuration"};
-	sotm::Parameter<double> m_stepMin{m_parameters, "stepMin"};
-	sotm::Parameter<double> m_stepMax{m_parameters, "stepMax"};
-	sotm::Parameter<double> m_stopTime{m_parameters, "stopTime"};
+	sotm::Parameter<double> m_frameDuration{m_parameters, "frame-duration"};
+	sotm::Parameter<double> m_stepMin{m_parameters, "step-min"};
+	sotm::Parameter<double> m_stepMax{m_parameters, "step-max"};
+	sotm::Parameter<double> m_stopTime{m_parameters, "stop-time"};
 
 
 	sotm::Parameter<double> m_beta{m_parameters, "beta"};
-	sotm::Parameter<double> m_ioiTemp{m_parameters, "ioiTemp"};
-	sotm::Parameter<double> m_condLimit{m_parameters, "condLimit"};
+	sotm::Parameter<double> m_ioiTemp{m_parameters, "ioi-temp"};
+	sotm::Parameter<double> m_condLimit{m_parameters, "cond-limit"};
 
-	sotm::Parameter<unsigned int> m_seedsNumber{m_parameters, "seedsNumber"};
-	sotm::Parameter<double> m_seedsZoneHeight{m_parameters, "seedsZoneHeight"};
-	sotm::Parameter<double> m_seedsZoneDia{m_parameters, "seedsZoneDia"};
-	sotm::Parameter<double> m_seedsMinDist{m_parameters, "seedsMinDist"};
+	sotm::Parameter<unsigned int> m_seedsNumber{m_parameters, "seeds-number"};
+	sotm::Parameter<double> m_seedsZoneHeight{m_parameters, "seeds-zone-height"};
+	sotm::Parameter<double> m_seedsZoneDia{m_parameters, "seeds-zone-dia"};
+	sotm::Parameter<double> m_seedsMinDist{m_parameters, "seeds-min-dist"};
+	sotm::Parameter<double> m_seedsZUniform{m_parameters, "seeds-z-uniform"};
 
-	sotm::Parameter<double> m_conductivityCriticalField{m_parameters, "conductivityCriticalField"};
+	sotm::Parameter<double> m_conductivityCriticalField{m_parameters, "field-cond-critical"};
 	sotm::Parameter<double> m_field{m_parameters, "field"};
-	sotm::Parameter<double> m_fieldScale{m_parameters, "field_scale"};
-	sotm::Parameter<double> m_fieldRecession{m_parameters, "field_recession"};
+	sotm::Parameter<double> m_fieldScale{m_parameters, "field-z-size"};
+	sotm::Parameter<double> m_fieldRecession{m_parameters, "field-z-recession"};
 
 	boost::program_options::variables_map m_cmdLineOptions;
 	int m_argc;
