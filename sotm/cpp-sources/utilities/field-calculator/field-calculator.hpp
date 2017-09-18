@@ -32,6 +32,7 @@ private:
 		double charge = 0;
 	};
 
+    /// @todo All parsing should be in function parseCmdLineArgs! Remove next line.
 	boost::program_options::variables_map m_cmdLineOptions;
 	std::vector<Charge> m_charges;
 	bool m_hasCorners;
@@ -39,7 +40,10 @@ private:
 
 	size_t m_nx = 0, m_ny = 0, m_nz = 0;
 	double m_minDist = 0.0;
+    sotm::Vector<3> m_externalE;
+    bool m_ignoreExternal = false;
 	std::vector<double> m_potential;
+    std::string m_outputFilenamePrefix;
 };
 
 

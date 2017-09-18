@@ -2,10 +2,10 @@
 #include "grid-builder.hpp"
 
 #include "sotm/utils/const.hpp"
+#include <tbb/tbb.h>
 #include <iostream>
 #include <fstream>
 #include <string>
-
 
 using namespace std;
 
@@ -15,19 +15,24 @@ bool FieldCalculator::parseCmdLineArgs(int argc, char** argv)
 	po::options_description generalOptions("General options");
 	generalOptions.add_options()
 		("help,h", "Print help message")
-		("file,f", po::value<std::string>(), "Input file name")
-		("nx", po::value<unsigned int>()->default_value(1), "Points per x")
-		("ny", po::value<unsigned int>()->default_value(10), "Points per y")
-		("nz", po::value<unsigned int>()->default_value(10), "Points per z")
+        ("input,i", po::value<std::string>(), "Input file name")
+        ("nx", po::value<unsigned int>()->default_value(10), "Points per x")
+        ("ny", po::value<unsigned int>()->default_value(1), "Points per y")
+        ("nz", po::value<unsigned int>()->default_value(70), "Points per z")
 		("min-dist,d", po::value<double>()->default_value(0.05), "Charges closer to grid point than this value will be rejected")
-		("zone-begin,b", po::value<std::string>(), "Zone begin coords (x, y, z)")
-		("zone-end,e", po::value<std::string>(), "Zone end coords (x, y, z)");
+        ("ex", po::value<double>()->default_value(0.0), "External field X")
+        ("ey", po::value<double>()->default_value(0.0), "External field Y")
+        ("ez", po::value<double>()->default_value(0.0), "External field Z")
+        ("no-external", "Ignore external field")
+        ("output,o", po::value<string>()->default_value("field"), "Output file name prefix")
+        ("zone-begin,b", po::value<string>(), "Zone begin coords (x, y, z)")
+        ("zone-end,e", po::value<string>(), "Zone end coords (x, y, z)");
 
 	po::options_description allOptions("Allowed options");
 	allOptions
 		.add(generalOptions);
 
-	try
+    try
 	{
 		po::store(po::parse_command_line(argc, argv, allOptions), m_cmdLineOptions);
 		po::notify(m_cmdLineOptions);
@@ -36,12 +41,22 @@ bool FieldCalculator::parseCmdLineArgs(int argc, char** argv)
 		m_ny = m_cmdLineOptions["ny"].as<unsigned int>();
 		m_nz = m_cmdLineOptions["nz"].as<unsigned int>();
 		m_minDist = m_cmdLineOptions["min-dist"].as<double>();
+        m_externalE[0] = m_cmdLineOptions["ex"].as<double>();
+        m_externalE[1] = m_cmdLineOptions["ey"].as<double>();
+        m_externalE[2] = m_cmdLineOptions["ez"].as<double>();
+        m_ignoreExternal = m_cmdLineOptions.count("no-external") == 0;
+        m_outputFilenamePrefix = m_cmdLineOptions["output"].as<string>();
 	}
 	catch (po::error& e)
 	{
 		cerr << "Command line parsing error: " << e.what() << endl;
 		return false;
 	}
+    catch(exception& e)
+    {
+        cerr << "Command line parsing general error: " << e.what() << endl;
+        return false;
+    }
 
 	if (m_cmdLineOptions.count("help"))
 	{
@@ -49,7 +64,7 @@ bool FieldCalculator::parseCmdLineArgs(int argc, char** argv)
 		return false;
 	}
 
-	if (m_cmdLineOptions.count("file") == 0)
+    if (m_cmdLineOptions.count("input") == 0)
 	{
 		cerr << "File not specified" << endl;
 		return false;
@@ -124,11 +139,11 @@ void FieldCalculator::fixCorners()
 
 bool FieldCalculator::readPoints()
 {
-	std::ifstream file(m_cmdLineOptions["file"].as<std::string>().c_str(), std::ios::in);
+    std::ifstream file(m_cmdLineOptions["input"].as<std::string>().c_str(), std::ios::in);
 
 	if (!file.is_open())
 	{
-		cerr << "Cannot open file " << m_cmdLineOptions["file"].as<std::string>() << "!" << endl;
+        cerr << "Cannot open file " << m_cmdLineOptions["input"].as<std::string>() << "!" << endl;
 		return false;
 	}
 
@@ -146,7 +161,7 @@ bool FieldCalculator::readPoints()
 			iss >> newCharge.pos[1] >> tmp;
 			iss >> newCharge.pos[2] >> tmp;
 			iss >> newCharge.charge;
-			cout << newCharge.pos[0] << " " << newCharge.pos[1] << " " << newCharge.pos[2] << " " << newCharge.charge << endl;
+            //cout << newCharge.pos[0] << " " << newCharge.pos[1] << " " << newCharge.pos[2] << " " << newCharge.charge << endl;
 			if (!m_hasCorners)
 			{
 				// Auto scaling
@@ -158,7 +173,6 @@ bool FieldCalculator::readPoints()
 					if (firstLine || m_c2[i] < newCharge.pos[i])
 						m_c2[i] = newCharge.pos[i];
 				}
-
 			}
 			firstLine = false;
 		} catch(std::exception& ex)
@@ -178,21 +192,30 @@ bool FieldCalculator::createGrid()
 			m_c1[0], m_c1[1], m_c1[2],
 			m_c2[0], m_c2[1], m_c2[2]);
 
-	for (auto it=w.valuePoints().begin(); it != w.valuePoints().end(); ++it)
-	{
-		double potential = 0;
+    GridBuilder::ValuePoint *p = w.valuePoints().data();
 
-		for (auto &jt : m_charges)
-		{
-			double dist = (jt.pos - it->point).len();
-			if (dist < m_minDist)
-				continue;
-			potential += sotm::Const::Si::k * jt.charge / dist;
-		}
+    tbb::parallel_for( size_t(0), w.valuePoints().size(),
+        [this, p]( size_t i ) {
+            double potential = 0;
 
-		it->value = potential;
-	}
-	w.writeFile("output");
+            sotm::Vector<3> &point = p[i].point;
+
+            for (auto &jt : m_charges)
+            {
+                double dist = (jt.pos - point).len();
+                if (dist < m_minDist)
+                    continue;
+                potential += jt.charge / dist;
+            }
+            potential *= sotm::Const::Si::k;
+
+            if (!m_ignoreExternal)
+                potential += -(m_externalE ^ point);
+            p[i].value = potential;
+        }
+    );
+
+    w.writeFile(m_outputFilenamePrefix);
 	return true;
 }
 

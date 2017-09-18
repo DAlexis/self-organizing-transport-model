@@ -69,14 +69,14 @@ add_library(${PROJECT_NAME} STATIC ${LIB_SOURCE} ${LIB_HPP})
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_rvalue_references)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_lambdas)
 
+# Include directories that should be added with this project
 export_include_dirs(
     ${PROJECT_SOURCE_DIR}
     ${${PROJECT_NAME}_USED_INCDIRS}
-    # Add here include directories that should be exported, i.e. ${PROJECT_SOURCE_DIR}/include
 )
 
+# Libraries this projects needs to be linked with
 export_libs(
     ${PROJECT_NAME}
-    tbb
-    # Add here libraries this one depends from
+    tbb 
 )
