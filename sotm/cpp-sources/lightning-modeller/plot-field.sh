@@ -14,18 +14,17 @@ then
     binary="./field-calc"
 fi
 
-if [ ! -f $binary ]
+if [ ! -f "$binary" ]
 then
     echo "field-calc binary not found!"
     exit 1
 fi
 
-
 input=$1
 config=$2
 
-output=${input/\./-}-field
-field=`cat $config | awk '{if ($1 == "field") print $NF}'`
+output="${input/lightmod/lightmod-field}"
+field=`cat "$config" | awk '{if ($1 == "field") print $NF}'`
 
-cat $config | awk '{if ($1 == "field") print $NF}'
-$binary --input=$input --output=$output --ez=$field $3 $4 $5 $6 $7
+#cat $config | awk '{if ($1 == "field") print $NF}'
+$binary --input="$input" --output="$output" --ez="$field" $3 $4 $5 $6 $7
