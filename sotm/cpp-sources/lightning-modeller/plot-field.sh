@@ -28,4 +28,4 @@ output=${input/\./-}-field
 field=`cat $config | awk '{if ($1 == "field") print $NF}'`
 
 cat $config | awk '{if ($1 == "field") print $NF}'
-$binary --input=$input --output=$output --ez=$field $3
+$binary --input=$input --output=$output --ez=$field $3 $4 $5 $6 $7

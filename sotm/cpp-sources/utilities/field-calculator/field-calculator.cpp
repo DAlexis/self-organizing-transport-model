@@ -44,7 +44,7 @@ bool FieldCalculator::parseCmdLineArgs(int argc, char** argv)
         m_externalE[0] = m_cmdLineOptions["ex"].as<double>();
         m_externalE[1] = m_cmdLineOptions["ey"].as<double>();
         m_externalE[2] = m_cmdLineOptions["ez"].as<double>();
-        m_ignoreExternal = m_cmdLineOptions.count("no-external") == 0;
+        m_ignoreExternal = m_cmdLineOptions.count("no-external") != 0;
         m_outputFilenamePrefix = m_cmdLineOptions["output"].as<string>();
 	}
 	catch (po::error& e)
