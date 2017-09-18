@@ -30,3 +30,5 @@ add_custom_target(
 )
 
 add_dependencies(${PROJECT_NAME} gen-config)
+
+configure_file(plot-field.sh plot-field.sh COPYONLY)
