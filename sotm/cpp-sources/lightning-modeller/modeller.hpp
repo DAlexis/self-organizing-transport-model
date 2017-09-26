@@ -16,6 +16,7 @@
 #include "sotm/math/random.hpp"
 #include "sotm/output/graph-file-writer.hpp"
 #include "sotm/math/functions.hpp"
+#include "cic.hpp"
 
 #include <boost/program_options.hpp>
 #include <memory>
@@ -49,31 +50,49 @@ private:
 
 	sotm::ContiniousIteratorParameters m_timeIterParams;
 
-	sotm::ParametersGroup m_parameters{"LightningModellerCommandLine"};
-	sotm::Parameter<double> m_frameDuration{m_parameters, "frame-duration"};
-	sotm::Parameter<double> m_stepMin{m_parameters, "step-min"};
-	sotm::Parameter<double> m_stepMax{m_parameters, "step-max"};
-	sotm::Parameter<double> m_stopTime{m_parameters, "stop-time"};
+	cic::Parameters m_p{
+		"Lightning modeller command line options",
+		cic::ParametersGroup(
+		    "General",
+		    "General options",
+		    cic::Parameter<bool>("no-gui", "Work without GUI", cic::ParamterType::cmdLine)
+		),
+		cic::ParametersGroup(
+		    "Iter",
+		    "Iterating options",
+		    cic::Parameter<double>("step-min",       "Minimal integration step", 0.0),
+		    cic::Parameter<double>("step-max",       "Maximal integration step", 1e-7),
+		    cic::Parameter<double>("frame-duration", "File output frame duration", 1e-6),
+		    cic::Parameter<double>("stop-time",      "Integration time limit", 1.0)
+		),
+		cic::ParametersGroup(
+		    "Discharge",
+		    "Gas discharge options",
+		    cic::Parameter<double>("beta",                "Electrons conductivity relaxation decrement", 2e7),
+		    cic::Parameter<double>("ioi-temp",            "TII critical temperature", 1500.0),
+		    cic::Parameter<double>("cond-limit",          "Conductivity limit", 1e1),
+		    cic::Parameter<double>("field-cond-critical", "Critical field that maintain glow discharge", 0.24e6)
+		),
+		cic::ParametersGroup(
+		    "Seeds",
+		    "Initial seeds options",
+		    cic::Parameter<unsigned int>("seeds-number", "Count of seed streamers in zone", 1),
+		    cic::Parameter<double>("seeds-zone-height",  "Height of zone where seeds will be generated", 15.0),
+		    cic::Parameter<double>("seeds-zone-dia",     "Diameter of zone where seeda will be generated", 5),
+		    cic::Parameter<double>("seeds-min-dist",     "Critical field that maintain glow discharge", 0.24e6),
+		    cic::Parameter<bool>("seeds-z-uniform",      "Place seeds uniformly by z, without random")
+		),
+		cic::ParametersGroup(
+		    "Field",
+		    "Electric field options",
+		    cic::Parameter<double>("field",             "External field", 0.3e6),
+		    cic::Parameter<double>("field-z-size",      "Field vertical size", 1000),
+		    cic::Parameter<double>("field-z-recession", "Field recession zone size", 1000)
+		)
+	};
 
-
-	sotm::Parameter<double> m_beta{m_parameters, "beta"};
-	sotm::Parameter<double> m_ioiTemp{m_parameters, "ioi-temp"};
-	sotm::Parameter<double> m_condLimit{m_parameters, "cond-limit"};
-
-	sotm::Parameter<unsigned int> m_seedsNumber{m_parameters, "seeds-number"};
-	sotm::Parameter<double> m_seedsZoneHeight{m_parameters, "seeds-zone-height"};
-	sotm::Parameter<double> m_seedsZoneDia{m_parameters, "seeds-zone-dia"};
-	sotm::Parameter<double> m_seedsMinDist{m_parameters, "seeds-min-dist"};
-	sotm::Parameter<double> m_seedsZUniform{m_parameters, "seeds-z-uniform"};
-
-	sotm::Parameter<double> m_conductivityCriticalField{m_parameters, "field-cond-critical"};
-	sotm::Parameter<double> m_field{m_parameters, "field"};
-	sotm::Parameter<double> m_fieldScale{m_parameters, "field-z-size"};
-	sotm::Parameter<double> m_fieldRecession{m_parameters, "field-z-recession"};
-
-	boost::program_options::variables_map m_cmdLineOptions;
-	int m_argc;
-	char** m_argv;
+	int m_argc = 0;
+	char** m_argv = nullptr;
 };
 
 #endif /* LIGHTNING_MODELLER_MODELLER_HPP_ */

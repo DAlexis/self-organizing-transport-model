@@ -1,0 +1,3 @@
+[submodule "sotm/cpp-sources/utilities/cli-ini-config"]
+	path = sotm/cpp-sources/utilities/cli-ini-config
+	url = https://github.com/DAlexis/cli-ini-config.git
