@@ -173,7 +173,6 @@ void Modeller::initParameters()
 
 	Vector<3> externalField{0.0, 0.0, m_p["Field"].get<double>("field")};
 	m_physCont->externalPotential = m_externalPotential.get();
-	m_physCont->externalFieldValue = m_p["Field"].get<double>("field");
 
 	generateCondEvoParams();
 

@@ -10,6 +10,7 @@
 #include <set>
 #include <vector>
 #include <functional>
+#include <mutex>
 
 namespace sotm
 {
@@ -47,10 +48,10 @@ public:
 	void applyLinkVisitor(LinkVisitor v);
 
 	/// Iterate by all nodes. New nodes should not be added during iteration
-	void applyNodeVisitorWithoutGraphChganges(NodeVisitor v, bool parallel = false);
+    void applyNodeVisitorWithoutGraphChganges(NodeVisitor v, bool optimizeToVector = true);
 
 	/// Iterate by all links. New nodes should not be added during iteration
-	void applyLinkVisitorWithoutGraphChganges(LinkVisitor v);
+    void applyLinkVisitorWithoutGraphChganges(LinkVisitor v, bool optimizeToVector = true);
 
 	Node* getNearestNode(const Vector<3>& point, bool searchOverReceintlyAdded = true);
 
@@ -60,8 +61,11 @@ public:
 	size_t stateHash();
 
 private:
-	using NodeSet = std::set<Node*>;
-	using LinkSet = std::set<Link*>;
+    using NodeSet = std::set<Node*>;
+    using LinkSet = std::set<Link*>;
+
+    using NodeVector = std::vector<Node*>;
+    using LinkVector = std::vector<Link*>;
 
 	/// Make iterating over links on nodes safe for add/remove link/node operations
 	void beginIterating();
@@ -71,13 +75,25 @@ private:
 
 	void changeStateHash();
 
+    /**
+     * @brief This function builds from scratch m_nodesVector and m_linksVector.
+     * It uses mutex to protect this objects. In normal case it should not be a problem,
+     * because only one building of links and nodes vector is needed for a long time
+     */
+    void buildVectorsForIteration();
+
 	/// If true we cannot add/remove directly to/from m_nodes and m_links because we are iterating by them
 	bool m_iteratingNow = false;
 
 	NodeSet m_nodes, m_nodesToAdd, m_nodesToDelete;
 	LinkSet m_links, m_linksToAdd, m_linksToDelete;
 
-	size_t m_stateHash = 0;
+    NodeVector m_nodesVector;
+    LinkVector m_linksVector;
+    std::mutex m_nlvecsMutex;
+
+    size_t m_stateHash = 1;
+    size_t m_nodesLinksVectorsStateHash = 0;
 };
 
 class ModelContextDependent

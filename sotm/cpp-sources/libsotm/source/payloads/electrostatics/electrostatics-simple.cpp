@@ -105,7 +105,6 @@ bool ElectrostaticPhysicalContext::testConnection(Node* n1, Node* n2)
 }
 
 ////////////////////////////////////
-////////////////////////////////////
 // ElectrostaticNodePayload
 
 ElectrostaticNodePayload::ElectrostaticNodePayload(PhysicalPayloadsRegister* reg, Node* node) :

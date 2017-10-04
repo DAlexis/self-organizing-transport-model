@@ -73,13 +73,8 @@ public:
 	Parameter<double> linkEta{parameters, "linkEta"};
 	Parameter<double> linkBeta{parameters, "linkBeta"};
 
-	// @todo remove this duplication. It is only for saving to file
-	Parameter<double> externalFieldValue{parameters, "externalFieldValue"};
-
 	Function1D ionizationOverheatingInstFunc{zero};
 	Parameter<double> conductivityLimit{parameters, "conductivityLimit"};
-
-	//Vector<3> externalConstField;
 
 	Scaler chargeScaler;
 	LinearGradientColorMapper chargeColorMapper;
