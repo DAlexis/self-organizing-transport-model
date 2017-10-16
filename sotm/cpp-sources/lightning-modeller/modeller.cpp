@@ -100,9 +100,7 @@ void Modeller::createParametersFile(const std::string& prefix)
 		cerr << "ERROR: Cannot open file " << filename << " to write current parameters!" << endl;
 		return;
 	}
-	outputFile << m_physCont->parameters;
-	outputFile << std::endl;
-	m_p.writeIni(outputFile);
+    m_p.writeIni(outputFile);
 }
 
 void Modeller::createProgramCofigurationFile(const std::string& prefix)

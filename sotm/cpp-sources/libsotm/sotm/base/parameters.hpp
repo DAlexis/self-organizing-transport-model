@@ -48,7 +48,7 @@ struct Parameter : public IAnyTypeParameter
 #endif
 	{ group.add(*this); }
 
-	Parameter(ParametersGroup& group, const char* name) :
+    Parameter(ParametersGroup& group, const char* name = unknown) :
 		m_value(0.0),
 		m_name(name)
 #ifdef DEBUG
@@ -64,6 +64,14 @@ struct Parameter : public IAnyTypeParameter
 #endif
 	{ }
 
+    Parameter(T initValue) :
+        m_value(initValue),
+        m_name(unknown)
+#ifdef DEBUG
+        , m_isInitialized(true)
+#endif
+    { }
+
 	Parameter(const char* name) :
 		m_value(0.0),
 		m_name(name)
@@ -71,6 +79,14 @@ struct Parameter : public IAnyTypeParameter
 		, m_isInitialized(false)
 #endif
 	{ }
+
+    Parameter() :
+        m_value(0.0),
+        m_name(unknown)
+#ifdef DEBUG
+        , m_isInitialized(false)
+#endif
+    { }
 
 	SOTM_INLINE T operator=(T newValue)
 	{
@@ -116,6 +132,7 @@ struct Parameter : public IAnyTypeParameter
 	}
 
 private:
+    constexpr static const char* unknown = "unknown_parameter";
 	T m_value;
 	const std::string m_name;
 #ifdef DEBUG

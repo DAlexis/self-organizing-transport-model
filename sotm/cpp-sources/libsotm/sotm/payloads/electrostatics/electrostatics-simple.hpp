@@ -50,32 +50,31 @@ public:
 		return static_cast<const ElectrostaticPhysicalContext*>(context);
 	}
 
-	ParametersGroup parameters{"ElectrostaticPhysicalContext"};
+    Parameter<double> airTemperature{300};
 
-	Parameter<double> airTemperature{parameters, "airTemperature", 300};
+    Parameter<double> branchingStep;
 
-	Parameter<double> branchingStep{parameters, "branchingStep"};
+    Parameter<bool>   smartBranching{false};
+    Parameter<double> smartBranchingEDiff{0.5};
+    Parameter<double> smartBranchingMaxLen{0.5};
 
-	Parameter<bool>   smartBranching{parameters, "smartBranching", false};
-	Parameter<double> smartBranchingEDiff{parameters, "smartBranchingEDiff", 0.5};
-	Parameter<double> smartBranchingMaxLen{parameters, "smartBranchingMaxLen", 0.5};
+    Parameter<double> initialConductivity;
+    Parameter<double> minimalConductivity;
 
-	Parameter<double> initialConductivity{parameters, "initialConductivity"};
-	Parameter<double> minimalConductivity{parameters, "minimalConductivity"};
+    Parameter<double> connectionCriticalField;
+    Parameter<double> connectionMaximalDist;
 
-	Parameter<double> connectionCriticalField{parameters, "connectionCriticalField"};
-	Parameter<double> connectionMaximalDist{parameters, "connectionMaximalDist"};
+    Parameter<double> nodeRadiusConductivity;
+    Parameter<double> nodeRadiusBranching;
+    Parameter<double> linkRadius;
 
-	Parameter<double> nodeRadiusConductivity{parameters, "nodeRadiusConductivity"};
-	Parameter<double> nodeRadiusBranching{parameters, "nodeRadiusBranching"};
-	Parameter<double> linkRadius{parameters, "linkRadius"};
+    Parameter<double> linkEta;
+    Parameter<double> linkBeta;
+    Parameter<double> conductivityLimit;
 
-	Parameter<double> linkEta{parameters, "linkEta"};
-	Parameter<double> linkBeta{parameters, "linkBeta"};
+    Function1D ionizationOverheatingInstFunc{zero};
 
-	Function1D ionizationOverheatingInstFunc{zero};
-	Parameter<double> conductivityLimit{parameters, "conductivityLimit"};
-
+    /// @todo Remove coloring/scaling functionality outside
 	Scaler chargeScaler;
 	LinearGradientColorMapper chargeColorMapper;
 
@@ -191,8 +190,8 @@ public:
 	//double current = 0;
 };
 
-SOTM_QUICK_NPF(ElectrostaticNodePayload, ElectrostaticNodePayloadFactory);
-SOTM_QUICK_LPF(ElectrostaticLinkPayload, ElectrostaticLinkPayloadFactory);
+SOTM_QUICK_NPF(ElectrostaticNodePayload, ElectrostaticNodePayloadFactory)
+SOTM_QUICK_LPF(ElectrostaticLinkPayload, ElectrostaticLinkPayloadFactory)
 
 }
 
