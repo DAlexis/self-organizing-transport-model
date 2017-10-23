@@ -42,14 +42,14 @@ void Modeller::run()
 {
 	Random::randomize(0);
 
-	c.setNodePayloadFactory(std::unique_ptr<INodePayloadFactory>(new ElectrostaticNodePayloadFactory()));
-	c.setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory>(new ElectrostaticLinkPayloadFactory()));
-	c.setPhysicalContext(std::unique_ptr<IPhysicalContext>(new ElectrostaticPhysicalContext()));
+    c.setPhysicalContext(std::unique_ptr<IPhysicalContext>(new ElectrostaticPhysicalContext()));
+    m_physCont = static_cast<ElectrostaticPhysicalContext*>(c.physicalContext());
+
+    c.setNodePayloadFactory(std::unique_ptr<INodePayloadFactory>(new ElectrostaticNodePayloadFactory(*m_physCont)));
+    c.setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory>(new ElectrostaticLinkPayloadFactory(*m_physCont)));
 
 	c.parallelSettings.parallelContiniousIteration.calculateSecondaryValues = true;
 	c.parallelSettings.parallelBifurcationIteration.prepareBifurcation = true;
-
-	m_physCont = static_cast<ElectrostaticPhysicalContext*>(c.physicalContext());
 
 	initTimeIterator();
 	initExternalPotential();
@@ -155,15 +155,15 @@ void Modeller::initParameters()
 			}
 	);
 
-	m_physCont->nodeRadiusConductivity = 0.03;
-	m_physCont->nodeRadiusBranching = 0.05;
-	m_physCont->linkRadius = 0.001;
-	m_physCont->branchingStep = 0.3;
+    m_physCont->nodeRadiusConductivityDefault = m_p["Geometry"].get<double>("node-radius-conductivity-default");
+    m_physCont->nodeRadiusBranchingDefault = m_p["Geometry"].get<double>("node-radius-branching-default");
+    m_physCont->linkRadius = m_p["Geometry"].get<double>("link-radius");
+    m_physCont->branchingStep = m_p["Geometry"].get<double>("branch-step");
 
-	m_physCont->connectionCriticalField = 0.3e6;
+    m_physCont->connectionCriticalField = m_p["Discharge"].get<double>("field-connect-critical");
 	m_physCont->connectionMaximalDist = m_physCont->branchingStep.get();
 
-	m_physCont->initialConductivity = 1e-10;
+    m_physCont->initialConductivity = m_p["Discharge"].get<double>("conductivity-initial");
 	m_physCont->minimalConductivity = m_physCont->initialConductivity * 0.95;
 
 	m_physCont->conductivityLimit = m_p["Discharge"].get<double>("cond-limit");
@@ -191,8 +191,8 @@ void Modeller::initTimeIterator()
 
 void Modeller::generateCondEvoParams()
 {
-	m_physCont->linkBeta = m_p["Discharge"].get<double>("beta");
-	m_physCont->linkEta = m_physCont->linkBeta / sqr(m_p["Discharge"].get<double>("field-cond-critical"));
+    m_physCont->linkBetaDefault = m_p["Discharge"].get<double>("beta");
+    m_physCont->linkEtaDefault = m_physCont->linkBetaDefault / sqr(m_p["Discharge"].get<double>("field-cond-critical"));
 }
 
 void Modeller::genSeeds()

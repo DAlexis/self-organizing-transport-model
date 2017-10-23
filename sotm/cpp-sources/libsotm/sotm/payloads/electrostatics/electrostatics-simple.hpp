@@ -64,12 +64,12 @@ public:
     Parameter<double> connectionCriticalField;
     Parameter<double> connectionMaximalDist;
 
-    Parameter<double> nodeRadiusConductivity;
-    Parameter<double> nodeRadiusBranching;
+    Parameter<double> nodeRadiusConductivityDefault;
+    Parameter<double> nodeRadiusBranchingDefault;
     Parameter<double> linkRadius;
 
-    Parameter<double> linkEta;
-    Parameter<double> linkBeta;
+    Parameter<double> linkEtaDefault;
+    Parameter<double> linkBetaDefault;
     Parameter<double> conductivityLimit;
 
     Function1D ionizationOverheatingInstFunc{zero};
@@ -94,7 +94,7 @@ private:
 class ElectrostaticNodePayload : public NodePayloadBase
 {
 public:
-	ElectrostaticNodePayload(PhysicalPayloadsRegister* reg, Node* node);
+    ElectrostaticNodePayload(PhysicalPayloadsRegister* reg, Node* node, double nodeRadiusConductivity, double nodeRadiusBranching);
 
 	SOTM_INLINE ElectrostaticPhysicalContext* context() { return static_cast<ElectrostaticPhysicalContext*>(node->physicalContext()); }
 
@@ -120,7 +120,11 @@ public:
 
 	static void setChargeColorLimits(double chargeMin, double chargeMax);
 	// Parameters
+    /// For smart branching: dynamic branch len
 	double branchProbeStep = 0.001;
+
+    double nodeRadiusBranching;
+    double nodeRadiusConductivity;
 
 	// Primary
 	Variable charge;
@@ -149,7 +153,7 @@ private:
 class ElectrostaticLinkPayload : public LinkPayloadBase
 {
 public:
-	ElectrostaticLinkPayload(PhysicalPayloadsRegister* reg, Link* link);
+    ElectrostaticLinkPayload(PhysicalPayloadsRegister* reg, Link* link, double linkEta, double linkBeta);
 
 	SOTM_INLINE ElectrostaticPhysicalContext* context() { return static_cast<ElectrostaticPhysicalContext*>(link->physicalContext()); }
 
@@ -182,6 +186,9 @@ public:
 	// Parameters
 	double radius = 0.01; // 1cm
 
+    double linkEta;
+    double linkBeta;
+
 	// Primary
 	Variable conductivity; // Simens
 	Variable temperature;
@@ -190,8 +197,24 @@ public:
 	//double current = 0;
 };
 
-SOTM_QUICK_NPF(ElectrostaticNodePayload, ElectrostaticNodePayloadFactory)
-SOTM_QUICK_LPF(ElectrostaticLinkPayload, ElectrostaticLinkPayloadFactory)
+class ElectrostaticNodePayloadFactory : public INodePayloadFactory
+{
+public:
+    ElectrostaticNodePayloadFactory(ElectrostaticPhysicalContext& context);
+    NodePayloadBase* create(PhysicalPayloadsRegister* reg, Node* node) override final;
+private:
+    ElectrostaticPhysicalContext& m_context;
+};
+
+class ElectrostaticLinkPayloadFactory : public ILinkPayloadFactory
+{
+public:
+    ElectrostaticLinkPayloadFactory(ElectrostaticPhysicalContext& context);
+    LinkPayloadBase* create(PhysicalPayloadsRegister* reg, Link* link) override final;
+
+private:
+    ElectrostaticPhysicalContext& m_context;
+};
 
 }
 

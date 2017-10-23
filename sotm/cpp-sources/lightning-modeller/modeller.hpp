@@ -71,8 +71,18 @@ private:
 		    cic::Parameter<double>("beta",                "Electrons conductivity relaxation decrement", 2e7),
 		    cic::Parameter<double>("ioi-temp",            "TII critical temperature", 1500.0),
 		    cic::Parameter<double>("cond-limit",          "Conductivity limit", 1e1),
-		    cic::Parameter<double>("field-cond-critical", "Critical field that maintain glow discharge", 0.24e6)
+            cic::Parameter<double>("field-cond-critical", "Critical field that maintain glow discharge. Beta calculated by this value. Minimal conductivity is 95% of it", 0.24e6),
+            cic::Parameter<double>("field-connect-critical", "Critical average field for nodes connection", 0.3e6),
+            cic::Parameter<double>("conductivity-initial", "Initial link conductivity", 1e-10)
 		),
+        cic::ParametersGroup(
+            "Geometry",
+            "Nodes and links geometry options",
+            cic::Parameter<double>("node-radius-conductivity-default", "Node effective radius for new nodes from point of conductivity calculations. This is capacity exactly", 0.03),
+            cic::Parameter<double>("node-radius-branching-default",    "Node effective radius for new nodes from point of branching. Surface E field will be calculated here", 0.05),
+            cic::Parameter<double>("link-radius",                      "Link wire effective radius for conductivity and air heating", 0.001),
+            cic::Parameter<double>("branch-step",                      "Link wire length when bush is branching", 0.3)
+        ),
 		cic::ParametersGroup(
 		    "Seeds",
 		    "Initial seeds options",

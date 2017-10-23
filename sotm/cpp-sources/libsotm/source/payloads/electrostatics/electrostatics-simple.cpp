@@ -107,8 +107,10 @@ bool ElectrostaticPhysicalContext::testConnection(Node* n1, Node* n2)
 ////////////////////////////////////
 // ElectrostaticNodePayload
 
-ElectrostaticNodePayload::ElectrostaticNodePayload(PhysicalPayloadsRegister* reg, Node* node) :
-		NodePayloadBase(reg, node)
+ElectrostaticNodePayload::ElectrostaticNodePayload(PhysicalPayloadsRegister* reg, Node* node, double nodeRadiusConductivity, double nodeRadiusBranching) :
+        NodePayloadBase(reg, node),
+        nodeRadiusBranching(nodeRadiusBranching),
+        nodeRadiusConductivity(nodeRadiusConductivity)
 {
 }
 
@@ -121,7 +123,7 @@ void ElectrostaticNodePayload::calculateSecondaryValues(double time)
 {
 	calculateExtFieldAndPhi();
 
-	double capacity = context()->nodeRadiusConductivity / Const::Si::k;
+    double capacity = nodeRadiusConductivity / Const::Si::k;
 	externalField = externalField * 3;
 	phi += charge.current / capacity;
 }
@@ -214,7 +216,7 @@ void ElectrostaticNodePayload::init()
 
 void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, BranchingParameters& branchingParameters)
 {
-	double radius = context()->nodeRadiusBranching;
+    double radius = nodeRadiusBranching;
 	double E1 = Const::Si::k*charge.current / sqr(radius);
 	DistributionResult<SphericalPoint> res = generateDischargeDirection(
 			dt,
@@ -261,7 +263,7 @@ void ElectrostaticNodePayload::getColor(double* rgb)
 
 double ElectrostaticNodePayload::getSize()
 {
-	return context()->nodeRadiusConductivity;
+    return nodeRadiusConductivity;
 }
 
 std::string ElectrostaticNodePayload::getFollowerText()
@@ -318,11 +320,12 @@ void ElectrostaticNodePayload::setChargeColorLimits(double chargeMin, double cha
 }
 
 ////////////////////////////////////
-////////////////////////////////////
 // ElectrostaticLinkPayload
 
-ElectrostaticLinkPayload::ElectrostaticLinkPayload(PhysicalPayloadsRegister* reg, Link* link) :
-		LinkPayloadBase(reg, link)
+ElectrostaticLinkPayload::ElectrostaticLinkPayload(PhysicalPayloadsRegister* reg, Link* link, double linkEta, double linkBeta) :
+        LinkPayloadBase(reg, link),
+        linkEta(linkEta),
+        linkBeta(linkBeta)
 {
 }
 
@@ -340,7 +343,7 @@ void ElectrostaticLinkPayload::calculateSecondaryValues(double time)
 void ElectrostaticLinkPayload::calculateRHS(double time)
 {
 	double U = getVoltage();
-	conductivity.rhs = (context()->linkEta * sqr(U / link->length()) - context()->linkBeta) * conductivity.current;
+    conductivity.rhs = (linkEta * sqr(U / link->length()) - linkBeta) * conductivity.current;
 	temperature.rhs = getCurrent() * U / getHeatCapacity();
 }
 
@@ -475,4 +478,31 @@ double ElectrostaticLinkPayload::getHeatCapacity()
 	double volume = Const::pi * sqr(r) * l;
 	double heatCapacity = volume * Const::Si::SpecificHeat::air;
 	return heatCapacity;
+}
+
+/////////////////////////////
+// ElectrostaticNodePayloadFactory
+
+ElectrostaticNodePayloadFactory::ElectrostaticNodePayloadFactory(ElectrostaticPhysicalContext& context) :
+    m_context(context)
+{
+
+}
+
+NodePayloadBase* ElectrostaticNodePayloadFactory::create(PhysicalPayloadsRegister* reg, Node* node)
+{
+    return new ElectrostaticNodePayload(reg, node, m_context.nodeRadiusConductivityDefault, m_context.nodeRadiusBranchingDefault);
+}
+
+/////////////////////////////
+// ElectrostaticLinkPayloadFactory
+ElectrostaticLinkPayloadFactory::ElectrostaticLinkPayloadFactory(ElectrostaticPhysicalContext& context) :
+    m_context(context)
+{
+
+}
+
+LinkPayloadBase* ElectrostaticLinkPayloadFactory::create(PhysicalPayloadsRegister* reg, Link* link)
+{
+    return new ElectrostaticLinkPayload(reg, link, m_context.linkEtaDefault, m_context.linkBetaDefault);
 }

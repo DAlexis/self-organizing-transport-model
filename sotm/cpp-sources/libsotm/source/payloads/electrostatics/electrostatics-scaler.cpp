@@ -12,5 +12,5 @@ ElectrostaticScaler::ElectrostaticScaler(ElectrostaticPhysicalContext* context) 
 void ElectrostaticScaler::scaleStep(double factor)
 {
 	m_context->branchingStep = m_context->branchingStep * factor;
-	m_context->nodeRadiusBranching = m_context->nodeRadiusBranching * sqrt(factor);
+    m_context->nodeRadiusBranchingDefault = m_context->nodeRadiusBranchingDefault * sqrt(factor);
 }

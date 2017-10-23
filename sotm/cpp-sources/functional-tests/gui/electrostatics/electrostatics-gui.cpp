@@ -20,14 +20,17 @@ int main(int argc, char** argv)
 	Random::randomize(0);
 	ModelContext c;
 
-	c.setNodePayloadFactory(std::unique_ptr<INodePayloadFactory>(new ElectrostaticNodePayloadFactory()));
-	c.setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory>(new ElectrostaticLinkPayloadFactory()));
-	c.setPhysicalContext(std::unique_ptr<IPhysicalContext>(new ElectrostaticPhysicalContext()));
+    c.setPhysicalContext(std::unique_ptr<IPhysicalContext>(new ElectrostaticPhysicalContext()));
+    ElectrostaticPhysicalContext* physCont = static_cast<ElectrostaticPhysicalContext*>(c.physicalContext());
+
+    c.setNodePayloadFactory(std::unique_ptr<INodePayloadFactory>(new ElectrostaticNodePayloadFactory(*physCont)));
+    c.setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory>(new ElectrostaticLinkPayloadFactory(*physCont)));
+
 
 	c.parallelSettings.parallelContiniousIteration.calculateSecondaryValues = true;
 	c.parallelSettings.parallelBifurcationIteration.prepareBifurcation = true;
 
-	ElectrostaticPhysicalContext* physCont = static_cast<ElectrostaticPhysicalContext*>(c.physicalContext());
+
 
 	physCont->setDischargeFunc(
 			[](double E) -> double
@@ -49,7 +52,7 @@ int main(int argc, char** argv)
 
 	physCont->conductivityScaler.setScale(Scaler::Scale::log);
 	physCont->conductivityColorMapper.setGreenYellow();
-	physCont->linkEta = 1e-5; // 1e-4; // 1e-5;
+    physCont->linkEtaDefault = 1e-5; // 1e-4; // 1e-5;
 
 	//Vector<3> externalField{0.0, 0.0, 0.6e6};
 	Vector<3> externalField{0.0, 0.0, 0.2e6};
