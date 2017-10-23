@@ -172,14 +172,14 @@ void ModelContext::rebuildBufurcatableVectorIfNeeded()
 			[this](Node* n)
 			{
 				m_bifurcatableObjects.push_back(n->payload.get());
-			}
+            }, false
 		);
 
 		graphRegister.applyLinkVisitorWithoutGraphChganges(
 			[this](Link* l)
 			{
 				m_bifurcatableObjects.push_back(l->payload.get());
-			}
+            }, false
 		);
 		m_lastStateHash = graphRegister.stateHash();
 	}

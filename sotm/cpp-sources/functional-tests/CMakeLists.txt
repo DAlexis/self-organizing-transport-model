@@ -6,7 +6,7 @@ export_include_dirs(
     ${PROJECT_SOURCE_DIR}
 )
 
-configure_file(run-function-tests.sh run-function-tests.sh COPYONLY)
+configure_file(coloring.sh coloring.sh COPYONLY)
 
 add_subdirectory(memory)
 add_subdirectory(gui)

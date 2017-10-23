@@ -13,14 +13,16 @@ set(EXE_SOURCES
 
 include_directories(
     ${sotm_INCLUDE_DIRS}
-    ${sotm-gui_INCLUDE_DIRS}
+	${sotm-gui_INCLUDE_DIRS}
+	${cic_INCLUDE_DIRS}
 )
 
 add_executable(${PROJECT_NAME} ${EXE_SOURCES})
 
 target_link_libraries (${PROJECT_NAME}
     ${sotm_LIBRARY}
-    ${sotm-gui_LIBRARY}
+	${sotm-gui_LIBRARY}
+	${cic_LIBRARY}
     ${Boost_PROGRAM_OPTIONS_LIBRARY} # For command line options parsing for example
 )
 
@@ -32,3 +34,4 @@ add_custom_target(
 add_dependencies(${PROJECT_NAME} gen-config)
 
 configure_file(plot-field.sh plot-field.sh COPYONLY)
+configure_file(plot-field-all.sh plot-field-all.sh COPYONLY)

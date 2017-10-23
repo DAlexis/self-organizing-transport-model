@@ -78,30 +78,38 @@ void GraphRegister::applyLinkVisitor(LinkVisitor v)
 	}
 }
 
-void GraphRegister::applyNodeVisitorWithoutGraphChganges(NodeVisitor v, bool parallel)
+void GraphRegister::applyNodeVisitorWithoutGraphChganges(NodeVisitor v, bool optimizeToVector)
 {
-	/*if (parallel)
-	{
-		if (m_nodesVectorDirty) {
-			updateNodesVector();
-		}
-		tbb::parallel_for( size_t(0), m_nodesVector.size(), [this, v]( size_t i ) {
-			v(m_nodesVector[i]);
-		} );
-	} else {*/
-		for (auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
-		{
-			v(*it);
-		}
-	//}
+    if (optimizeToVector)
+    {
+        buildVectorsForIteration();
+        for (auto& n : m_nodesVector)
+        {
+            v(n);
+        }
+    } else {
+        for (auto& n : m_nodes)
+        {
+            v(n);
+        }
+    }
 }
 
-void GraphRegister::applyLinkVisitorWithoutGraphChganges(LinkVisitor v)
+void GraphRegister::applyLinkVisitorWithoutGraphChganges(LinkVisitor v, bool optimizeToVector)
 {
-	for (auto it = m_links.begin(); it != m_links.end(); ++it)
-	{
-		v(*it);
-	}
+    if (optimizeToVector)
+    {
+        buildVectorsForIteration();
+        for (auto& n : m_linksVector)
+        {
+            v(n);
+        }
+    } else {
+        for (auto& n : m_links)
+        {
+            v(n);
+        }
+    }
 }
 
 Node* GraphRegister::getNearestNode(const Vector<3>& point, bool searchOverReceintlyAdded)
@@ -118,7 +126,7 @@ Node* GraphRegister::getNearestNode(const Vector<3>& point, bool searchOverRecei
 		}
 	};
 
-	applyNodeVisitorWithoutGraphChganges(visitor);
+    applyNodeVisitorWithoutGraphChganges(visitor, false);
 	if (searchOverReceintlyAdded && m_iteratingNow)
 	{
 		for (auto &it : m_nodesToAdd)
@@ -158,8 +166,9 @@ void GraphRegister::endIterating()
 		|| !m_linksToDelete.empty())
 	{
 		changeStateHash();
-	} else
+    } else {
 		return;
+    }
 
 	m_nodes.insert(m_nodesToAdd.begin(), m_nodesToAdd.end());
 
@@ -181,6 +190,21 @@ void GraphRegister::endIterating()
 void GraphRegister::changeStateHash()
 {
 	m_stateHash++;
+}
+
+void GraphRegister::buildVectorsForIteration()
+{
+    if (m_nodesLinksVectorsStateHash != m_stateHash)
+    {
+        std::unique_lock<std::mutex> m_lock(m_nlvecsMutex);
+        // We should double check this condition because two threads may pass first check,
+        // but this check is protected by mutex
+        if (m_nodesLinksVectorsStateHash == m_stateHash)
+            return;
+        m_nodesVector = NodeVector(m_nodes.begin(), m_nodes.end());
+        m_linksVector = LinkVector(m_linksVector.begin(), m_linksVector.end());
+        m_nodesLinksVectorsStateHash = m_stateHash;
+    }
 }
 
 ////////////////////////////
