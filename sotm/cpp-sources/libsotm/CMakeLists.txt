@@ -28,6 +28,7 @@ set(LIB_SOURCE
     ${PROJECT_SOURCE_DIR}/source/payloads/demo/absolute-random-graph.cpp
     ${PROJECT_SOURCE_DIR}/source/payloads/electrostatics/electrostatics-simple.cpp
     ${PROJECT_SOURCE_DIR}/source/payloads/electrostatics/electrostatics-scaler.cpp
+	${PROJECT_SOURCE_DIR}/source/optimizers/coulomb.cpp
 )
 
 set(LIB_HPP
@@ -55,11 +56,13 @@ set(LIB_HPP
     ${PROJECT_SOURCE_DIR}/sotm/base/physical-payload.hpp
     ${PROJECT_SOURCE_DIR}/sotm/base/transport-graph.hpp
     ${PROJECT_SOURCE_DIR}/sotm/base/parameters.hpp
+	${PROJECT_SOURCE_DIR}/sotm/optimizers/coulomb.hpp
 )
 
 # Include dirs that are used and will be exported 
 set(${PROJECT_NAME}_USED_INCDIRS
     ${PROJECT_SOURCE_DIR}
+	${octree_INCLUDE_DIRS}
 )
 
 include_directories(${${PROJECT_NAME}_USED_INCDIRS})
@@ -78,5 +81,6 @@ export_include_dirs(
 # Libraries this projects needs to be linked with
 export_libs(
     ${PROJECT_NAME}
-    tbb 
+	${octree_LIBRARY}
+	tbb
 )

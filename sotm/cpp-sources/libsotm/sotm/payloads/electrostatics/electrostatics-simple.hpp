@@ -10,10 +10,11 @@
 
 #include "sotm/base/physical-payload.hpp"
 #include "sotm/base/parameters.hpp"
+#include "sotm/base/model-context.hpp"
 #include "sotm/math/integration.hpp"
 #include "sotm/math/field.hpp"
 #include "sotm/output/variables.hpp"
-
+#include "sotm/optimizers/coulomb.hpp"
 #include <memory>
 
 namespace sotm
@@ -83,6 +84,7 @@ public:
 
 	Field<1, 3> *externalPotential = &zeroField;
 
+    CoulombOptimizer optimizer{m_model->graphRegister};
 private:
 	bool m_readyToDestroy = false;
 	Function1D m_dischargeProb{zero};
@@ -133,6 +135,8 @@ public:
 	double phi = 0; // Electrostatic potential
 	Vector<3> externalField; // Electric field from other nodes
 
+    // For charge field computations
+    CoulombNode coulombNode{static_cast<ElectrostaticPhysicalContext*>(node->physicalContext())->optimizer, charge.current, *node};
 private:
 	void calculateExtFieldAndPhi();
 	void findTargetToConnect();

@@ -9,4 +9,5 @@ export_include_dirs(
 configure_file(coloring.sh coloring.sh COPYONLY)
 
 add_subdirectory(memory)
+add_subdirectory(determinism)
 add_subdirectory(gui)

@@ -73,18 +73,22 @@ void ElectrostaticPhysicalContext::getElectricField(const Vector<3>& point, Vect
 		Vector<3> r1 = node->pos;
 
 		double dist = (point - r1).len();
-		double dist3 = dist*dist*dist;
+        //double dist3 = dist*dist*dist;
 
 		double charge = static_cast<ElectrostaticNodePayload*>(node->payload.get())->charge.current;
 
-		outPotential += Const::Si::k * charge / dist;
+        double dp = Const::Si::k * charge / dist;
 
-		outField[0] += Const::Si::k * charge * (point[0]-r1[0]) / dist3;
-		outField[1] += Const::Si::k * charge * (point[1]-r1[1]) / dist3;
-		outField[2] += Const::Si::k * charge * (point[2]-r1[2]) / dist3;
+        outPotential += dp;
+
+        double tmp = dp / dist / dist;
+
+        outField[0] += tmp * (point[0]-r1[0]);
+        outField[1] += tmp * (point[1]-r1[1]);
+        outField[2] += tmp * (point[2]-r1[2]);
 	};
 
-	m_model->graphRegister.applyNodeVisitorWithoutGraphChganges(nodeVisitor);
+    m_model->graphRegister.applyNodeVisitorWithoutGraphChganges(nodeVisitor);
 }
 
 bool ElectrostaticPhysicalContext::testConnection(Node* n1, Node* n2)
@@ -161,8 +165,18 @@ double ElectrostaticNodePayload::getMinimalStepsCount()
 
 void ElectrostaticNodePayload::calculateExtFieldAndPhi()
 {
+/*
 	static_cast<ElectrostaticPhysicalContext*>(node->physicalContext())->
 		getElectricField(node->pos, externalField, phi, this->node.data());
+
+*/
+
+    FieldPotential fp = coulombNode.getFP();
+    externalField = fp.field;
+    phi = fp.potential;
+
+    externalField += - GradientFixedStep<3>(*context()->externalPotential, 1e-2) (node->pos);
+    phi += (*context()->externalPotential) (node->pos);
 }
 
 void ElectrostaticNodePayload::findTargetToConnect()

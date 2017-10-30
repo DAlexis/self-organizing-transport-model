@@ -54,6 +54,7 @@ macro(export_libs)
         CACHE INTERNAL "${PROJECT_NAME}: used and exported libs" FORCE)
 endmacro()
 
+add_subdirectory(octree-cpp/src)
 add_subdirectory(libsotm)
 add_subdirectory(libsotm-gui)
 add_subdirectory(utilities)

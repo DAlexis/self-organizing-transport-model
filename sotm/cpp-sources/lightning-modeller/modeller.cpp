@@ -86,6 +86,10 @@ void Modeller::run()
 
 void Modeller::initFileOutput(const std::string& prefix)
 {
+    if (m_p["General"].get<bool>("benchmark"))
+    {
+        return;
+    }
 	m_fileWriteHook.reset(new FileWriteHook(&c, nullptr, m_p["Iter"].get<double>("frame-duration")));
 	m_fileWriteHook->setFilenamePrefix(prefix);
 	m_timeIter->addHook(m_fileWriteHook.get());
@@ -192,7 +196,7 @@ void Modeller::initTimeIterator()
 void Modeller::generateCondEvoParams()
 {
     m_physCont->linkBetaDefault = m_p["Discharge"].get<double>("beta");
-    m_physCont->linkEtaDefault = m_physCont->linkBetaDefault / sqr(m_p["Discharge"].get<double>("field-cond-critical"));
+    m_physCont->linkEtaDefault = m_physCont->linkBetaDefault / sotm::sqr(m_p["Discharge"].get<double>("field-cond-critical"));
 }
 
 void Modeller::genSeeds()

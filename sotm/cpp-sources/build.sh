@@ -17,5 +17,5 @@ fi
 
 mkdir -p $build_dir
 (
-    cd $build_dir && cmake -DCMAKE_BUILD_TYPE=$cfg $source_dir_from_build_dir && make -j `nproc`
+    cd $build_dir && cmake -DCMAKE_BUILD_TYPE=$cfg -Wno-dev $source_dir_from_build_dir && make -j `nproc`
 )

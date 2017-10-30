@@ -1,3 +1,6 @@
 [submodule "sotm/cpp-sources/utilities/cli-ini-config"]
 	path = sotm/cpp-sources/utilities/cli-ini-config
 	url = https://github.com/DAlexis/cli-ini-config.git
+[submodule "sotm/cpp-sources/octree-cpp"]
+	path = sotm/cpp-sources/octree-cpp
+	url = https://github.com/DAlexis/octree-cpp.git
