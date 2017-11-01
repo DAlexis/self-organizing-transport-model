@@ -8,7 +8,7 @@
 #ifndef LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_SCALER_HPP_
 #define LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_SCALER_HPP_
 
-#include "sotm/payloads/electrostatics/electrostatics-simple.hpp"
+#include "sotm/payloads/electrostatics/electrostatics.hpp"
 
 namespace sotm {
 

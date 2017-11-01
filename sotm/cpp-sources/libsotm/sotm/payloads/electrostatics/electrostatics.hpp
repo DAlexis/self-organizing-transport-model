@@ -5,8 +5,8 @@
  *      Author: dalexies
  */
 
-#ifndef LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_SIMPLE_HPP_
-#define LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_SIMPLE_HPP_
+#ifndef LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_HPP_
+#define LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_HPP_
 
 #include "sotm/base/physical-payload.hpp"
 #include "sotm/base/parameters.hpp"
@@ -137,10 +137,12 @@ public:
 
     // For charge field computations
     CoulombNode coulombNode{static_cast<ElectrostaticPhysicalContext*>(node->physicalContext())->optimizer, charge.current, *node};
+
+    static double etaFromCriticalField(double criticalFeild, double beta);
 private:
 	void calculateExtFieldAndPhi();
-	void findTargetToConnect();
-	void connectToTarget();
+	Node* findTargetToConnectByMeanField();
+	void connectToTarget(Node* connectTo);
 	double calculateBranchLen(
 			const Vector<3>& startPoint,
 			const Vector<3>& direction,
@@ -150,8 +152,6 @@ private:
 
 	static double chargeMin;
 	static double chargeMax;
-
-	Node* m_connectTo = nullptr;
 };
 
 class ElectrostaticLinkPayload : public LinkPayloadBase
@@ -223,4 +223,4 @@ private:
 }
 
 
-#endif /* LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_SIMPLE_HPP_ */
+#endif /* LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_HPP_ */

@@ -7,8 +7,10 @@ find_package (Boost COMPONENTS date_time program_options REQUIRED)
 set(EXE_SOURCES
     main.cpp
     modeller.cpp
+	seeds-generator.cpp
     
     modeller.hpp
+	seeds-generator.hpp
 )
 
 include_directories(

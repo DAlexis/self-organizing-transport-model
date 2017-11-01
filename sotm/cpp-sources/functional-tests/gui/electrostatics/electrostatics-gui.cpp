@@ -2,7 +2,7 @@
 
 #include "sotm/base/transport-graph.hpp"
 #include "sotm/base/model-context.hpp"
-#include "sotm/payloads/electrostatics/electrostatics-simple.hpp"
+#include "sotm/payloads/electrostatics/electrostatics.hpp"
 #include "sotm/time-iter/euler-explicit.hpp"
 #include "sotm/time-iter/runge-kutta.hpp"
 #include "sotm/math/random.hpp"
