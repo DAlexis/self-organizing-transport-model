@@ -81,6 +81,7 @@ double RungeKuttaIterator::iterate(double dt)
 
 	m_target->step();
 	m_metrics.timeIterations++;
+    //m_metrics.complexity +=
 	m_time += dt;
 	//cout << (int)m_parameters->outputVerboseLevel << endl;
 	if (m_parameters->outputVerboseLevel != ContiniousIteratorParameters::VerboseLevel::none)

@@ -242,13 +242,23 @@ Node::~Node()
 
 void Node::addLink(Link* link)
 {
+    bool wasEmpty = m_links.empty();
 	m_links.insert(link);
+    if (m_hook && wasEmpty)
+        m_hook(this, false);
 }
 
 void Node::removeLink(Link* link)
 {
 	size_t count = m_links.erase(link);
 	ASSERT(count != 0, "Removing link that was not connected");
+    if (m_hook && m_links.empty())
+        m_hook(this, true);
+}
+
+void Node::setIsolatedUpdateHook(IsolatedUpdateHook hook)
+{
+    m_hook = hook;
 }
 
 void Node::applyConnectedLinksVisitor(LinkVisitor visitor)

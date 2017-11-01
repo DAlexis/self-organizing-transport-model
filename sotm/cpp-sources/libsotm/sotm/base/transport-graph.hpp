@@ -112,11 +112,13 @@ class Node : public ModelContextDependent, public SelfMemMgr
 {
 public:
 	using LinkVisitor = std::function<void(Link*, LinkDirection)>;
+    using IsolatedUpdateHook = std::function<void(Node*, bool isIsolated)>;
 
 	Node(ModelContext* context, Vector<3> pos = Vector<3>());
 	~Node();
 	void addLink(Link* link);
 	void removeLink(Link* link);
+    void setIsolatedUpdateHook(IsolatedUpdateHook hook);
 	void applyConnectedLinksVisitor(LinkVisitor visitor);
 	bool hasNeighbour(Node* node);
 
@@ -126,6 +128,7 @@ public:
 
 private:
 	std::set<Link*> m_links;
+    IsolatedUpdateHook m_hook = nullptr;
 };
 
 

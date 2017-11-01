@@ -5,15 +5,16 @@
  *      Author: dalexies
  */
 
-#ifndef LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_SIMPLE_HPP_
-#define LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_SIMPLE_HPP_
+#ifndef LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_HPP_
+#define LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_HPP_
 
 #include "sotm/base/physical-payload.hpp"
 #include "sotm/base/parameters.hpp"
+#include "sotm/base/model-context.hpp"
 #include "sotm/math/integration.hpp"
 #include "sotm/math/field.hpp"
 #include "sotm/output/variables.hpp"
-
+#include "sotm/optimizers/coulomb.hpp"
 #include <memory>
 
 namespace sotm
@@ -83,6 +84,7 @@ public:
 
 	Field<1, 3> *externalPotential = &zeroField;
 
+    CoulombOptimizer optimizer{m_model->graphRegister};
 private:
 	bool m_readyToDestroy = false;
 	Function1D m_dischargeProb{zero};
@@ -133,10 +135,14 @@ public:
 	double phi = 0; // Electrostatic potential
 	Vector<3> externalField; // Electric field from other nodes
 
+    // For charge field computations
+    CoulombNode coulombNode{static_cast<ElectrostaticPhysicalContext*>(node->physicalContext())->optimizer, charge.current, *node};
+
+    static double etaFromCriticalField(double criticalFeild, double beta);
 private:
 	void calculateExtFieldAndPhi();
-	void findTargetToConnect();
-	void connectToTarget();
+	Node* findTargetToConnectByMeanField();
+	void connectToTarget(Node* connectTo);
 	double calculateBranchLen(
 			const Vector<3>& startPoint,
 			const Vector<3>& direction,
@@ -146,8 +152,6 @@ private:
 
 	static double chargeMin;
 	static double chargeMax;
-
-	Node* m_connectTo = nullptr;
 };
 
 class ElectrostaticLinkPayload : public LinkPayloadBase
@@ -219,4 +223,4 @@ private:
 }
 
 
-#endif /* LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_SIMPLE_HPP_ */
+#endif /* LIBSOTM_SOTM_PAYLOADS_ELECTROSTATICS_ELECTROSTATICS_HPP_ */

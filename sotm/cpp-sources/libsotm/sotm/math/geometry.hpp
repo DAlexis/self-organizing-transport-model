@@ -22,6 +22,11 @@ class Vector
 {
 public:
     
+    Vector(const Vector<dim>& v)
+    {
+        memcpy(x, v.x, sizeof(double)*dim);
+    }
+
     Vector(std::initializer_list<double> initList)
     {
         ASSERT(dim == initList.size(),

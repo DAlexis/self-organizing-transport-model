@@ -86,6 +86,10 @@ void Modeller::run()
 
 void Modeller::initFileOutput(const std::string& prefix)
 {
+    if (m_p["General"].get<bool>("benchmark"))
+    {
+        return;
+    }
 	m_fileWriteHook.reset(new FileWriteHook(&c, nullptr, m_p["Iter"].get<double>("frame-duration")));
 	m_fileWriteHook->setFilenamePrefix(prefix);
 	m_timeIter->addHook(m_fileWriteHook.get());
@@ -192,54 +196,12 @@ void Modeller::initTimeIterator()
 void Modeller::generateCondEvoParams()
 {
     m_physCont->linkBetaDefault = m_p["Discharge"].get<double>("beta");
-    m_physCont->linkEtaDefault = m_physCont->linkBetaDefault / sqr(m_p["Discharge"].get<double>("field-cond-critical"));
+    m_physCont->linkEtaDefault = ElectrostaticNodePayload::etaFromCriticalField(m_p["Discharge"].get<double>("field-cond-critical"), m_physCont->linkBetaDefault);
 }
 
 void Modeller::genSeeds()
 {
-	unsigned int seedsCount = m_p["Seeds"].get<unsigned int>("seeds-number");
-	double dia = m_p["Seeds"].get<double>("seeds-zone-dia");
-	double height = m_p["Seeds"].get<double>("seeds-zone-height");
-	double minDist = m_p["Seeds"].get<double>("seeds-min-dist");
-	bool uniform = m_p["Seeds"].get<bool>("seeds-z-uniform");
-
-	if (seedsCount == 1)
-	{
-		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, Vector<3>(0, 0, -0.2));
-		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, Vector<3>(0, 0, +0.2));
-
-		PtrWrap<Link> l = PtrWrap<Link>::make(&c);
-
-		l->connect(n1, n2);
-	} else {
-		for (unsigned int i=0; i<seedsCount; i++)
-		{
-			double d=0.0;
-			Vector<3> p;
-			do
-			{
-				p[0] = Random::uniform(-dia, dia);
-				p[1] = Random::uniform(-dia, dia);
-				if (uniform)
-					p[2] = -height + 2*height / (seedsCount-1) * i;
-				else
-					p[2] = Random::uniform(-height, height);
-
-				auto nearest = c.graphRegister.getNearestNode(p);
-				if (nearest == nullptr)
-					break;
-				d = (nearest->pos-p).len();
-			} while (d < minDist);
-
-			/// Building initial tree
-			PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, Vector<3>(p[0], p[1], p[2]-0.2));
-			PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, Vector<3>(p[0], p[1], p[2]+0.2));
-
-			PtrWrap<Link> l = PtrWrap<Link>::make(&c);
-
-			l->connect(n1, n2);
-		}
-	}
+    m_sg.generate();
 }
 
 std::string Modeller::getTimeStr()

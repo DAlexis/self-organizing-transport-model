@@ -1,4 +1,4 @@
-#include "sotm/payloads/electrostatics/electrostatics-simple.hpp"
+#include "sotm/payloads/electrostatics/electrostatics.hpp"
 #include "sotm/base/model-context.hpp"
 #include "sotm/utils/const.hpp"
 #include "sotm/math/distrib-gen.hpp"
@@ -73,18 +73,22 @@ void ElectrostaticPhysicalContext::getElectricField(const Vector<3>& point, Vect
 		Vector<3> r1 = node->pos;
 
 		double dist = (point - r1).len();
-		double dist3 = dist*dist*dist;
+        //double dist3 = dist*dist*dist;
 
 		double charge = static_cast<ElectrostaticNodePayload*>(node->payload.get())->charge.current;
 
-		outPotential += Const::Si::k * charge / dist;
+        double dp = Const::Si::k * charge / dist;
 
-		outField[0] += Const::Si::k * charge * (point[0]-r1[0]) / dist3;
-		outField[1] += Const::Si::k * charge * (point[1]-r1[1]) / dist3;
-		outField[2] += Const::Si::k * charge * (point[2]-r1[2]) / dist3;
+        outPotential += dp;
+
+        double tmp = dp / dist / dist;
+
+        outField[0] += tmp * (point[0]-r1[0]);
+        outField[1] += tmp * (point[1]-r1[1]);
+        outField[2] += tmp * (point[2]-r1[2]);
 	};
 
-	m_model->graphRegister.applyNodeVisitorWithoutGraphChganges(nodeVisitor);
+    m_model->graphRegister.applyNodeVisitorWithoutGraphChganges(nodeVisitor);
 }
 
 bool ElectrostaticPhysicalContext::testConnection(Node* n1, Node* n2)
@@ -112,6 +116,20 @@ ElectrostaticNodePayload::ElectrostaticNodePayload(PhysicalPayloadsRegister* reg
         nodeRadiusBranching(nodeRadiusBranching),
         nodeRadiusConductivity(nodeRadiusConductivity)
 {
+
+	// Connecting to node if it is too close
+	Node *nearest = context()->m_model->graphRegister.getNearestNode(node->pos);
+
+	if (nearest != nullptr)
+	{
+		double dist = (nearest->pos - node->pos).len();
+		double r1 = nodeRadiusBranching;
+		double r2 = static_cast<ElectrostaticNodePayload*>(nearest->payload.get())->nodeRadiusBranching;
+		if (dist < r1 + r2)
+		{
+			connectToTarget(nearest);
+		}
+	}
 }
 
 void ElectrostaticNodePayload::clearSubiteration()
@@ -161,32 +179,44 @@ double ElectrostaticNodePayload::getMinimalStepsCount()
 
 void ElectrostaticNodePayload::calculateExtFieldAndPhi()
 {
+/*
 	static_cast<ElectrostaticPhysicalContext*>(node->physicalContext())->
 		getElectricField(node->pos, externalField, phi, this->node.data());
+
+*/
+
+    FieldPotential fp = coulombNode.getFP();
+    externalField = fp.field;
+    phi = fp.potential;
+
+    externalField += - GradientFixedStep<3>(*context()->externalPotential, 1e-2) (node->pos);
+    phi += (*context()->externalPotential) (node->pos);
 }
 
-void ElectrostaticNodePayload::findTargetToConnect()
+Node* ElectrostaticNodePayload::findTargetToConnectByMeanField()
 {
-	m_connectTo = nullptr;
+	Node* result = nullptr;
 
-	GraphRegister::NodeVisitor nodeVisitor = [this](Node* n)
+	GraphRegister::NodeVisitor nodeVisitor = [&result, this](Node* n)
 	{
 		if (n <= this->node.data()) // To prevent double connections
 			return;
 
 		if (context()->testConnection(this->node, n)) // We are not already connected
-			m_connectTo = n;
+			result = n;
 	};
 
 	context()->m_model->graphRegister.applyNodeVisitorWithoutGraphChganges(nodeVisitor);
+
+	return result;
 }
 
-void ElectrostaticNodePayload::connectToTarget()
+void ElectrostaticNodePayload::connectToTarget(Node* connectTo)
 {
-	if (m_connectTo != nullptr)
+	if (connectTo != nullptr)
 	{
 		PtrWrap<Link> newLink = PtrWrap<Link>::make(context()->m_model);
-		newLink->connect(this->node, m_connectTo);
+		newLink->connect(this->node, connectTo);
 		newLink->payload->init();
 		//cout << "Connection!!!" << endl;
 	}
@@ -194,13 +224,13 @@ void ElectrostaticNodePayload::connectToTarget()
 
 void ElectrostaticNodePayload::prepareBifurcation(double time, double dt)
 {
-	findTargetToConnect();
+	findTargetToConnectByMeanField();
 }
 
 void ElectrostaticNodePayload::doBifurcation(double time, double dt)
 {
 	//findTargetToConnect();
-	connectToTarget();
+	connectToTarget(findTargetToConnectByMeanField());
 
 	// Check if physics tells us we can release parent object
 	if (context()->readyToDestroy())
@@ -317,6 +347,11 @@ void ElectrostaticNodePayload::setChargeColorLimits(double chargeMin, double cha
 {
 	ElectrostaticNodePayload::chargeMin = chargeMin;
 	ElectrostaticNodePayload::chargeMax = chargeMax;
+}
+
+double ElectrostaticNodePayload::etaFromCriticalField(double criticalFeild, double beta)
+{
+    return beta / sotm::sqr(criticalFeild);
 }
 
 ////////////////////////////////////

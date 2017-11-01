@@ -191,6 +191,7 @@ struct ContiniousIteratorMetrics
 {
 	size_t totalStepCalculations = 0;
 	size_t timeIterations = 0;
+    size_t complexity = 0;
 
     double adaptationEfficiency() { return double(timeIterations) / totalStepCalculations; }
 };
