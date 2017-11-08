@@ -149,14 +149,14 @@ void Modeller::initScalersAndColors()
 void Modeller::initParameters()
 {
 	m_physCont->setDischargeFunc(
-			[](double E) -> double
-			{
-				if (E > 0.5e6) // 20 kV/cm
-					return (E - 0.5e6)/2e6 * 5e7;
-				if (E < -1e6) // 20 kV/cm
-					return (-E - 1e6)/2e6 * 5e7;
-				return 0.0;
-			}
+		[](double E) -> double
+		{
+			if (E > 0.5e6)
+				return (E - 0.5e6)/2e6 * 5e7;
+			if (E < -1e6)
+				return (-E - 1e6)/2e6 * 5e7;
+			return 0.0;
+		}
 	);
 
     m_physCont->nodeRadiusConductivityDefault = m_p["Geometry"].get<double>("node-radius-conductivity-default");

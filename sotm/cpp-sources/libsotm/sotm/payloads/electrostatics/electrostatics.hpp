@@ -138,7 +138,7 @@ public:
     // For charge field computations
     CoulombNode coulombNode{static_cast<ElectrostaticPhysicalContext*>(node->physicalContext())->optimizer, charge.current, *node};
 
-    static double etaFromCriticalField(double criticalFeild, double beta);
+    static double etaFromCriticalField(double criticalFeild, double beta); // Move this to context
 private:
 	void calculateExtFieldAndPhi();
 	Node* findTargetToConnectByMeanField();

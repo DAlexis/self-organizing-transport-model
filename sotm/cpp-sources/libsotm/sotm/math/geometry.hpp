@@ -153,7 +153,7 @@ public:
         return ! (*this == right);
     }
     
-    /// Vector product
+
     Vector<dim> operator*(double right) const
     {
         Vector<dim> result;
@@ -172,6 +172,7 @@ public:
     	return result;
     }
 
+    /// Vector product
     Vector<dim> operator*(const Vector<dim>& right) const
     {
     	Vector<dim> result;
@@ -241,11 +242,18 @@ public:
 template<int dim>
 double angle(Vector<dim> v1, Vector<dim> v2)
 {
-	double c = v1^v2/v1.len()/v2.len();
+	double c = (v1^v2)/v1.len()/v2.len();
 	if (c > 1.0) c = 1.0;
 	if (c <-1.0) c =-1.0;
 	return acos(c);
 }
+
+template<int dim>
+Vector<dim> project(Vector<dim> what, Vector<dim> where)
+{
+	return where*(what^where)/where.len();
+}
+
 
 void createRotationMatrix(SquareMatrix<3>& matrix, Direction axis, double angle);
 void createRotationMatrix(SquareMatrix<3>& matrix, Direction axis, double cos, double sin);
