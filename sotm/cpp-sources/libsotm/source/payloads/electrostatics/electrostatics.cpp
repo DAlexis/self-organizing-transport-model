@@ -127,7 +127,8 @@ ElectrostaticNodePayload::ElectrostaticNodePayload(PhysicalPayloadsRegister* reg
 		double r2 = static_cast<ElectrostaticNodePayload*>(nearest->payload.get())->nodeRadiusBranching;
 		if (dist < r1 + r2)
 		{
-			connectToTarget(nearest);
+			if (!this->node->hasNeighbour(nearest))
+				connectToTarget(nearest);
 		}
 	}
 }
@@ -142,7 +143,6 @@ void ElectrostaticNodePayload::calculateSecondaryValues(double time)
 	calculateExtFieldAndPhi();
 
     double capacity = nodeRadiusConductivity / Const::Si::k;
-	externalField = externalField * 3;
 	phi += charge.current / capacity;
 }
 
@@ -218,7 +218,6 @@ void ElectrostaticNodePayload::connectToTarget(Node* connectTo)
 		PtrWrap<Link> newLink = PtrWrap<Link>::make(context()->m_model);
 		newLink->connect(this->node, connectTo);
 		newLink->payload->init();
-		//cout << "Connection!!!" << endl;
 	}
 }
 
@@ -248,13 +247,14 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 {
     double radius = nodeRadiusBranching;
 	double E1 = Const::Si::k*charge.current / sqr(radius);
+	double E0 = (externalField*3).len();
 	DistributionResult<SphericalPoint> res = generateDischargeDirection(
-			dt,
-			radius,
-			externalField.len(),
-			E1,
-			context()->m_dischargeProb,
-			context()->m_integralOfProb->function()
+		dt,
+		radius,
+		E0,
+		E1,
+		context()->m_dischargeProb,
+		context()->m_integralOfProb->function()
 	);
 	branchingParameters.needBranching = res.isHappened;
 	if (branchingParameters.needBranching)
@@ -277,12 +277,24 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 		//if (nearest && dist < radius*2.0)
 		if (nearest && dist < context()->branchingStep*0.3)
 		{
-			//cout << "Branching disabled" << endl;
 			branchingParameters.needBranching = false;
 		}
 
 		branchingParameters.length = len;
 		//cout << "Branching" << endl;
+		/*
+        // This code for debugging branching process
+		if (branchingParameters.needBranching)
+		{
+			double pot; Vector<3> field;
+
+			// External field
+			context()->getElectricField(branchStartPoint, field, pot, node.data());
+			field = project(field, branchingParameters.direction);
+			std::cout << "[b] External E_n = " << field.len() << "; E_1 = " << E1 << std::endl;
+			std::cout << "[b] Total without 3: " << field.len() + E1 << std::endl;
+			std::cout << "[b] Total with 3: " << 3*field.len() + E1 << std::endl;
+		}*/
 	}
 }
 
