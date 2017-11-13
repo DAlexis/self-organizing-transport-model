@@ -33,12 +33,10 @@ public:
 	void makeSubIteration(double dt) override;
 	void step() override;
 
-	void doBifurcation(double time, double dt) { UNUSED_ARG(time); UNUSED_ARG(dt); }
+    void doBifurcation(double time, double dt) override;
 
 	void setDischargeFunc(Function1D func);
-
 	void getElectricField(const Vector<3>& point, Vector<3>& outField, double& outPotential, const Node* excludeNode = nullptr);
-
 	bool testConnection(Node* n1, Node* n2);
 
 	static inline ElectrostaticPhysicalContext* cast(IPhysicalContext* context)

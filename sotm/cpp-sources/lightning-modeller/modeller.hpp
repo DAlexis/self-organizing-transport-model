@@ -38,7 +38,7 @@ private:
 	void initParameters();
 	void initTimeIterator();
 	void generateCondEvoParams();
-	void genSeeds();
+    void initSeeds();
 
 	static std::string getTimeStr();
 
@@ -92,13 +92,16 @@ private:
 		    cic::Parameter<unsigned int>("seeds-number", "Count of seed streamers in zone", 1),
 		    cic::Parameter<double>("seeds-zone-height",  "Height of zone where seeds will be generated", 15.0),
 		    cic::Parameter<double>("seeds-zone-dia",     "Diameter of zone where seeda will be generated", 5),
-		    cic::Parameter<double>("seeds-min-dist",     "Critical field that maintain glow discharge", 0.24e6),
+            cic::Parameter<double>("seeds-min-dist",     "Minimal distance between seeds", 0.01),
             cic::Parameter<double>("seed-size",          "Size of seed's link", 0.4),
             cic::Parameter<double>("seed-radius-cond",   "Seeds' node radius for conductivity", 0.03),
             cic::Parameter<double>("seed-radius-branch", "Seeds' node radius for branching", 0.05),
             cic::Parameter<double>("seed-beta",          "Seeds' link beta", 2e7),
             cic::Parameter<double>("seed-field-cond-critical", "Seeds' link critical field", 0.3e6),
-            cic::Parameter<bool>("seeds-z-uniform",      "Place seeds uniformly by z, without random")
+            cic::Parameter<bool>("seeds-z-uniform",      "Place seeds uniformly by z, without random"),
+            cic::Parameter<bool>("seeds-dynamic",        "Add seeds in process of evolution"),
+            cic::Parameter<size_t>("seeds-dynamic-count","Count of seeds that should be added dynamically in process of evolution", 10000),
+            cic::Parameter<double>("seeds-dynamic-count-per-vol-per-sec", "Count of seeds appearing in 1m^3 per 1s", 100)
 		),
 		cic::ParametersGroup(
 		    "Field",
