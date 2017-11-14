@@ -21,10 +21,10 @@ void SeedsGenerator::AddSeedsHook::hook(double realTime, double wantedTime)
     size_t needCountTillNow = realTime / m_sg.m_addSeedPeriod + m_sg.seedsCount;
     size_t toAdd = needCountTillNow - m_sg.m_currentCount;
 
-    std::cout << "Need to add " << toAdd << " seeds" << std::endl;
+    //std::cout << "Need to add " << toAdd << " seeds" << std::endl;
     for (size_t i=0; i<toAdd; i++)
     {
-        std::cout << "Adding seed" << std::endl;
+        //std::cout << "Adding seed" << std::endl;
         m_sg.addSeed();
     }
 }
@@ -121,12 +121,16 @@ void SeedsGenerator::addSeed()
     /// Building initial tree
     PtrWrap<Node> n1 = PtrWrap<Node>::make(&m_c, Vector<3>(p[0], p[1], p[2]-seedSize/2.0));
     PtrWrap<Node> n2 = PtrWrap<Node>::make(&m_c, Vector<3>(p[0], p[1], p[2]+seedSize/2.0));
+    PtrWrap<Link> l = PtrWrap<Link>::make(&m_c);
+    l->connect(n1, n2);
+
+    n1->payload->init();
+    n2->payload->init();
+    l->payload->init();
+
     setNodeParameters(n1);
     setNodeParameters(n2);
-
-    PtrWrap<Link> l = PtrWrap<Link>::make(&m_c);
     setLinkParameters(l);
 
-    l->connect(n1, n2);
     m_currentCount++;
 }
