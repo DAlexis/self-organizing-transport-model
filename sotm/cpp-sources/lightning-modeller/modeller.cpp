@@ -48,8 +48,11 @@ void Modeller::run()
     c.setNodePayloadFactory(std::unique_ptr<INodePayloadFactory>(new ElectrostaticNodePayloadFactory(*m_physCont)));
     c.setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory>(new ElectrostaticLinkPayloadFactory(*m_physCont)));
 
-	c.parallelSettings.parallelContiniousIteration.calculateSecondaryValues = true;
-	c.parallelSettings.parallelBifurcationIteration.prepareBifurcation = true;
+    if (!m_p["General"].get<bool>("no-threads"))
+    {
+        c.parallelSettings.parallelContiniousIteration.calculateSecondaryValues = true;
+        c.parallelSettings.parallelBifurcationIteration.prepareBifurcation = true;
+    }
 
 	initTimeIterator();
 	initExternalPotential();

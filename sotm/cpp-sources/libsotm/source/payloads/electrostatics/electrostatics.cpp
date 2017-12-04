@@ -30,6 +30,7 @@ bool ElectrostaticPhysicalContext::readyToDestroy()
 
 void ElectrostaticPhysicalContext::calculateSecondaryValues(double time)
 {
+    optimizer->rebuildOptimization();
 }
 
 void ElectrostaticPhysicalContext::calculateRHS(double time)
@@ -50,6 +51,12 @@ void ElectrostaticPhysicalContext::makeSubIteration(double dt)
 void ElectrostaticPhysicalContext::step()
 {
 
+}
+
+void ElectrostaticPhysicalContext::init()
+{
+    std::cout << "Here!" << std::endl;
+    optimizer->rebuildOptimization();
 }
 
 void ElectrostaticPhysicalContext::doBifurcation(double time, double dt)
@@ -190,7 +197,7 @@ void ElectrostaticNodePayload::calculateExtFieldAndPhi()
 
 */
 
-    FieldPotential fp = coulombNode.getFP();
+    FieldPotential fp = coulombNode->getFP();
     externalField = fp.field;
     phi = fp.potential;
 

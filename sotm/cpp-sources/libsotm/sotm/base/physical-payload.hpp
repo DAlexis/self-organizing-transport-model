@@ -47,7 +47,7 @@ public:
 	virtual ~AnyPhysicalPayloadBase();
 
 	/**
-	 * This function will be called when after payload is connected to link.
+     * This function will be called when after payload is connected to link or node.
 	 * Initial values for variables may be set here
 	 *
 	 * todo: check real usage of this function
@@ -88,6 +88,11 @@ class IPhysicalContext : public IContinuousTimeIterable, public IBifurcationTime
 public:
 	virtual ~IPhysicalContext() {}
 	virtual void connectModel(ModelContext* m) = 0;
+    /**
+     * @brief This function will be called after init() of all payloads.
+     * It is a place to first prepairing for optimizatiors i.e.
+     */
+    virtual void init() = 0;
 };
 
 class PhysicalContextBase : public IPhysicalContext
@@ -96,6 +101,7 @@ public:
 	void connectModel(ModelContext* m) override { m_model = m; }
 	virtual void clearSubiteration() override { }
 	virtual void prepareBifurcation(double time, double dt) override { }
+    virtual void init() override {}
 
 protected:
 	ModelContext* m_model = nullptr;

@@ -58,7 +58,8 @@ private:
 		    "General",
 		    "General options",
             cic::Parameter<bool>("no-gui", "Work without GUI", cic::ParamterType::cmdLine),
-            cic::Parameter<bool>("benchmark", "Do not output data", cic::ParamterType::cmdLine)
+            cic::Parameter<bool>("benchmark", "Do not output data", cic::ParamterType::cmdLine),
+            cic::Parameter<bool>("no-threads", "Run in signle thread", cic::ParamterType::cmdLine)
 		),
 		cic::ParametersGroup(
 		    "Iter",

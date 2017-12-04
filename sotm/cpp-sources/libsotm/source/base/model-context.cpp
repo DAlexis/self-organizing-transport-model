@@ -146,6 +146,7 @@ void ModelContext::initAllPhysicalPayloads()
 			l->payload->init();
 		}
 	);
+    m_physicalContext->init();
 }
 
 void ModelContext::branchIteration(double time, double dt, Node* node)
