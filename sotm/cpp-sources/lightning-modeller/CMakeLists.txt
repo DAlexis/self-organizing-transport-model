@@ -7,16 +7,22 @@ find_package (Boost COMPONENTS date_time program_options REQUIRED)
 set(EXE_SOURCES
     main.cpp
     modeller.cpp
-	seeds-generator.cpp
+    seeds-generator.cpp
+    coulomb-selector.cpp
     
     modeller.hpp
-	seeds-generator.hpp
+    seeds-generator.hpp
+    coulomb-selector.hpp
+)
+
+set(${PROJECT_NAME}_USED_INCDIRS
+    ${sotm_INCLUDE_DIRS}
+    ${sotm-gui_INCLUDE_DIRS}
+    ${cic_INCLUDE_DIRS}
 )
 
 include_directories(
-    ${sotm_INCLUDE_DIRS}
-	${sotm-gui_INCLUDE_DIRS}
-	${cic_INCLUDE_DIRS}
+    ${${PROJECT_NAME}_USED_INCDIRS}
 )
 
 add_executable(${PROJECT_NAME} ${EXE_SOURCES})
@@ -37,3 +43,9 @@ add_dependencies(${PROJECT_NAME} gen-config)
 
 configure_file(plot-field.sh plot-field.sh COPYONLY)
 configure_file(plot-field-all.sh plot-field-all.sh COPYONLY)
+
+# This is for unit tests
+export_include_dirs(
+    ${PROJECT_SOURCE_DIR}
+    ${${PROJECT_NAME}_USED_INCDIRS}
+)

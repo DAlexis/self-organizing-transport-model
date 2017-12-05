@@ -7,3 +7,4 @@ export_include_dirs(
 )
 
 add_subdirectory(libsotm-ut)
+add_subdirectory(lightning-modeller-ut)
