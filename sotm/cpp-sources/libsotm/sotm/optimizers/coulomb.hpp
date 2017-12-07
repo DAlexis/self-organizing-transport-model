@@ -4,7 +4,9 @@
 #include "sotm/math/geometry.hpp"
 #include "sotm/base/transport-graph.hpp"
 #include "octree.hpp"
+#include <string>
 #include <unordered_set>
+#include <atomic>
 
 namespace sotm {
 
@@ -116,6 +118,7 @@ public:
      */
     void rebuildOptimization() override;
 
+    octree::DiscreteScales& scales();
 private:
     void addCN(CoulombNodeBase& cn) override;
     void removeCN(CoulombNodeBase& cn) override;
@@ -165,8 +168,14 @@ public:
     CoulombNodeBase* makeNode(double& charge, Node& thisNode) override;
 
 private:
+    std::string diffStr(const FieldPotential& r1, const FieldPotential& r2);
+    double err(double v1, double v2);
+    std::string header();
     std::unique_ptr<IColoumbCalculator> m_c1;
     std::unique_ptr<IColoumbCalculator> m_c2;
+    std::atomic<size_t> m_counter{0};
+
+    double m_maxDiff = 0.0;
 };
 
 class CoulombComaratorNode : public CoulombNodeBase

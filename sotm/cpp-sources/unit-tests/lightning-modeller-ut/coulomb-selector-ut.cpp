@@ -16,7 +16,7 @@ TEST(ScalesParsing, Trivial)
 TEST(ScalesParsing, WellFormatted)
 {
     octree::DiscreteScales ds;
-    ASSERT_NO_THROW(CoulombSelector::parseScales(ds, "(1.0, 5.0); (3.0, 6.0); (10.0, 7.0); (100.0, 8.0)"));
+    ASSERT_NO_THROW(CoulombSelector::parseScales(ds, "(1.0, 5.0);     (3.0, 6.0); \t(10.0, 7.0); (100.0, 8.0)"));
     EXPECT_EQ(ds.findScale(0.0), 0.0);
     EXPECT_EQ(ds.findScale(1.1), 5.0);
     EXPECT_EQ(ds.findScale(3.1), 6.0);

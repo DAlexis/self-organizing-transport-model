@@ -9,6 +9,7 @@
 #define LIGHTNING_MODELLER_MODELLER_HPP_
 
 #include "seeds-generator.hpp"
+#include "coulomb-selector.hpp"
 
 #include "sotm/base/transport-graph.hpp"
 #include "sotm/base/model-context.hpp"
@@ -26,6 +27,7 @@
 class Modeller
 {
 public:
+    Modeller();
 	bool parseCmdLineArgs(int argc, char** argv);
 	void run();
 
@@ -52,6 +54,7 @@ private:
 
 	sotm::ContiniousIteratorParameters m_timeIterParams;
 
+    /// @todo: Each module should add its own group here by himself
 	cic::Parameters m_p{
 		"Lightning modeller command line options",
 		cic::ParametersGroup(
@@ -114,6 +117,7 @@ private:
 	};
 
     SeedsGenerator m_sg{m_p["Seeds"], c};
+    CoulombSelector m_coulombSelector{m_p};
 
 	int m_argc = 0;
 	char** m_argv = nullptr;

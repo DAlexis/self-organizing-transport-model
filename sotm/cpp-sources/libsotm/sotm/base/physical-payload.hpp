@@ -103,6 +103,7 @@ public:
 	virtual void prepareBifurcation(double time, double dt) override { }
     virtual void init() override {}
 
+    ModelContext& model() { return *m_model; }
 protected:
 	ModelContext* m_model = nullptr;
 };

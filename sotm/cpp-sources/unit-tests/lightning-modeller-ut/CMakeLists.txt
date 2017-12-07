@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 project(lightning-modeller-unit-tests)
 
 find_package (GTest REQUIRED)
+find_package (Boost COMPONENTS program_options REQUIRED)
 
 include_directories (
     ${GTEST_INCLUDE_DIR}
@@ -26,6 +27,9 @@ target_link_libraries (${PROJECT_NAME}
     gtest
     gtest_main
     ${sotm_LIBRARY}
+	${sotm-gui_LIBRARY}
+	${cic_LIBRARY}
+	${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
 export_include_dirs(

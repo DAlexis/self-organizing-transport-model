@@ -83,18 +83,11 @@ public:
 
 	Field<1, 3> *externalPotential = &zeroField;
 
-    /*
+
     std::unique_ptr<IColoumbCalculator> optimizer{
         new CoulombBruteForce(m_model->graphRegister)
     };
-    */
 
-    std::unique_ptr<IColoumbCalculator> optimizer{
-        new CoulombComarator(
-            std::unique_ptr<IColoumbCalculator>(new CoulombBruteForce(m_model->graphRegister)),
-            std::unique_ptr<IColoumbCalculator>(new CoulombBruteForce(m_model->graphRegister))
-        )
-    };
 private:
 	bool m_readyToDestroy = false;
 	Function1D m_dischargeProb{zero};

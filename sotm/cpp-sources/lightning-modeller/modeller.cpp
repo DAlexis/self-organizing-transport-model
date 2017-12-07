@@ -9,10 +9,17 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
+#include <fenv.h>
 
 using namespace sotm;
 using namespace std;
 
+Modeller::Modeller()
+{
+#ifdef DEBUG
+    feenableexcept(FE_INVALID | FE_OVERFLOW);
+#endif
+}
 
 bool Modeller::parseCmdLineArgs(int argc, char** argv)
 {
@@ -47,6 +54,8 @@ void Modeller::run()
 
     c.setNodePayloadFactory(std::unique_ptr<INodePayloadFactory>(new ElectrostaticNodePayloadFactory(*m_physCont)));
     c.setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory>(new ElectrostaticLinkPayloadFactory(*m_physCont)));
+
+    m_coulombSelector.addCoulombCalculator(*m_physCont);
 
     if (!m_p["General"].get<bool>("no-threads"))
     {

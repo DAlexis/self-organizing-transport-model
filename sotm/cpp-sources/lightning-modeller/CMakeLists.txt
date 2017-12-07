@@ -31,7 +31,7 @@ target_link_libraries (${PROJECT_NAME}
     ${sotm_LIBRARY}
 	${sotm-gui_LIBRARY}
 	${cic_LIBRARY}
-    ${Boost_PROGRAM_OPTIONS_LIBRARY} # For command line options parsing for example
+	${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
 add_custom_target(

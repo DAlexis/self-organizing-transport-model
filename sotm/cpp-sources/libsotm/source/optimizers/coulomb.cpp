@@ -2,6 +2,8 @@
 #include "sotm/utils/const.hpp"
 
 #include <iostream>
+#include <sstream>
+#include <cmath>
 
 using namespace sotm;
 
@@ -144,7 +146,7 @@ FieldPotential CoulombNodeBruteForce::getFP()
 CoulombOctree::CoulombOctree(GraphRegister& graph) :
     m_graph(graph)
 {
-    // todo: add scales to m_scales
+
 }
 
 FieldPotential CoulombOctree::getFP(Vector<3> pos, CoulombNodeBase* exclude)
@@ -165,7 +167,6 @@ FieldPotential CoulombOctree::getFP(Vector<3> pos, CoulombNodeBase* exclude)
     } else {
         octreeResult  = m_convolution.convolute(m_octreePositive, pos.x, convolutionVisitor);
         octreeResult += m_convolution.convolute(m_octreeNegative, pos.x, convolutionVisitor);
-
     }
 
     return octreeResult;
@@ -191,6 +192,11 @@ void CoulombOctree::rebuildOptimization()
         else
             m_octreeNegative.add(it->m_ectreeElement);
     }
+}
+
+octree::DiscreteScales& CoulombOctree::scales()
+{
+    return m_scales;
 }
 
 void CoulombOctree::addCN(CoulombNodeBase& cn)
@@ -251,7 +257,10 @@ CoulombComarator::CoulombComarator(std::unique_ptr<IColoumbCalculator> c1, std::
 
 FieldPotential CoulombComarator::getFP(Vector<3> pos, CoulombNodeBase* exclude)
 {
-    return m_c1->getFP(pos, static_cast<CoulombComaratorNode*>(exclude)->m_n1.get());
+    FieldPotential r1 = m_c1->getFP(pos, static_cast<CoulombComaratorNode*>(exclude)->m_n1.get());
+    FieldPotential r2 = m_c2->getFP(pos, static_cast<CoulombComaratorNode*>(exclude)->m_n2.get());
+    std::cout << diffStr(r1, r2) << std::endl;
+    return r1;
 }
 
 void CoulombComarator::rebuildOptimization()
@@ -279,6 +288,45 @@ CoulombNodeBase* CoulombComarator::makeNode(double& charge, Node& thisNode)
         std::unique_ptr<CoulombNodeBase>(m_c1->makeNode(charge, thisNode)),
         std::unique_ptr<CoulombNodeBase>(m_c2->makeNode(charge, thisNode))
     );
+}
+
+std::string CoulombComarator::diffStr(const FieldPotential& r1, const FieldPotential& r2)
+{
+    std::ostringstream oss;
+    m_counter++;
+
+    if (std::isnan(r2.potential))
+        oss << header() << "[ERROR] r2.potential == nan" << std::endl;
+
+    for (int i=0; i<3; i++)
+        if (std::isnan(r2.field[i]))
+            oss << header() << "[ERROR] r2.field[" << i << "]== nan" << std::endl;
+
+    oss << header() << " eps(potential) = " << err(r1.potential, r2.potential) << std::endl;
+
+    for (int i=0; i<3; i++)
+    {
+        oss << header() << " eps(E[" << i << "]) = " << err(r1.field[i], r2.field[i]) << std::endl;
+    }
+
+    oss << header() << " max error = " << m_maxDiff;
+    return oss.str();
+}
+
+double CoulombComarator::err(double v1, double v2)
+{
+    double err = 0.0;
+    v1 = fabs(v1); v2 = fabs(v2);
+    if (v1 != 0.0 || v2 != 0.0)
+        err = fabs(v1-v2) / std::max(v1, v2);
+    if (err > m_maxDiff)
+        m_maxDiff = err;
+    return err;
+}
+
+std::string CoulombComarator::header()
+{
+    return std::string("[Compare ") + std::to_string(m_counter) + "] ";
 }
 
 ////////////////////////
