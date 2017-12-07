@@ -104,7 +104,7 @@ void CoulombBruteForce::buildNodesVector()
 
 FieldPotential CoulombBruteForce::convolutionVisitor(const Position& target, const Position& object, double mass)
 {
-    double dist = (target - object).len();
+    double dist = target.distTo(object);
     double charge = mass;
 
     double p = Const::Si::k * charge / dist;
@@ -211,17 +211,20 @@ void CoulombOctree::removeCN(CoulombNodeBase& cn)
 
 FieldPotential CoulombOctree::convolutionVisitor(const Position& target, const Position& object, double mass)
 {
-    double dist = (target - object).len();
+    double dist = target.distTo(object);
     double charge = mass;
 
     double p = Const::Si::k * charge / dist;
-    double tmp = p / dist / dist;
+    double tmp = p / (dist * dist);
 
     FieldPotential fp;
+    const double *p1 = target.x;
+    const double *p2 = object.x;
+    double *pres = fp.field.x;
     fp.potential = p;
-    fp.field.x[0] = tmp * (target.x[0]-object.x[0]);
-    fp.field.x[1] = tmp * (target.x[1]-object.x[1]);
-    fp.field.x[2] = tmp * (target.x[2]-object.x[2]);
+    for (int i=0; i<3; i++)
+        pres[i] = tmp * (p1[i]-p2[i]);
+
     return fp;
 }
 
