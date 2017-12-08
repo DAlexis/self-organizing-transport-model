@@ -63,6 +63,34 @@ void CoulombSelector::parseScales(octree::DiscreteScales& target, const std::str
     }
 }
 
+std::unique_ptr<const octree::IScalesConfig> CoulombSelector::generateScales()
+{
+    std::unique_ptr<octree::IScalesConfig> result;
+
+    std::string scalesConfig = m_pg.get<std::string>("octree-scales");
+    scalesConfig.erase(std::remove_if(scalesConfig.begin(), scalesConfig.end(), ::isspace), scalesConfig.end());
+    std::vector<std::string> substrs;
+    boost::split(substrs, scalesConfig, boost::is_any_of(":"));
+    if (substrs.size() == 1)
+    {
+        std::cout << "Crating discrete" << std::endl;
+        result.reset(new octree::DiscreteScales());
+        parseScales(static_cast<octree::DiscreteScales&>(*result), substrs[0]);
+    } else if (substrs.size() == 2 && substrs[0] == "discrete")
+    {
+        std::cout << "Crating discrete" << std::endl;
+        result.reset(new octree::DiscreteScales());
+        parseScales(static_cast<octree::DiscreteScales&>(*result), substrs[1]);
+    } else if (substrs.size() == 2 && substrs[0] == "linear")
+    {
+        std::cout << "Crating linear" << std::endl;
+        result.reset(new octree::LinearScales(stod(substrs[1])));
+    } else {
+        throw std::runtime_error(std::string("Scales string format os bad: ") + m_pg.get<std::string>("octree-scales"));
+    }
+    return std::unique_ptr<const octree::IScalesConfig>(std::move(result)); // Making const unique_ptr
+}
+
 std::unique_ptr<IColoumbCalculator> CoulombSelector::produce(ElectrostaticPhysicalContext& c, const std::string& method)
 {
     std::unique_ptr<IColoumbCalculator> result;
@@ -74,11 +102,8 @@ std::unique_ptr<IColoumbCalculator> CoulombSelector::produce(ElectrostaticPhysic
     } else if (method == "octree")
     {
         cout << "Creating octree-based optimization for coulomb field calculator" << endl;
-        result.reset(new CoulombOctree(c.model().graphRegister));
-        parseScales(
-            static_cast<CoulombOctree*>(result.get())->scales(),
-            m_pg.get<std::string>("octree-scales")
-        );
+
+        result.reset(new CoulombOctree(c.model().graphRegister, generateScales()));
     }
     return result;
 }

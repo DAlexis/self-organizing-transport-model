@@ -20,6 +20,8 @@ struct FieldPotential
     double potential = 0.0;
 
     FieldPotential& operator+=(const FieldPotential& right);
+
+    static FieldPotential convolutionVisitor(const Position& target, const Position& object, double mass);
 };
 
 class ICoulombNode
@@ -73,8 +75,6 @@ private:
     void removeCN(CoulombNodeBase& cn) override;
     void buildNodesVector();
 
-    static FieldPotential convolutionVisitor(const Position& target, const Position& object, double mass);
-
     GraphRegister& m_graph;
     /// @todo Use unordered_set
     //std::set<CoulombNode*> m_nodesIsolated;
@@ -109,7 +109,7 @@ class CoulombNodeOctree;
 class CoulombOctree: public IColoumbCalculator
 {
 public:
-    CoulombOctree(GraphRegister& graph);
+    CoulombOctree(GraphRegister& graph, std::unique_ptr<const octree::IScalesConfig> scales);
     FieldPotential getFP(Vector<3> pos, CoulombNodeBase* exclude = nullptr) override;
     CoulombNodeBase* makeNode(double& charge, Node& thisNode) override;
 
@@ -117,13 +117,9 @@ public:
      * @brief build positive and negative octree
      */
     void rebuildOptimization() override;
-
-    octree::DiscreteScales& scales();
 private:
     void addCN(CoulombNodeBase& cn) override;
     void removeCN(CoulombNodeBase& cn) override;
-
-    static FieldPotential convolutionVisitor(const Position& target, const Position& object, double mass);
 
     GraphRegister& m_graph;
     std::set<CoulombNodeOctree*> m_nodesNotIsolated;
@@ -131,8 +127,8 @@ private:
     octree::Octree m_octreePositive;
     octree::Octree m_octreeNegative;
 
-    octree::DiscreteScales m_scales;
-    octree::Convolution<FieldPotential> m_convolution{m_scales};
+    std::unique_ptr<const octree::IScalesConfig> m_scales;
+    octree::Convolution<FieldPotential> m_convolution{*m_scales};
 };
 
 class CoulombNodeOctree : public CoulombNodeBase

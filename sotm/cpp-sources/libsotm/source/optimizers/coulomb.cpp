@@ -30,6 +30,23 @@ FieldPotential& FieldPotential::operator+=(const FieldPotential& right)
     return *this;
 }
 
+FieldPotential FieldPotential::convolutionVisitor(const Position& target, const Position& object, double mass)
+{
+    double dist = target.distTo(object);
+    double p = Const::Si::k * mass / dist;
+    double tmp = p / (dist * dist);
+
+    FieldPotential fp;
+    const double *p1 = target.x;
+    const double *p2 = object.x;
+    double *pres = fp.field.x;
+    fp.potential = p;
+    for (int i=0; i<3; i++)
+        pres[i] = tmp * (p1[i]-p2[i]);
+
+    return fp;
+}
+
 //////////////////////
 // CoulombBruteForce
 CoulombBruteForce::CoulombBruteForce(GraphRegister& graph) :
@@ -55,7 +72,7 @@ FieldPotential CoulombBruteForce::getFP(Vector<3> pos, CoulombNodeBase* exclude)
         double charge = it->charge;
 
         double dp = Const::Si::k * charge / dist;
-        double tmp = dp / dist / dist;
+        double tmp = dp / (dist * dist);
 
         potential += dp;
 
@@ -102,22 +119,6 @@ void CoulombBruteForce::buildNodesVector()
     m_vectorDirty = false;
 }
 
-FieldPotential CoulombBruteForce::convolutionVisitor(const Position& target, const Position& object, double mass)
-{
-    double dist = target.distTo(object);
-    double charge = mass;
-
-    double p = Const::Si::k * charge / dist;
-    double tmp = p / dist / dist;
-
-    FieldPotential fp;
-    fp.potential = p;
-    fp.field.x[0] = tmp * (target.x[0]-object.x[0]);
-    fp.field.x[1] = tmp * (target.x[1]-object.x[1]);
-    fp.field.x[2] = tmp * (target.x[2]-object.x[2]);
-    return fp;
-}
-
 ////////////////////////
 // CoulombNodeTrivial
 
@@ -143,8 +144,9 @@ FieldPotential CoulombNodeBruteForce::getFP()
 ////////////////////////
 // CoulombOctree
 
-CoulombOctree::CoulombOctree(GraphRegister& graph) :
-    m_graph(graph)
+CoulombOctree::CoulombOctree(GraphRegister& graph, std::unique_ptr<const octree::IScalesConfig> scales) :
+    m_graph(graph),
+    m_scales(std::move(scales))
 {
 
 }
@@ -162,11 +164,11 @@ FieldPotential CoulombOctree::getFP(Vector<3> pos, CoulombNodeBase* exclude)
     FieldPotential octreeResult;
     if (exclude != nullptr)
     {
-        octreeResult  = m_convolution.convoluteExcludingElement(m_octreePositive, *static_cast<CoulombNodeOctree*>(exclude)->m_ectreeElement.get(), convolutionVisitor);
-        octreeResult += m_convolution.convoluteExcludingElement(m_octreeNegative, *static_cast<CoulombNodeOctree*>(exclude)->m_ectreeElement.get(), convolutionVisitor);
+        octreeResult  = m_convolution.convoluteExcludingElement(m_octreePositive, *static_cast<CoulombNodeOctree*>(exclude)->m_ectreeElement.get(), FieldPotential::convolutionVisitor);
+        octreeResult += m_convolution.convoluteExcludingElement(m_octreeNegative, *static_cast<CoulombNodeOctree*>(exclude)->m_ectreeElement.get(), FieldPotential::convolutionVisitor);
     } else {
-        octreeResult  = m_convolution.convolute(m_octreePositive, pos.x, convolutionVisitor);
-        octreeResult += m_convolution.convolute(m_octreeNegative, pos.x, convolutionVisitor);
+        octreeResult  = m_convolution.convolute(m_octreePositive, pos.x, FieldPotential::convolutionVisitor);
+        octreeResult += m_convolution.convolute(m_octreeNegative, pos.x, FieldPotential::convolutionVisitor);
     }
 
     return octreeResult;
@@ -194,11 +196,6 @@ void CoulombOctree::rebuildOptimization()
     }
 }
 
-octree::DiscreteScales& CoulombOctree::scales()
-{
-    return m_scales;
-}
-
 void CoulombOctree::addCN(CoulombNodeBase& cn)
 {
     m_nodesNotIsolated.insert(static_cast<CoulombNodeOctree*>(&cn));
@@ -207,25 +204,6 @@ void CoulombOctree::addCN(CoulombNodeBase& cn)
 void CoulombOctree::removeCN(CoulombNodeBase& cn)
 {
     m_nodesNotIsolated.erase(static_cast<CoulombNodeOctree*>(&cn));
-}
-
-FieldPotential CoulombOctree::convolutionVisitor(const Position& target, const Position& object, double mass)
-{
-    double dist = target.distTo(object);
-    double charge = mass;
-
-    double p = Const::Si::k * charge / dist;
-    double tmp = p / (dist * dist);
-
-    FieldPotential fp;
-    const double *p1 = target.x;
-    const double *p2 = object.x;
-    double *pres = fp.field.x;
-    fp.potential = p;
-    for (int i=0; i<3; i++)
-        pres[i] = tmp * (p1[i]-p2[i]);
-
-    return fp;
 }
 
 ////////////////////////

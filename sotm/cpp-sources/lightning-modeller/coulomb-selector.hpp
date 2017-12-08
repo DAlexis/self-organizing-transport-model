@@ -19,6 +19,8 @@ public:
 
 private:
 
+    std::unique_ptr<const octree::IScalesConfig> generateScales();
+
     std::unique_ptr<sotm::IColoumbCalculator> produce(sotm::ElectrostaticPhysicalContext& c, const std::string& method);
 
     cic::ParametersGroup m_pg{
