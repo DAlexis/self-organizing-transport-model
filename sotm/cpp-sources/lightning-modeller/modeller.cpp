@@ -9,10 +9,17 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
+#include <fenv.h>
 
 using namespace sotm;
 using namespace std;
 
+Modeller::Modeller()
+{
+#ifdef DEBUG
+    feenableexcept(FE_INVALID | FE_OVERFLOW);
+#endif
+}
 
 bool Modeller::parseCmdLineArgs(int argc, char** argv)
 {
@@ -48,8 +55,13 @@ void Modeller::run()
     c.setNodePayloadFactory(std::unique_ptr<INodePayloadFactory>(new ElectrostaticNodePayloadFactory(*m_physCont)));
     c.setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory>(new ElectrostaticLinkPayloadFactory(*m_physCont)));
 
-	c.parallelSettings.parallelContiniousIteration.calculateSecondaryValues = true;
-	c.parallelSettings.parallelBifurcationIteration.prepareBifurcation = true;
+    m_coulombSelector.addCoulombCalculator(*m_physCont);
+
+    if (!m_p["General"].get<bool>("no-threads"))
+    {
+        c.parallelSettings.parallelContiniousIteration.calculateSecondaryValues = true;
+        c.parallelSettings.parallelBifurcationIteration.prepareBifurcation = true;
+    }
 
 	initTimeIterator();
 	initExternalPotential();
@@ -61,7 +73,7 @@ void Modeller::run()
 	createParametersFile(filenamePrefix);
 	createProgramCofigurationFile(filenamePrefix);
 
-	genSeeds();
+    initSeeds();
 
 	c.initAllPhysicalPayloads();
 
@@ -179,7 +191,7 @@ void Modeller::initParameters()
 	generateCondEvoParams();
 
 	m_timeIter->setTime(0.0);
-	m_timeIter->setStep(m_p["Iter"].get<double>("step-max") / 100);
+    m_timeIter->setStep(m_p["Iter"].get<double>("step-max"));
 	m_timeIter->setStepBounds(m_p["Iter"].get<double>("step-min"), m_p["Iter"].get<double>("step-max"));
 	m_timeIter->continiousIterParameters().autoStepAdjustment = true;
 	m_timeIter->setStopTime(m_p["Iter"].get<double>("stop-time"));
@@ -199,9 +211,14 @@ void Modeller::generateCondEvoParams()
     m_physCont->linkEtaDefault = ElectrostaticNodePayload::etaFromCriticalField(m_p["Discharge"].get<double>("field-cond-critical"), m_physCont->linkBetaDefault);
 }
 
-void Modeller::genSeeds()
+void Modeller::initSeeds()
 {
-    m_sg.generate();
+    m_sg.parseConfig();
+    m_sg.generateInitial();
+    if (m_p["Seeds"].get<bool>("seeds-dynamic"))
+    {
+        m_timeIter->addHook(&m_sg.hook());
+    }
 }
 
 std::string Modeller::getTimeStr()

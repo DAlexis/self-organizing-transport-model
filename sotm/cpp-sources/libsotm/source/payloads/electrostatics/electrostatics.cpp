@@ -30,6 +30,7 @@ bool ElectrostaticPhysicalContext::readyToDestroy()
 
 void ElectrostaticPhysicalContext::calculateSecondaryValues(double time)
 {
+    optimizer->rebuildOptimization();
 }
 
 void ElectrostaticPhysicalContext::calculateRHS(double time)
@@ -50,6 +51,17 @@ void ElectrostaticPhysicalContext::makeSubIteration(double dt)
 void ElectrostaticPhysicalContext::step()
 {
 
+}
+
+void ElectrostaticPhysicalContext::init()
+{
+    std::cout << "Here!" << std::endl;
+    optimizer->rebuildOptimization();
+}
+
+void ElectrostaticPhysicalContext::doBifurcation(double time, double dt)
+{
+    UNUSED_ARG(time); UNUSED_ARG(dt);
 }
 
 void ElectrostaticPhysicalContext::setDischargeFunc(Function1D func)
@@ -185,7 +197,7 @@ void ElectrostaticNodePayload::calculateExtFieldAndPhi()
 
 */
 
-    FieldPotential fp = coulombNode.getFP();
+    FieldPotential fp = coulombNode->getFP();
     externalField = fp.field;
     phi = fp.potential;
 
@@ -437,7 +449,8 @@ void ElectrostaticLinkPayload::doBifurcation(double time, double dt)
 void ElectrostaticLinkPayload::init()
 {
 	setTemperature(context()->airTemperature);
-	
+    conductivity.set(context()->initialConductivity);
+    /*
 	// Calculating middle field got set conductivity correctly
 	Vector<3> c = (link->getNode1()->pos + link->getNode2()->pos) * 0.5;
 
@@ -446,8 +459,7 @@ void ElectrostaticLinkPayload::init()
 	context()->getElectricField(c, field, phi);
 
 	double absE = field.len();
-	UNUSED_ARG(absE);
-	conductivity.set(context()->initialConductivity);
+    UNUSED_ARG(absE);*/
 	
 	// todo: add conductivity from temperature function
 	//conductivity.set(context()->initialConductivity * (1+absE / 0.2e5));

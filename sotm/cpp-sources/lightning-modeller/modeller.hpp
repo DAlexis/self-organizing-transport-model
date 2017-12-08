@@ -9,6 +9,7 @@
 #define LIGHTNING_MODELLER_MODELLER_HPP_
 
 #include "seeds-generator.hpp"
+#include "coulomb-selector.hpp"
 
 #include "sotm/base/transport-graph.hpp"
 #include "sotm/base/model-context.hpp"
@@ -26,6 +27,7 @@
 class Modeller
 {
 public:
+    Modeller();
 	bool parseCmdLineArgs(int argc, char** argv);
 	void run();
 
@@ -38,7 +40,7 @@ private:
 	void initParameters();
 	void initTimeIterator();
 	void generateCondEvoParams();
-	void genSeeds();
+    void initSeeds();
 
 	static std::string getTimeStr();
 
@@ -52,13 +54,15 @@ private:
 
 	sotm::ContiniousIteratorParameters m_timeIterParams;
 
+    /// @todo: Each module should add its own group here by himself
 	cic::Parameters m_p{
 		"Lightning modeller command line options",
 		cic::ParametersGroup(
 		    "General",
 		    "General options",
             cic::Parameter<bool>("no-gui", "Work without GUI", cic::ParamterType::cmdLine),
-            cic::Parameter<bool>("benchmark", "Do not output data", cic::ParamterType::cmdLine)
+            cic::Parameter<bool>("benchmark", "Do not output data", cic::ParamterType::cmdLine),
+            cic::Parameter<bool>("no-threads", "Run in signle thread", cic::ParamterType::cmdLine)
 		),
 		cic::ParametersGroup(
 		    "Iter",
@@ -92,13 +96,16 @@ private:
 		    cic::Parameter<unsigned int>("seeds-number", "Count of seed streamers in zone", 1),
 		    cic::Parameter<double>("seeds-zone-height",  "Height of zone where seeds will be generated", 15.0),
 		    cic::Parameter<double>("seeds-zone-dia",     "Diameter of zone where seeda will be generated", 5),
-		    cic::Parameter<double>("seeds-min-dist",     "Critical field that maintain glow discharge", 0.24e6),
+            cic::Parameter<double>("seeds-min-dist",     "Minimal distance between seeds", 0.01),
             cic::Parameter<double>("seed-size",          "Size of seed's link", 0.4),
             cic::Parameter<double>("seed-radius-cond",   "Seeds' node radius for conductivity", 0.03),
             cic::Parameter<double>("seed-radius-branch", "Seeds' node radius for branching", 0.05),
             cic::Parameter<double>("seed-beta",          "Seeds' link beta", 2e7),
             cic::Parameter<double>("seed-field-cond-critical", "Seeds' link critical field", 0.3e6),
-            cic::Parameter<bool>("seeds-z-uniform",      "Place seeds uniformly by z, without random")
+            cic::Parameter<bool>("seeds-z-uniform",      "Place seeds uniformly by z, without random"),
+            cic::Parameter<bool>("seeds-dynamic",        "Add seeds in process of evolution"),
+            cic::Parameter<size_t>("seeds-dynamic-count","Count of seeds that should be added dynamically in process of evolution", 10000),
+            cic::Parameter<double>("seeds-dynamic-count-per-vol-per-sec", "Count of seeds appearing in 1m^3 per 1s", 100)
 		),
 		cic::ParametersGroup(
 		    "Field",
@@ -110,6 +117,7 @@ private:
 	};
 
     SeedsGenerator m_sg{m_p["Seeds"], c};
+    CoulombSelector m_coulombSelector{m_p};
 
 	int m_argc = 0;
 	char** m_argv = nullptr;

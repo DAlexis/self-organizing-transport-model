@@ -32,13 +32,12 @@ public:
 	void addRHSToDelta(double m) override;
 	void makeSubIteration(double dt) override;
 	void step() override;
+    void init() override;
 
-	void doBifurcation(double time, double dt) { UNUSED_ARG(time); UNUSED_ARG(dt); }
+    void doBifurcation(double time, double dt) override;
 
 	void setDischargeFunc(Function1D func);
-
 	void getElectricField(const Vector<3>& point, Vector<3>& outField, double& outPotential, const Node* excludeNode = nullptr);
-
 	bool testConnection(Node* n1, Node* n2);
 
 	static inline ElectrostaticPhysicalContext* cast(IPhysicalContext* context)
@@ -84,7 +83,11 @@ public:
 
 	Field<1, 3> *externalPotential = &zeroField;
 
-    CoulombOptimizer optimizer{m_model->graphRegister};
+
+    std::unique_ptr<IColoumbCalculator> optimizer{
+        new CoulombBruteForce(m_model->graphRegister)
+    };
+
 private:
 	bool m_readyToDestroy = false;
 	Function1D m_dischargeProb{zero};
@@ -136,7 +139,12 @@ public:
 	Vector<3> externalField; // Electric field from other nodes
 
     // For charge field computations
-    CoulombNode coulombNode{static_cast<ElectrostaticPhysicalContext*>(node->physicalContext())->optimizer, charge.current, *node};
+    std::shared_ptr<CoulombNodeBase> coulombNode{
+        static_cast<ElectrostaticPhysicalContext*>(node->physicalContext())->optimizer->makeNode(
+            charge.current,
+            *node
+        )
+    };
 
     static double etaFromCriticalField(double criticalFeild, double beta); // Move this to context
 private:
