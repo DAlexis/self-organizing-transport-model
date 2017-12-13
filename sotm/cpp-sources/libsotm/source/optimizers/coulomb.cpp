@@ -33,6 +33,8 @@ FieldPotential& FieldPotential::operator+=(const FieldPotential& right)
 FieldPotential FieldPotential::convolutionVisitor(const Position& target, const Position& object, double mass)
 {
     double dist = target.distTo(object);
+    if (dist == 0.0)
+        return FieldPotential();
     double p = Const::Si::k * mass / dist;
     double tmp = p / (dist * dist);
 
@@ -94,6 +96,18 @@ CoulombNodeBase* CoulombBruteForce::makeNode(double& charge, Node& thisNode)
     return new CoulombNodeBruteForce(*this, charge, thisNode);
 }
 
+void CoulombBruteForce::getClose(std::vector<CoulombNodeBase*>& container, const Vector<3>& pos, double distance)
+{
+    for (auto it: m_nodesNotIsolatedVector)
+    {
+        double d = (pos - it->node.pos).len();
+        if (d <= distance)
+        {
+            container.push_back(it);
+        }
+    };
+}
+
 void CoulombBruteForce::addCN(CoulombNodeBase& cn)
 {
     m_nodesNotIsolated.insert(static_cast<CoulombNodeBruteForce*>(&cn));
@@ -123,8 +137,7 @@ void CoulombBruteForce::buildNodesVector()
 // CoulombNodeTrivial
 
 CoulombNodeBruteForce::CoulombNodeBruteForce(IColoumbCalculator& co, double &charge, Node &thisNode) :
-    CoulombNodeBase(charge),
-    node(thisNode),
+    CoulombNodeBase(charge, thisNode),
     m_co(co)
 {
     m_co.addCN(*this);
@@ -162,14 +175,9 @@ FieldPotential CoulombOctree::getFP(Vector<3> pos, CoulombNodeBase* exclude)
     // Octree-based variant
 
     FieldPotential octreeResult;
-    if (exclude != nullptr)
-    {
-        octreeResult  = m_convolution.convoluteExcludingElement(m_octreePositive, *static_cast<CoulombNodeOctree*>(exclude)->m_ectreeElement.get(), FieldPotential::convolutionVisitor);
-        octreeResult += m_convolution.convoluteExcludingElement(m_octreeNegative, *static_cast<CoulombNodeOctree*>(exclude)->m_ectreeElement.get(), FieldPotential::convolutionVisitor);
-    } else {
-        octreeResult  = m_convolution.convolute(m_octreePositive, pos.x, FieldPotential::convolutionVisitor);
-        octreeResult += m_convolution.convolute(m_octreeNegative, pos.x, FieldPotential::convolutionVisitor);
-    }
+
+    octreeResult  = m_convolution.convolute(m_octreePositive, pos.x, FieldPotential::convolutionVisitor);
+    octreeResult += m_convolution.convolute(m_octreeNegative, pos.x, FieldPotential::convolutionVisitor);
 
     return octreeResult;
 }
@@ -177,6 +185,18 @@ FieldPotential CoulombOctree::getFP(Vector<3> pos, CoulombNodeBase* exclude)
 CoulombNodeBase* CoulombOctree::makeNode(double& charge, Node& thisNode)
 {
     return new CoulombNodeOctree(*this, charge, thisNode);
+}
+
+void CoulombOctree::getClose(std::vector<CoulombNodeBase*>& container, const Vector<3>& pos, double distace)
+{
+    std::vector<octree::Element*> octreeElements;
+    m_octreeNegative.getClose(octreeElements, pos.x, distace);
+    container.reserve(octreeElements.size());
+    for (auto it: octreeElements)
+    {
+        OctreeElementForColulomb* e = static_cast<OctreeElementForColulomb*>(it);
+        container.push_back(&e->coulombNode);
+    }
 }
 
 void CoulombOctree::rebuildOptimization()
@@ -210,12 +230,11 @@ void CoulombOctree::removeCN(CoulombNodeBase& cn)
 // CoulombNodeOctree
 
 CoulombNodeOctree::CoulombNodeOctree(IColoumbCalculator& co, double &charge, Node &thisNode) :
-    CoulombNodeBase(charge),
-    node(thisNode),
+    CoulombNodeBase(charge, thisNode),
     m_co(co)
 {
     m_co.addCN(*this);
-    m_ectreeElement = std::make_shared<octree::Element>(node.pos.x, charge);
+    m_ectreeElement = std::make_shared<OctreeElementForColulomb>(node.pos.x, charge, *this);
 }
 
 CoulombNodeOctree::~CoulombNodeOctree()
@@ -242,6 +261,11 @@ FieldPotential CoulombComarator::getFP(Vector<3> pos, CoulombNodeBase* exclude)
     FieldPotential r2 = m_c2->getFP(pos, static_cast<CoulombComaratorNode*>(exclude)->m_n2.get());
     std::cout << diffStr(r1, r2) << std::endl;
     return r1;
+}
+
+void CoulombComarator::getClose(std::vector<CoulombNodeBase*>& container, const Vector<3>& pos, double distance)
+{
+    m_c1->getClose(container, pos, distance);
 }
 
 void CoulombComarator::rebuildOptimization()
@@ -314,8 +338,7 @@ std::string CoulombComarator::header()
 // CoulombComaratorNode
 
 CoulombComaratorNode::CoulombComaratorNode(IColoumbCalculator &co, Node& thisNode, std::unique_ptr<CoulombNodeBase> n1, std::unique_ptr<CoulombNodeBase> n2) :
-    CoulombNodeBase(n1->charge),
-    m_node(thisNode),
+    CoulombNodeBase(n1->charge, thisNode),
     m_co(co),
     m_n1(std::move(n1)), m_n2(std::move(n2))
 {
@@ -323,5 +346,5 @@ CoulombComaratorNode::CoulombComaratorNode(IColoumbCalculator &co, Node& thisNod
 
 FieldPotential CoulombComaratorNode::getFP()
 {
-    return m_co.getFP(m_node.pos, this);
+    return m_co.getFP(node.pos, this);
 }

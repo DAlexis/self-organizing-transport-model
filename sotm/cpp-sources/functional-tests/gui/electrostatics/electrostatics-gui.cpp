@@ -94,9 +94,7 @@ int main(int argc, char** argv)
 	gui.run(argc, argv);
 
 	cout << "Destroying graph" << endl;
-	ElectrostaticPhysicalContext::cast(c.physicalContext())->destroyGraph();
-	c.doBifurcation(0.0, 1.0);
-
+    c.destroyAll();
 	cout << "Exiting" << endl;
 	return 0;
 }

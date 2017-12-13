@@ -272,7 +272,7 @@ void Node::applyConnectedLinksVisitor(LinkVisitor visitor)
 	}
 }
 
-bool Node::hasNeighbour(Node* node)
+bool Node::hasNeighbour(const Node* node) const
 {
 	for (auto it = m_links.begin(); it != m_links.end(); it++)
 	{

@@ -21,6 +21,7 @@ namespace sotm
 class ModelContext : public IContinuousTimeIterable, public IBifurcationTimeIterable
 {
 public:
+    ~ModelContext();
 	void setNodePayloadFactory(std::unique_ptr<INodePayloadFactory> factory);
 	void setLinkPayloadFactory(std::unique_ptr<ILinkPayloadFactory> factory);
 	void setPhysicalContext(std::unique_ptr<IPhysicalContext> physicalContext);
@@ -47,6 +48,8 @@ public:
 
 	PhysicalPayloadsRegister payloadsRegister{&parallelSettings};
 	GraphRegister graphRegister;
+
+    void destroyAll();
 
 private:
 	void branchIteration(double time, double dt, Node* node);

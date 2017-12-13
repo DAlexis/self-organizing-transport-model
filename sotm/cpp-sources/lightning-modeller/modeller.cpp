@@ -91,8 +91,7 @@ void Modeller::run()
 	}
 
 	cout << "Destroying graph" << endl;
-	ElectrostaticPhysicalContext::cast(c.physicalContext())->destroyGraph();
-	c.doBifurcation(0.0, 1.0);
+    c.destroyAll();
 	cout << "Exiting" << endl;
 }
 
