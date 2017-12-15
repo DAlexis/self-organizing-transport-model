@@ -60,6 +60,10 @@ void Modeller::run()
     if (!m_p["General"].get<bool>("no-threads"))
     {
         c.parallelSettings.parallelContiniousIteration.calculateSecondaryValues = true;
+        c.parallelSettings.parallelContiniousIteration.calculateRHS = true;
+        c.parallelSettings.parallelContiniousIteration.addRHSToDelta = true;
+        c.parallelSettings.parallelContiniousIteration.makeSubIteration = true;
+        c.parallelSettings.parallelContiniousIteration.step = true;
         c.parallelSettings.parallelBifurcationIteration.prepareBifurcation = true;
     }
 
