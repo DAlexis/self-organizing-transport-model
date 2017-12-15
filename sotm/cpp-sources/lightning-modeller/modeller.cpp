@@ -60,6 +60,10 @@ void Modeller::run()
     if (!m_p["General"].get<bool>("no-threads"))
     {
         c.parallelSettings.parallelContiniousIteration.calculateSecondaryValues = true;
+        c.parallelSettings.parallelContiniousIteration.calculateRHS = true;
+        c.parallelSettings.parallelContiniousIteration.addRHSToDelta = true;
+        c.parallelSettings.parallelContiniousIteration.makeSubIteration = true;
+        c.parallelSettings.parallelContiniousIteration.step = true;
         c.parallelSettings.parallelBifurcationIteration.prepareBifurcation = true;
     }
 
@@ -91,8 +95,7 @@ void Modeller::run()
 	}
 
 	cout << "Destroying graph" << endl;
-	ElectrostaticPhysicalContext::cast(c.physicalContext())->destroyGraph();
-	c.doBifurcation(0.0, 1.0);
+    c.destroyAll();
 	cout << "Exiting" << endl;
 }
 

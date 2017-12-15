@@ -31,6 +31,8 @@ public:
 	void step() override final;
 	double getMinimalStepsCount() override final;
 
+    void destroyAll();
+
 private:
 	void rebuildPayloadsVectorIfNeeded();
 	std::set<AnyPhysicalPayloadBase*> m_payloads;
@@ -71,13 +73,16 @@ public:
 
 	virtual void prepareBifurcation(double time, double dt) override { }
 
+    /**
+     * @brief onDeletePayload
+     * This function should be called by physical payload
+     * when physics things that object holding this payload should die.
+     * derived classes must call this func BEFORE calling their own version of this func
+     */
+    virtual void onDeletePayload();
 
 protected:
 	constexpr static double defaultColor[3] = {1.0, 0.8, 0.3};
-	/// This function should be called by physical payload
-	/// when physics things that object holding this payload should die.
-	/// derived classes must call this func BEFORE calling their own version of this func
-	virtual void onDeletePayload();
 
 private:
 	PhysicalPayloadsRegister *m_payloadsRegister;
@@ -88,6 +93,12 @@ class IPhysicalContext : public IContinuousTimeIterable, public IBifurcationTime
 public:
 	virtual ~IPhysicalContext() {}
 	virtual void connectModel(ModelContext* m) = 0;
+    /**
+     * @brief This should be called by model before it will be deleted.
+     * Physical context here may release some PtrWrap'pers to some specific
+     * nodes or links
+     */
+    virtual void onDestroy() = 0;
     /**
      * @brief This function will be called after init() of all payloads.
      * It is a place to first prepairing for optimizatiors i.e.
@@ -101,6 +112,7 @@ public:
 	void connectModel(ModelContext* m) override { m_model = m; }
 	virtual void clearSubiteration() override { }
 	virtual void prepareBifurcation(double time, double dt) override { }
+    virtual void onDestroy() override {}
     virtual void init() override {}
 
     ModelContext& model() { return *m_model; }

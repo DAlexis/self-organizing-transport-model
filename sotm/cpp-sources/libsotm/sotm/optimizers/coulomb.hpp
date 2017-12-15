@@ -34,14 +34,15 @@ public:
 class CoulombNodeBase : public ICoulombNode
 {
 public:
-    CoulombNodeBase(const double& charge)
-        : charge(charge)
+    CoulombNodeBase(const double& charge, Node& node)
+        : charge(charge), node(node)
     { }
 
     virtual ~CoulombNodeBase() {}
     virtual FieldPotential getFP() = 0;
 
     const double& charge;
+    Node& node;
 };
 
 class IColoumbCalculator
@@ -53,6 +54,7 @@ public:
     virtual void addCN(CoulombNodeBase& cn) = 0;
     virtual void removeCN(CoulombNodeBase& cn) = 0;
     virtual CoulombNodeBase* makeNode(double& charge, Node& thisNode) = 0;
+    virtual void getClose(std::vector<CoulombNodeBase*>& container, const Vector<3>& pos, double distace) = 0;
 };
 
 //////////////////////////////////////
@@ -70,6 +72,8 @@ public:
     void rebuildOptimization() override;
 
     CoulombNodeBase* makeNode(double& charge, Node& thisNode) override;
+    void getClose(std::vector<CoulombNodeBase*>& container, const Vector<3>& pos, double distace) override;
+
 private:
     void addCN(CoulombNodeBase& cn) override;
     void removeCN(CoulombNodeBase& cn) override;
@@ -92,7 +96,6 @@ public:
 
     FieldPotential getFP() override;
 
-    Node& node;
     std::shared_ptr<octree::Element> m_ectreeElement;
 
 private:
@@ -106,12 +109,24 @@ private:
 
 class CoulombNodeOctree;
 
+class OctreeElementForColulomb : public octree::Element
+{
+public:
+    OctreeElementForColulomb(const Position& p, double& value, CoulombNodeOctree& cn) :
+        octree::Element(p, value), coulombNode(cn)
+    { }
+
+    CoulombNodeOctree& coulombNode;
+};
+
+
 class CoulombOctree: public IColoumbCalculator
 {
 public:
     CoulombOctree(GraphRegister& graph, std::unique_ptr<const octree::IScalesConfig> scales);
     FieldPotential getFP(Vector<3> pos, CoulombNodeBase* exclude = nullptr) override;
     CoulombNodeBase* makeNode(double& charge, Node& thisNode) override;
+    void getClose(std::vector<CoulombNodeBase*>& container, const Vector<3>& pos, double distance) override;
 
     /**
      * @brief build positive and negative octree
@@ -133,15 +148,12 @@ private:
 
 class CoulombNodeOctree : public CoulombNodeBase
 {
-friend class CoulombBruteForce;
 public:
     CoulombNodeOctree(IColoumbCalculator& co, double& charge, Node& thisNode);
     ~CoulombNodeOctree();
 
     FieldPotential getFP() override;
 
-
-    Node& node;
     std::shared_ptr<octree::Element> m_ectreeElement;
 
 private:
@@ -158,6 +170,8 @@ public:
     CoulombComarator(std::unique_ptr<IColoumbCalculator> c1, std::unique_ptr<IColoumbCalculator> c2);
 
     FieldPotential getFP(Vector<3> pos, CoulombNodeBase* exclude = nullptr) override;
+    void getClose(std::vector<CoulombNodeBase*>& container, const Vector<3>& pos, double distance) override;
+
     void rebuildOptimization() override;
     void addCN(CoulombNodeBase& cn) override;
     void removeCN(CoulombNodeBase& cn) override;
@@ -183,7 +197,6 @@ public:
     FieldPotential getFP() override;
 
 private:
-    Node& m_node;
     IColoumbCalculator &m_co;
     std::unique_ptr<CoulombNodeBase> m_n1;
     std::unique_ptr<CoulombNodeBase> m_n2;

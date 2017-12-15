@@ -120,7 +120,7 @@ public:
 	void removeLink(Link* link);
     void setIsolatedUpdateHook(IsolatedUpdateHook hook);
 	void applyConnectedLinksVisitor(LinkVisitor visitor);
-	bool hasNeighbour(Node* node);
+    bool hasNeighbour(const Node* node) const;
 
 	std::unique_ptr<NodePayloadBase> payload;
 

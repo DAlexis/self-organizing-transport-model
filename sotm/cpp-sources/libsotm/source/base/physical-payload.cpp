@@ -139,6 +139,12 @@ double PhysicalPayloadsRegister::getMinimalStepsCount()
 	return minStepsCount;
 }
 
+void PhysicalPayloadsRegister::destroyAll()
+{
+    for (auto &it: m_payloads)
+        it->onDeletePayload();
+}
+
 AnyPhysicalPayloadBase::AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg) :
 		m_payloadsRegister(reg)
 {

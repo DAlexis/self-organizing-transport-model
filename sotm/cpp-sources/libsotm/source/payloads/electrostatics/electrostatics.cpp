@@ -18,16 +18,6 @@ double ElectrostaticNodePayload::chargeMax = 0.0;
 
 FieldScalarZero<3> ElectrostaticPhysicalContext::zeroField;
 
-void ElectrostaticPhysicalContext::destroyGraph()
-{
-	m_readyToDestroy = true;
-}
-
-bool ElectrostaticPhysicalContext::readyToDestroy()
-{
-	return m_readyToDestroy;
-}
-
 void ElectrostaticPhysicalContext::calculateSecondaryValues(double time)
 {
     optimizer->rebuildOptimization();
@@ -70,41 +60,12 @@ void ElectrostaticPhysicalContext::setDischargeFunc(Function1D func)
 	m_integralOfProb.reset(new DefinedIntegral(m_dischargeProb, -20e6, 20e6, 10000));
 }
 
-void ElectrostaticPhysicalContext::getElectricField(const Vector<3>& point, Vector<3>& outField, double& outPotential, const Node* exclude)
+bool ElectrostaticPhysicalContext::testConnection(const Node* n1, const Node* n2)
 {
-	//outPotential = - (point ^ externalConstField);
-	//outField = externalConstField;
-	outPotential = (*externalPotential) (point);
-	outField = - GradientFixedStep<3>(*externalPotential, 1e-2) (point);
-
-	GraphRegister::NodeVisitor nodeVisitor = [&point, exclude, &outPotential, &outField](const Node* node) {
-
-		// Skip this node
-		if (node == exclude)
-			return;
-		Vector<3> r1 = node->pos;
-
-		double dist = (point - r1).len();
-        //double dist3 = dist*dist*dist;
-
-		double charge = static_cast<ElectrostaticNodePayload*>(node->payload.get())->charge.current;
-
-        double dp = Const::Si::k * charge / dist;
-
-        outPotential += dp;
-
-        double tmp = dp / dist / dist;
-
-        outField[0] += tmp * (point[0]-r1[0]);
-        outField[1] += tmp * (point[1]-r1[1]);
-        outField[2] += tmp * (point[2]-r1[2]);
-	};
-
-    m_model->graphRegister.applyNodeVisitorWithoutGraphChganges(nodeVisitor);
-}
-
-bool ElectrostaticPhysicalContext::testConnection(Node* n1, Node* n2)
-{
+    if (n1 == n2)
+    {
+        return false;
+    }
 	double phi1 = static_cast<ElectrostaticNodePayload*>(n1->payload.get())->phi;
 	double phi2 = static_cast<ElectrostaticNodePayload*>(n2->payload.get())->phi;
 
@@ -207,19 +168,20 @@ void ElectrostaticNodePayload::calculateExtFieldAndPhi()
 
 Node* ElectrostaticNodePayload::findTargetToConnectByMeanField()
 {
-	Node* result = nullptr;
 
-	GraphRegister::NodeVisitor nodeVisitor = [&result, this](Node* n)
-	{
-		if (n <= this->node.data()) // To prevent double connections
-			return;
+    Node* result = nullptr;
 
-		if (context()->testConnection(this->node, n)) // We are not already connected
-			result = n;
-	};
-
-	context()->m_model->graphRegister.applyNodeVisitorWithoutGraphChganges(nodeVisitor);
-
+    std::vector<CoulombNodeBase*> close;
+    context()->optimizer->getClose(close, this->node->pos, context()->connectionMaximalDist);
+    for (auto it: close)
+    {
+        Node* n = &(it->node);
+        if (context()->testConnection(this->node, n))
+        {
+            result = n;
+            return n;
+        }
+    }
 	return result;
 }
 
@@ -242,12 +204,6 @@ void ElectrostaticNodePayload::doBifurcation(double time, double dt)
 {
 	//findTargetToConnect();
 	connectToTarget(findTargetToConnectByMeanField());
-
-	// Check if physics tells us we can release parent object
-	if (context()->readyToDestroy())
-	{
-		onDeletePayload();
-	}
 }
 
 void ElectrostaticNodePayload::init()
@@ -340,6 +296,8 @@ void ElectrostaticNodePayload::setCharge(double charge)
 
 double ElectrostaticNodePayload::calculateBranchLen(const Vector<3>& startPoint, const Vector<3>& direction, double eDiffMax, double lenMax)
 {
+    /// @todo: Fix this function or remove it away
+    /*
 	Vector<3> step = direction;
 	step.normalize();
 	step = step * branchProbeStep;
@@ -364,7 +322,8 @@ double ElectrostaticNodePayload::calculateBranchLen(const Vector<3>& startPoint,
 
 	} while (deltaField.len() / startField.len() < eDiffMax && len < lenMax);
 
-	return len;
+    return len;*/
+    return 0.15;
 }
 
 void ElectrostaticNodePayload::setChargeColorLimits(double chargeMin, double chargeMax)
@@ -436,13 +395,6 @@ void ElectrostaticLinkPayload::doBifurcation(double time, double dt)
 	{
 		onDeletePayload();
 		return;
-	}
-
-	// Check if physics tells us we can release parent object
-	ElectrostaticPhysicalContext* context = ElectrostaticPhysicalContext::cast(link->context()->physicalContext());
-	if (context->readyToDestroy())
-	{
-		onDeletePayload();
 	}
 }
 

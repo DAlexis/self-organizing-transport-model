@@ -3,6 +3,11 @@
 
 using namespace sotm;
 
+ModelContext::~ModelContext()
+{
+    destroyAll();
+}
+
 void ModelContext::setNodePayloadFactory(std::unique_ptr<INodePayloadFactory> factory)
 {
 	m_nodePayloadFactory = std::move(factory);
@@ -147,6 +152,12 @@ void ModelContext::initAllPhysicalPayloads()
 		}
 	);
     m_physicalContext->init();
+}
+
+void ModelContext::destroyAll()
+{
+    payloadsRegister.destroyAll();
+    m_physicalContext->onDestroy();
 }
 
 void ModelContext::branchIteration(double time, double dt, Node* node)

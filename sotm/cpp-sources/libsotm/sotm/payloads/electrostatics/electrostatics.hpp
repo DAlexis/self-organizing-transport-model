@@ -37,8 +37,7 @@ public:
     void doBifurcation(double time, double dt) override;
 
 	void setDischargeFunc(Function1D func);
-	void getElectricField(const Vector<3>& point, Vector<3>& outField, double& outPotential, const Node* excludeNode = nullptr);
-	bool testConnection(Node* n1, Node* n2);
+    bool testConnection(const Node* n1, const Node* n2);
 
 	static inline ElectrostaticPhysicalContext* cast(IPhysicalContext* context)
 	{
@@ -89,7 +88,6 @@ public:
     };
 
 private:
-	bool m_readyToDestroy = false;
 	Function1D m_dischargeProb{zero};
 	Function1D m_IOInstFunc{zero};
 	std::unique_ptr<DefinedIntegral> m_integralOfProb;
