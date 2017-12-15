@@ -157,7 +157,8 @@ void ModelContext::initAllPhysicalPayloads()
 void ModelContext::destroyAll()
 {
     payloadsRegister.destroyAll();
-    m_physicalContext->onDestroy();
+    if (m_physicalContext)
+        m_physicalContext->onDestroy();
 }
 
 void ModelContext::branchIteration(double time, double dt, Node* node)
