@@ -1,6 +1,7 @@
 #ifndef COULOMB_HPP
 #define COULOMB_HPP
 
+#include "sotm/optimizers/coulomb-calculator.hpp"
 #include "sotm/math/geometry.hpp"
 #include "sotm/base/transport-graph.hpp"
 #include "octree.hpp"
@@ -9,8 +10,6 @@
 #include <atomic>
 
 namespace sotm {
-
-class CoulombNodeBruteForce;
 
 struct FieldPotential
 {
@@ -59,6 +58,8 @@ public:
 
 //////////////////////////////////////
 // Brute force approach
+
+class CoulombNodeBruteForce;
 
 class CoulombBruteForce : public IColoumbCalculator
 {

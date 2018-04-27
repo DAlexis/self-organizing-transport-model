@@ -57,6 +57,7 @@ set(LIB_HPP
     ${PROJECT_SOURCE_DIR}/sotm/base/transport-graph.hpp
     ${PROJECT_SOURCE_DIR}/sotm/base/parameters.hpp
 	${PROJECT_SOURCE_DIR}/sotm/optimizers/coulomb.hpp
+	${PROJECT_SOURCE_DIR}/sotm/optimizers/coulomb-calculator.hpp
 )
 
 # Include dirs that are used and will be exported 
