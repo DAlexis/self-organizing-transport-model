@@ -11,20 +11,6 @@ execute_process(COMMAND git log -1 --format="%H" OUTPUT_VARIABLE git_commit)
 # The line above brokes QT visualization compilation. This need some investigation
 #add_definitions( -DGIT_COMMIT_TAG=${git_commit} )
 
-# This is to run all tests using 'make run-unit-tests' command.
-# Another way is simply run 'ctest -VV', but output is not colorized by default :(
-# This project may be a part of other cmake project so this trick may be implemented yet
-if (NOT COMMAND add_unit_test)
-	add_custom_target(run-unit-tests)
-	macro(add_unit_test test_target)
-		add_custom_target(${test_target}_runtest
-	    	COMMAND ${test_target} 
-	    	DEPENDS ${test_target}
-	    	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
-		add_dependencies(run-unit-tests ${test_target}_runtest)
-	endmacro()
-endif()
-
 if (NOT COMMAND add_functional_test)
 	add_custom_target(run-functional-tests)
 	macro(add_functional_test test_script script_argument)
@@ -62,6 +48,8 @@ add_subdirectory(lightning-modeller)
 
 # To enable ctest usage
 enable_testing()
-
-add_subdirectory(unit-tests)
+include(detect-gtest.cmake)
+if(GTEST_FOUND)
+    add_subdirectory(unit-tests)
+endif()
 add_subdirectory(functional-tests)

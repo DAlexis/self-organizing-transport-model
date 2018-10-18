@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 
 project(lightning-modeller-unit-tests)
 
-find_package (GTest REQUIRED)
 find_package (Boost COMPONENTS program_options REQUIRED)
 
 include_directories (
@@ -37,7 +36,4 @@ export_include_dirs(
 )
 
 
-add_test(NAME Library_testing
-         COMMAND ${PROJECT_NAME})
-
-add_unit_test(${PROJECT_NAME})
+add_test(NAME lightmod_testing COMMAND ${PROJECT_NAME})

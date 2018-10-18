@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 
 project(sotm-unit-tests)
 
-find_package (GTest REQUIRED)
-
 include_directories (
     ${GTEST_INCLUDE_DIR}
     ${sotm_INCLUDE_DIRS}
@@ -45,7 +43,4 @@ export_include_dirs(
 )
 
 
-add_test(NAME Library_testing
-         COMMAND ${PROJECT_NAME})
-
-add_unit_test(${PROJECT_NAME})
+add_test(NAME Library_testing COMMAND ${PROJECT_NAME})
