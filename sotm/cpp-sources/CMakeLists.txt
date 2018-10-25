@@ -51,5 +51,6 @@ enable_testing()
 include(detect-gtest.cmake)
 if(GTEST_FOUND)
     add_subdirectory(unit-tests)
+    add_subdirectory(functional-tests)
 endif()
-add_subdirectory(functional-tests)
+
