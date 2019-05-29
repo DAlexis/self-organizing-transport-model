@@ -14,7 +14,7 @@
 #include "sotm/math/integration.hpp"
 #include "sotm/math/field.hpp"
 #include "sotm/output/variables.hpp"
-#include "sotm/optimizers/coulomb.hpp"
+#include "sotm/optimizers/coulomb-brute-force.hpp"
 #include <memory>
 
 namespace sotm

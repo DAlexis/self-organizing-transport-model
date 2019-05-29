@@ -43,11 +43,12 @@ plt.ylabel('Суммарный ток $I$, А')
 
 #plt.subplots_adjust(top=0.8)
 plt.plot(times[1000:], currents[1000:])
+plt.grid(True)
 
 #f = mticker.ScalarFormatter(useOffset=False, useMathText=True)
 #g = lambda x,pos : "${}$".format(f._formatSciNotation('%1.10e' % x))
 #plt.gca().xaxis.set_major_formatter(mticker.FuncFormatter(g))
 
-plt.savefig("currents.png")
+plt.savefig("currents.png", dpi=300)
 plt.show()
 #plt.xlabel(r'Ток , сек')

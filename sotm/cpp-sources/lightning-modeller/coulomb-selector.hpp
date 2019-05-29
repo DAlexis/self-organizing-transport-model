@@ -1,7 +1,8 @@
 #ifndef COULOMBSELECTOR_HPP
 #define COULOMBSELECTOR_HPP
 
-#include "sotm/optimizers/coulomb.hpp"
+#include "sotm/optimizers/coulomb-octree.hpp"
+#include "sotm/optimizers/coulomb-brute-force.hpp"
 #include "sotm/payloads/electrostatics/electrostatics.hpp"
 #include "sotm/optimizers/coulomb.hpp"
 

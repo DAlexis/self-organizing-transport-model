@@ -29,6 +29,8 @@ set(LIB_SOURCE
     ${PROJECT_SOURCE_DIR}/source/payloads/electrostatics/electrostatics.cpp
     ${PROJECT_SOURCE_DIR}/source/payloads/electrostatics/electrostatics-scaler.cpp
 	${PROJECT_SOURCE_DIR}/source/optimizers/coulomb.cpp
+	${PROJECT_SOURCE_DIR}/source/optimizers/coulomb-brute-force.cpp
+	${PROJECT_SOURCE_DIR}/source/optimizers/coulomb-octree.cpp
 )
 
 set(LIB_HPP
@@ -57,6 +59,8 @@ set(LIB_HPP
     ${PROJECT_SOURCE_DIR}/sotm/base/transport-graph.hpp
     ${PROJECT_SOURCE_DIR}/sotm/base/parameters.hpp
 	${PROJECT_SOURCE_DIR}/sotm/optimizers/coulomb.hpp
+	${PROJECT_SOURCE_DIR}/sotm/optimizers/coulomb-brute-force.hpp
+	${PROJECT_SOURCE_DIR}/sotm/optimizers/coulomb-octree.hpp
 )
 
 # Include dirs that are used and will be exported 
