@@ -10,29 +10,19 @@ include_directories (
     ${lightmod_INCLUDE_DIRS}
 )
 
-set(EXE_SOURCES
+add_executable(${PROJECT_NAME}
     coulomb-selector-ut.cpp
     ../../lightning-modeller/coulomb-selector.cpp
     ../../lightning-modeller/coulomb-selector.hpp
 )
 
-set(EXE_HPP
-    
-)
-
-add_executable(${PROJECT_NAME} ${EXE_SOURCES} ${EXE_HPP})
-
-target_link_libraries (${PROJECT_NAME}
+target_link_libraries (${PROJECT_NAME} PUBLIC
     gtest
     gtest_main
-    ${sotm_LIBRARY}
-	${sotm-gui_LIBRARY}
-	${cic_LIBRARY}
-	${Boost_PROGRAM_OPTIONS_LIBRARY}
-)
-
-export_include_dirs(
-    ${PROJECT_SOURCE_DIR}
+    sotm
+    sotm-gui
+    cic
+    ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
 

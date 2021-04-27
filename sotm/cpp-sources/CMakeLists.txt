@@ -24,22 +24,6 @@ if (NOT COMMAND add_functional_test)
 	endmacro()
 endif()
 
-## This macro creates variable ${PROJECT_NAME}_INCLUDE_DIRS with list of 
-# include directories exported by project
-macro(export_include_dirs)
-    set(${PROJECT_NAME}_INCLUDE_DIRS
-        ${ARGV}
-        CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)
-endmacro()
-
-# This macro creates variable ${PROJECT_NAME}_LIBRARY with list of libraries exported 
-# by project
-macro(export_libs)
-    set(${PROJECT_NAME}_LIBRARY
-        ${ARGV}
-        CACHE INTERNAL "${PROJECT_NAME}: used and exported libs" FORCE)
-endmacro()
-
 add_subdirectory(octree-cpp/src)
 add_subdirectory(libsotm)
 add_subdirectory(libsotm-gui)

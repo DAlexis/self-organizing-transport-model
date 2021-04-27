@@ -1,11 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
-
 project(sotm-unit-tests)
-
-include_directories (
-    ${GTEST_INCLUDE_DIR}
-    ${sotm_INCLUDE_DIRS}
-)
 
 set(EXE_SOURCES
     math/generic-ut.cpp
@@ -32,15 +25,16 @@ set(EXE_HPP
 
 add_executable(${PROJECT_NAME} ${EXE_SOURCES} ${EXE_HPP})
 
-target_link_libraries (${PROJECT_NAME}
+target_link_libraries (${PROJECT_NAME} PUBLIC
     gtest
     gtest_main
-    ${sotm_LIBRARY}
+    sotm
 )
 
-export_include_dirs(
-    ${PROJECT_SOURCE_DIR}
-)
+#target_include_directories (${PROJECT_NAME} PUBLIC
+#    ${GTEST_INCLUDE_DIR}
+#    ${sotm_INCLUDE_DIRS}
+#)
 
 
 add_test(NAME Library_testing COMMAND ${PROJECT_NAME})

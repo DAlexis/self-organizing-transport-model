@@ -28,9 +28,9 @@ set(LIB_SOURCE
     ${PROJECT_SOURCE_DIR}/source/payloads/demo/absolute-random-graph.cpp
     ${PROJECT_SOURCE_DIR}/source/payloads/electrostatics/electrostatics.cpp
     ${PROJECT_SOURCE_DIR}/source/payloads/electrostatics/electrostatics-scaler.cpp
-	${PROJECT_SOURCE_DIR}/source/optimizers/coulomb.cpp
-	${PROJECT_SOURCE_DIR}/source/optimizers/coulomb-brute-force.cpp
-	${PROJECT_SOURCE_DIR}/source/optimizers/coulomb-octree.cpp
+    ${PROJECT_SOURCE_DIR}/source/optimizers/coulomb.cpp
+    ${PROJECT_SOURCE_DIR}/source/optimizers/coulomb-brute-force.cpp
+    ${PROJECT_SOURCE_DIR}/source/optimizers/coulomb-octree.cpp
 )
 
 set(LIB_HPP
@@ -58,33 +58,14 @@ set(LIB_HPP
     ${PROJECT_SOURCE_DIR}/sotm/base/physical-payload.hpp
     ${PROJECT_SOURCE_DIR}/sotm/base/transport-graph.hpp
     ${PROJECT_SOURCE_DIR}/sotm/base/parameters.hpp
-	${PROJECT_SOURCE_DIR}/sotm/optimizers/coulomb.hpp
-	${PROJECT_SOURCE_DIR}/sotm/optimizers/coulomb-brute-force.hpp
-	${PROJECT_SOURCE_DIR}/sotm/optimizers/coulomb-octree.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/optimizers/coulomb.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/optimizers/coulomb-brute-force.hpp
+    ${PROJECT_SOURCE_DIR}/sotm/optimizers/coulomb-octree.hpp
 )
 
-# Include dirs that are used and will be exported 
-set(${PROJECT_NAME}_USED_INCDIRS
-    ${PROJECT_SOURCE_DIR}
-	${octree_INCLUDE_DIRS}
-)
-
-include_directories(${${PROJECT_NAME}_USED_INCDIRS})
 
 add_library(${PROJECT_NAME} STATIC ${LIB_SOURCE} ${LIB_HPP})
+target_link_libraries(${PROJECT_NAME} PUBLIC tbb octree)
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR})
 
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_rvalue_references)
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_lambdas)
-
-# Include directories that should be added with this project
-export_include_dirs(
-    ${PROJECT_SOURCE_DIR}
-    ${${PROJECT_NAME}_USED_INCDIRS}
-)
-
-# Libraries this projects needs to be linked with
-export_libs(
-    ${PROJECT_NAME}
-	${octree_LIBRARY}
-	tbb
-)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)

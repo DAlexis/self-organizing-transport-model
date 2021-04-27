@@ -1,4 +1,4 @@
-#include "coulomb-selector.hpp"
+#include "../../lightning-modeller/coulomb-selector.hpp"
 #include "gtest/gtest.h"
 
 using namespace sotm;

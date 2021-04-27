@@ -168,9 +168,6 @@ void ElectrostaticNodePayload::calculateExtFieldAndPhi()
 
 Node* ElectrostaticNodePayload::findTargetToConnectByMeanField()
 {
-
-    Node* result = nullptr;
-
     std::vector<CoulombNodeBase*> close;
     context()->optimizer->getClose(close, this->node->pos, context()->connectionMaximalDist);
     for (auto it: close)
@@ -178,11 +175,10 @@ Node* ElectrostaticNodePayload::findTargetToConnectByMeanField()
         Node* n = &(it->node);
         if (context()->testConnection(this->node, n))
         {
-            result = n;
             return n;
         }
     }
-	return result;
+    return nullptr;
 }
 
 void ElectrostaticNodePayload::connectToTarget(Node* connectTo)

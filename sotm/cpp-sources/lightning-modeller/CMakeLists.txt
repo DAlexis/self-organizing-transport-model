@@ -15,23 +15,15 @@ set(EXE_SOURCES
     coulomb-selector.hpp
 )
 
-set(${PROJECT_NAME}_USED_INCDIRS
-    ${sotm_INCLUDE_DIRS}
-    ${sotm-gui_INCLUDE_DIRS}
-    ${cic_INCLUDE_DIRS}
-)
-
-include_directories(
-    ${${PROJECT_NAME}_USED_INCDIRS}
-)
 
 add_executable(${PROJECT_NAME} ${EXE_SOURCES})
 
-target_link_libraries (${PROJECT_NAME}
-    ${sotm_LIBRARY}
-	${sotm-gui_LIBRARY}
-	${cic_LIBRARY}
-	${Boost_PROGRAM_OPTIONS_LIBRARY}
+target_link_libraries (${PROJECT_NAME} PUBLIC cic)
+
+target_link_libraries (${PROJECT_NAME} PUBLIC
+    sotm
+    sotm-gui
+    ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
 add_custom_target(
@@ -43,9 +35,3 @@ add_dependencies(${PROJECT_NAME} gen-config)
 
 configure_file(plot-field.sh plot-field.sh COPYONLY)
 configure_file(plot-field-all.sh plot-field-all.sh COPYONLY)
-
-# This is for unit tests
-export_include_dirs(
-    ${PROJECT_SOURCE_DIR}
-    ${${PROJECT_NAME}_USED_INCDIRS}
-)
