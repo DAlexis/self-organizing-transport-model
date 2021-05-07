@@ -15,20 +15,20 @@ CoulombBruteForce::CoulombBruteForce(GraphRegister& graph) :
     // todo: add scales to m_scales
 }
 
-FieldPotential CoulombBruteForce::getFP(Vector<3> pos, CoulombNodeBase* exclude)
+FieldPotential CoulombBruteForce::getFP(StaticVector<3> pos, CoulombNodeBase* exclude)
 {
     buildNodesVector();
 
     double potential = 0.0;
-    Vector<3> E;
+    StaticVector<3> E;
 
     for (auto it: m_nodesNotIsolatedVector)
     {
         // Skip this node
         if (static_cast<CoulombNodeBase*>(it) == exclude)
             continue;
-        Vector<3> r1 = it->node.pos;
-        double dist = (pos - r1).len();
+        StaticVector<3> r1 = it->node.pos;
+        double dist = (pos - r1).norm();
         double charge = it->charge;
 
         double dp = Const::Si::k * charge / dist;
@@ -54,11 +54,11 @@ CoulombNodeBase* CoulombBruteForce::makeNode(double& charge, Node& thisNode)
     return new CoulombNodeBruteForce(*this, charge, thisNode);
 }
 
-void CoulombBruteForce::getClose(std::vector<CoulombNodeBase*>& container, const Vector<3>& pos, double distance)
+void CoulombBruteForce::getClose(std::vector<CoulombNodeBase*>& container, const StaticVector<3>& pos, double distance)
 {
     for (auto it: m_nodesNotIsolatedVector)
     {
-        double d = (pos - it->node.pos).len();
+        double d = (pos - it->node.pos).norm();
         if (d <= distance)
         {
             container.push_back(it);

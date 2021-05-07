@@ -31,8 +31,8 @@ class SphereDrawer
 {
 public:
 	SphereDrawer();
-	SphereDrawer(Vector<3> pos, double radius, double color[3], const std::string& follower = std::string());
-	void create(Vector<3> pos, double radius, double color[3], const std::string& follower = std::string());
+	SphereDrawer(StaticVector<3> pos, double radius, double color[3], const std::string& follower = std::string());
+	void create(StaticVector<3> pos, double radius, double color[3], const std::string& follower = std::string());
 	void addActors(vtkRenderer* renderer);
 
 private:

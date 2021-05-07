@@ -42,7 +42,7 @@ public:
 		if (EmptyPhysicalContextWithBranching::cast(node->physicalContext())->doBranching)
 		{
 			branchingParameters.needBranching = true;
-			branchingParameters.direction = Vector<3>({1.0, 1.0, 1.0});
+			branchingParameters.direction = StaticVector<3>({1.0, 1.0, 1.0});
 			branchingParameters.length = 1.0;
 		} else {
 			branchingParameters.needBranching = false;

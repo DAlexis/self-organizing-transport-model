@@ -86,7 +86,7 @@ void FieldCalculator::run()
 	createGrid();
 }
 
-bool FieldCalculator::parsePoint(sotm::Vector<3>& v, const std::string& str)
+bool FieldCalculator::parsePoint(sotm::StaticVector<3>& v, const std::string& str)
 {
 	std::istringstream iss(str);
 	char tmp;
@@ -198,11 +198,11 @@ bool FieldCalculator::createGrid()
         [this, p]( size_t i ) {
             double potential = 0;
 
-            sotm::Vector<3> &point = p[i].point;
+            sotm::StaticVector<3> &point = p[i].point;
 
             for (auto &jt : m_charges)
             {
-                double dist = (jt.pos - point).len();
+                double dist = (jt.pos - point).norm();
                 if (dist < m_minDist)
                     continue;
                 potential += jt.charge / dist;
@@ -210,7 +210,7 @@ bool FieldCalculator::createGrid()
             potential *= sotm::Const::Si::k;
 
             if (!m_ignoreExternal)
-                potential += -(m_externalE ^ point);
+                potential += -(m_externalE * point);
             p[i].value = potential;
         }
     );

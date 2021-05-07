@@ -34,7 +34,7 @@ GridBuilder::GridBuilder(
 				m_points->InsertNextPoint(x, y, z);
 
 				ValuePoint p;
-				p.point = sotm::Vector<3>(x, y, z);
+				p.point = sotm::StaticVector<3>(x, y, z);
 				m_valuePoints.push_back(p);
 			}
 }

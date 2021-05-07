@@ -53,7 +53,7 @@ public:
 	/// Iterate by all links. New nodes should not be added during iteration
     void applyLinkVisitorWithoutGraphChganges(LinkVisitor v, bool optimizeToVector = true);
 
-	Node* getNearestNode(const Vector<3>& point, bool searchOverReceintlyAdded = true);
+	Node* getNearestNode(const StaticVector<3>& point, bool searchOverReceintlyAdded = true);
 
 	size_t nodesCount();
 	size_t linksCount();
@@ -101,7 +101,8 @@ class ModelContextDependent
 public:
 	ModelContextDependent(ModelContext* context);
 	ModelContext* context();
-	IPhysicalContext* physicalContext();
+    IPhysicalContext* physicalContext();
+    const IPhysicalContext* physicalContext() const;
 
 
 protected:
@@ -114,7 +115,7 @@ public:
 	using LinkVisitor = std::function<void(Link*, LinkDirection)>;
     using IsolatedUpdateHook = std::function<void(Node*, bool isIsolated)>;
 
-	Node(ModelContext* context, Vector<3> pos = Vector<3>());
+	Node(ModelContext* context, StaticVector<3> pos = StaticVector<3>());
 	~Node();
 	void addLink(Link* link);
 	void removeLink(Link* link);
@@ -124,7 +125,7 @@ public:
 
 	std::unique_ptr<NodePayloadBase> payload;
 
-	Vector<3> pos;
+	StaticVector<3> pos;
 
 private:
 	std::set<Link*> m_links;
@@ -136,7 +137,7 @@ class Link : public ModelContextDependent, public SelfMemMgr
 {
 public:
 	Link(ModelContext* context);
-	Link(ModelContext* context, Node* nodeFrom, Vector<3> pointTo);
+	Link(ModelContext* context, Node* nodeFrom, StaticVector<3> pointTo);
 	~Link();
 	void connect(Node* n1, Node* n2);
 

@@ -60,7 +60,7 @@ void ElectrostaticPhysicalContext::setDischargeFunc(Function1D func)
 	m_integralOfProb.reset(new DefinedIntegral(m_dischargeProb, -20e6, 20e6, 10000));
 }
 
-bool ElectrostaticPhysicalContext::testConnection(const Node* n1, const Node* n2)
+bool ElectrostaticPhysicalContext::testConnection(const Node* n1, const Node* n2) const
 {
     if (n1 == n2)
     {
@@ -70,7 +70,7 @@ bool ElectrostaticPhysicalContext::testConnection(const Node* n1, const Node* n2
 	double phi2 = static_cast<ElectrostaticNodePayload*>(n2->payload.get())->phi;
 
 	double U = fabs(phi1 - phi2);
-	double l = (n1->pos - n2->pos).len();
+    double l = (n1->pos - n2->pos).norm();
 	// Filed is enough and we are not already connected. Second check is here for performance reason
 	if (U/l > connectionCriticalField
 			&& !n1->hasNeighbour(n2)
@@ -95,7 +95,7 @@ ElectrostaticNodePayload::ElectrostaticNodePayload(PhysicalPayloadsRegister* reg
 
 	if (nearest != nullptr)
 	{
-		double dist = (nearest->pos - node->pos).len();
+        double dist = (nearest->pos - node->pos).norm();
 		double r1 = nodeRadiusBranching;
 		double r2 = static_cast<ElectrostaticNodePayload*>(nearest->payload.get())->nodeRadiusBranching;
 		if (dist < r1 + r2)
@@ -166,7 +166,7 @@ void ElectrostaticNodePayload::calculateExtFieldAndPhi()
     phi += (*context()->externalPotential) (node->pos);
 }
 
-Node* ElectrostaticNodePayload::findTargetToConnectByMeanField()
+Node* ElectrostaticNodePayload::findTargetToConnectByMeanField() const
 {
     std::vector<CoulombNodeBase*> close;
     context()->optimizer->getClose(close, this->node->pos, context()->connectionMaximalDist);
@@ -193,7 +193,7 @@ void ElectrostaticNodePayload::connectToTarget(Node* connectTo)
 
 void ElectrostaticNodePayload::prepareBifurcation(double time, double dt)
 {
-	findTargetToConnectByMeanField();
+    //findTargetToConnectByMeanField();
 }
 
 void ElectrostaticNodePayload::doBifurcation(double time, double dt)
@@ -211,7 +211,7 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 {
     double radius = nodeRadiusBranching;
 	double E1 = Const::Si::k*charge.current / sqr(radius);
-	double E0 = (externalField*3).len();
+    double E0 = (externalField*3).norm();
 	DistributionResult<SphericalPoint> res = generateDischargeDirection(
 		dt,
 		radius,
@@ -226,7 +226,7 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 		SphericalVectorPlacer pl(externalField);
 		branchingParameters.direction = pl.place(1.0, res.value);
 
-		Vector<3> branchStartPoint = node->pos + branchingParameters.direction * (radius*1.00);
+		StaticVector<3> branchStartPoint = node->pos + branchingParameters.direction * (radius*1.00);
 		double len;
 		if (context()->smartBranching)
 			len = calculateBranchLen(branchStartPoint, branchingParameters.direction, 0.5, 0.3);
@@ -235,9 +235,9 @@ void ElectrostaticNodePayload::getBranchingParameters(double time, double dt, Br
 		//cout << "branch len should be " << len << endl;
 
 		// Testing for collision with nearest nodes
-		Vector<3> newPlace = node->pos + branchingParameters.direction * len;
+		StaticVector<3> newPlace = node->pos + branchingParameters.direction * len;
 		Node *nearest = context()->m_model->graphRegister.getNearestNode(newPlace);
-		double dist = (nearest->pos - newPlace).len();
+        double dist = (nearest->pos - newPlace).norm();
 		//if (nearest && dist < radius*2.0)
 		if (nearest && dist < context()->branchingStep*0.3)
 		{
@@ -290,7 +290,7 @@ void ElectrostaticNodePayload::setCharge(double charge)
 	this->charge.setInitial(charge);
 }
 
-double ElectrostaticNodePayload::calculateBranchLen(const Vector<3>& startPoint, const Vector<3>& direction, double eDiffMax, double lenMax)
+double ElectrostaticNodePayload::calculateBranchLen(const StaticVector<3>& startPoint, const StaticVector<3>& direction, double eDiffMax, double lenMax)
 {
     /// @todo: Fix this function or remove it away
     /*

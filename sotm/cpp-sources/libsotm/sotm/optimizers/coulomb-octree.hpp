@@ -23,9 +23,9 @@ class CoulombOctree: public IColoumbCalculator
 {
 public:
     CoulombOctree(GraphRegister& graph, std::unique_ptr<const octree::IScalesConfig> scales);
-    FieldPotential getFP(Vector<3> pos, CoulombNodeBase* exclude = nullptr) override;
+    FieldPotential getFP(StaticVector<3> pos, CoulombNodeBase* exclude = nullptr) override;
     CoulombNodeBase* makeNode(double& charge, Node& thisNode) override;
-    void getClose(std::vector<CoulombNodeBase*>& container, const Vector<3>& pos, double distance) override;
+    void getClose(std::vector<CoulombNodeBase*>& container, const StaticVector<3>& pos, double distance) override;
 
     /**
      * @brief build positive and negative octree
@@ -58,7 +58,7 @@ public:
 private:
     IColoumbCalculator &m_co;
     double m_isolatedPotential = 0;
-    Vector<3> m_isolatedField{0.0, 0.0, 0.0};
+    StaticVector<3> m_isolatedField{0.0, 0.0, 0.0};
 };
 
 

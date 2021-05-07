@@ -169,7 +169,7 @@ void ModelContext::branchIteration(double time, double dt, Node* node)
 		return;
 
 	// Its time to create new node with link
-	Vector<3> newPos = node->pos + bp.direction * bp.length;
+	StaticVector<3> newPos = node->pos + bp.direction * bp.length;
 	PtrWrap<Link> newLink = PtrWrap<Link>::make(this, node, newPos);
 	newLink->getNode2()->payload->init();
 	newLink->payload->init();

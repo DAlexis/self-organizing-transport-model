@@ -188,7 +188,7 @@ void Modeller::initParameters()
 	m_physCont->conductivityLimit = m_p["Discharge"].get<double>("cond-limit");
 	m_physCont->ionizationOverheatingInstFunc = SmoothedLocalStepFunction(m_p["Discharge"].get<double>("ioi-temp"), 50);
 
-	Vector<3> externalField{0.0, 0.0, m_p["Field"].get<double>("field")};
+	StaticVector<3> externalField{0.0, 0.0, m_p["Field"].get<double>("field")};
 	m_physCont->externalPotential = m_externalPotential.get();
 
 	generateCondEvoParams();

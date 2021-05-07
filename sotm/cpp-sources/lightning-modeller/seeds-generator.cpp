@@ -39,8 +39,8 @@ void SeedsGenerator::generateInitial()
 {
     if (seedsCount == 1)
     {
-        PtrWrap<Node> n1 = PtrWrap<Node>::make(&m_c, Vector<3>(0, 0, -seedSize/2.0));
-        PtrWrap<Node> n2 = PtrWrap<Node>::make(&m_c, Vector<3>(0, 0, +seedSize/2.0));
+        PtrWrap<Node> n1 = PtrWrap<Node>::make(&m_c, StaticVector<3>(0, 0, -seedSize/2.0));
+        PtrWrap<Node> n2 = PtrWrap<Node>::make(&m_c, StaticVector<3>(0, 0, +seedSize/2.0));
         setNodeParameters(n1);
         setNodeParameters(n2);
         PtrWrap<Link> l = PtrWrap<Link>::make(&m_c);
@@ -102,7 +102,7 @@ void SeedsGenerator::setLinkParameters(Link* l)
 void SeedsGenerator::addSeed()
 {
     double d=0.0;
-    Vector<3> p;
+    StaticVector<3> p;
     do
     {
         p[0] = Random::uniform(-dia, dia);
@@ -115,12 +115,12 @@ void SeedsGenerator::addSeed()
         auto nearest = m_c.graphRegister.getNearestNode(p);
         if (nearest == nullptr)
             break;
-        d = (nearest->pos-p).len();
+        d = (nearest->pos-p).norm();
     } while (d < minDist);
 
     /// Building initial tree
-    PtrWrap<Node> n1 = PtrWrap<Node>::make(&m_c, Vector<3>(p[0], p[1], p[2]-seedSize/2.0));
-    PtrWrap<Node> n2 = PtrWrap<Node>::make(&m_c, Vector<3>(p[0], p[1], p[2]+seedSize/2.0));
+    PtrWrap<Node> n1 = PtrWrap<Node>::make(&m_c, StaticVector<3>(p[0], p[1], p[2]-seedSize/2.0));
+    PtrWrap<Node> n2 = PtrWrap<Node>::make(&m_c, StaticVector<3>(p[0], p[1], p[2]+seedSize/2.0));
     PtrWrap<Link> l = PtrWrap<Link>::make(&m_c);
     l->connect(n1, n2);
 

@@ -20,7 +20,7 @@ void RandomGraphNodePayload::getBranchingParameters(double time, double dt, Bran
 	{
 		branchingParameters.needBranching = true;
 		/// @todo generate uniformly by angle
-		Vector<3> dir;
+		StaticVector<3> dir;
 
 		dir.x[0] = Random::uniform(-1.0, 1.0);
 		dir.x[1] = Random::uniform(-1.0, 1.0);

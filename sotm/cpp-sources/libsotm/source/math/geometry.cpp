@@ -3,8 +3,8 @@
 
 using namespace sotm;
 
-Vector<3> SphericalVectorPlacer::ortX{1.0, 0.0, 0.0};
-Vector<3> SphericalVectorPlacer::ortZ{0.0, 0.0, 1.0};
+StaticVector<3> SphericalVectorPlacer::ortX{1.0, 0.0, 0.0};
+StaticVector<3> SphericalVectorPlacer::ortZ{0.0, 0.0, 1.0};
 
 void sotm::createRotationMatrix(SquareMatrix<3>& matrix, Direction axis, double angle)
 {
@@ -20,17 +20,17 @@ void sotm::createRotationMatrix(SquareMatrix<3>& matrix, Direction axis, double 
     matrix.x[6+0] = (1-cos)*axis[z]*axis[x] - sin*axis[y]; matrix.x[6+1] = (1-cos)*axis[z]*axis[y] + sin*axis[x]; matrix.x[6+2] = cos + (1-cos)*sqr(axis[z]);
 }
 
-SphericalVectorPlacer::SphericalVectorPlacer(const Vector<3>& baseVector) :
+SphericalVectorPlacer::SphericalVectorPlacer(const StaticVector<3>& baseVector) :
 		m_baseVector(baseVector)
 {
 	m_baseVector.normalize();
-	double mz = m_baseVector^ortZ;
-	double mx = m_baseVector^ortX;
+    double mz = m_baseVector*ortZ;
+    double mx = m_baseVector*ortX;
 	if (fabs(mx) < fabs(mz))
 		m_useRotationToZ = false;
 }
 
-Vector<3> SphericalVectorPlacer::place(double len, double theta, double phi)
+StaticVector<3> SphericalVectorPlacer::place(double len, double theta, double phi)
 {
 	if (m_useRotationToZ)
 		useRotationToZ(len, theta, phi);
@@ -39,7 +39,7 @@ Vector<3> SphericalVectorPlacer::place(double len, double theta, double phi)
 	return m_result;
 }
 
-Vector<3> SphericalVectorPlacer::place(double len, SphericalPoint dir)
+StaticVector<3> SphericalVectorPlacer::place(double len, SphericalPoint dir)
 {
 	return place(len, dir.theta, dir.phi);
 }
@@ -47,19 +47,19 @@ Vector<3> SphericalVectorPlacer::place(double len, SphericalPoint dir)
 void SphericalVectorPlacer::useRotationToZ(double len, double theta, double phi)
 {
 	double alpha = angle(m_baseVector, ortZ);
-	Vector<3> rotAround = m_baseVector*ortZ;
+    StaticVector<3> rotAround = m_baseVector%ortZ;
 	rotAround.normalize();
 	createRotationMatrix(m_rotationMatrix, rotAround, -alpha);
 	m_result[0] = len*cos(phi)*sin(theta);
 	m_result[1] = len*sin(phi)*sin(theta);
 	m_result[2] = len*cos(theta);
-	m_result = m_rotationMatrix*m_result;
+    m_result = m_rotationMatrix*m_result;
 }
 
 void SphericalVectorPlacer::useRotationToX(double len, double theta, double phi)
 {
 	double alpha = angle(m_baseVector, ortX);
-	Vector<3> rotAround = m_baseVector*ortX;
+    StaticVector<3> rotAround = m_baseVector%ortX;
 	rotAround.normalize();
 	createRotationMatrix(m_rotationMatrix, rotAround, -alpha);
 	m_result[0] = len*cos(theta);

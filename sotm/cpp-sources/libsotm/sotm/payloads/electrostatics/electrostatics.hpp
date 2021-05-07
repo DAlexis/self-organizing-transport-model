@@ -37,7 +37,7 @@ public:
     void doBifurcation(double time, double dt) override;
 
 	void setDischargeFunc(Function1D func);
-    bool testConnection(const Node* n1, const Node* n2);
+    bool testConnection(const Node* n1, const Node* n2) const;
 
 	static inline ElectrostaticPhysicalContext* cast(IPhysicalContext* context)
 	{
@@ -99,7 +99,8 @@ class ElectrostaticNodePayload : public NodePayloadBase
 public:
     ElectrostaticNodePayload(PhysicalPayloadsRegister* reg, Node* node, double nodeRadiusConductivity, double nodeRadiusBranching);
 
-	SOTM_INLINE ElectrostaticPhysicalContext* context() { return static_cast<ElectrostaticPhysicalContext*>(node->physicalContext()); }
+    ElectrostaticPhysicalContext* context() { return static_cast<ElectrostaticPhysicalContext*>(node->physicalContext()); }
+    const ElectrostaticPhysicalContext* context() const { return static_cast<const ElectrostaticPhysicalContext*>(node->physicalContext()); }
 
 	void clearSubiteration() override final;
 	void calculateSecondaryValues(double time) override;
@@ -134,7 +135,7 @@ public:
 
 	// Secondary
 	double phi = 0; // Electrostatic potential
-	Vector<3> externalField; // Electric field from other nodes
+    StaticVector<3> externalField; // Electric field from other nodes
 
     // For charge field computations
     std::shared_ptr<CoulombNodeBase> coulombNode{
@@ -147,11 +148,11 @@ public:
     static double etaFromCriticalField(double criticalFeild, double beta); // Move this to context
 private:
 	void calculateExtFieldAndPhi();
-	Node* findTargetToConnectByMeanField();
+    Node* findTargetToConnectByMeanField() const;
 	void connectToTarget(Node* connectTo);
 	double calculateBranchLen(
-			const Vector<3>& startPoint,
-			const Vector<3>& direction,
+            const StaticVector<3>& startPoint,
+            const StaticVector<3>& direction,
 			double eDiffMax,
 			double lenMax
 	);

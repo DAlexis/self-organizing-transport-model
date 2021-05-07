@@ -19,7 +19,7 @@ public:
 	void run();
 
 private:
-	bool parsePoint(sotm::Vector<3>& v, const std::string& str);
+	bool parsePoint(sotm::StaticVector<3>& v, const std::string& str);
 
 	bool getCornersFromCmdline();
 	void fixCorners();
@@ -28,7 +28,7 @@ private:
 
 	struct Charge
 	{
-		sotm::Vector<3> pos;
+		sotm::StaticVector<3> pos;
 		double charge = 0;
 	};
 
@@ -36,11 +36,11 @@ private:
 	boost::program_options::variables_map m_cmdLineOptions;
 	std::vector<Charge> m_charges;
 	bool m_hasCorners;
-	sotm::Vector<3> m_c1, m_c2; // Corners
+	sotm::StaticVector<3> m_c1, m_c2; // Corners
 
 	size_t m_nx = 0, m_ny = 0, m_nz = 0;
 	double m_minDist = 0.0;
-    sotm::Vector<3> m_externalE;
+    sotm::StaticVector<3> m_externalE;
     bool m_ignoreExternal = false;
 	std::vector<double> m_potential;
     std::string m_outputFilenamePrefix;

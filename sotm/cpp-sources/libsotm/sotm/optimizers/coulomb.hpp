@@ -14,8 +14,8 @@ class CoulombNodeBruteForce;
 struct FieldPotential
 {
     FieldPotential(double Ex = 0, double Ey = 0, double Ez = 0, double potential = 0);
-    FieldPotential(const Vector<3>& E, double p);
-    Vector<3> field;
+    FieldPotential(const StaticVector<3>& E, double p);
+    StaticVector<3> field;
     double potential = 0.0;
 
     FieldPotential& operator+=(const FieldPotential& right);
@@ -48,12 +48,12 @@ class IColoumbCalculator
 {
 public:
     virtual ~IColoumbCalculator() {}
-    virtual FieldPotential getFP(Vector<3> pos, CoulombNodeBase* exclude = nullptr) = 0;
+    virtual FieldPotential getFP(StaticVector<3> pos, CoulombNodeBase* exclude = nullptr) = 0;
     virtual void rebuildOptimization() = 0;
     virtual void addCN(CoulombNodeBase& cn) = 0;
     virtual void removeCN(CoulombNodeBase& cn) = 0;
     virtual CoulombNodeBase* makeNode(double& charge, Node& thisNode) = 0;
-    virtual void getClose(std::vector<CoulombNodeBase*>& container, const Vector<3>& pos, double distace) = 0;
+    virtual void getClose(std::vector<CoulombNodeBase*>& container, const StaticVector<3>& pos, double distace) = 0;
 };
 
 
@@ -64,8 +64,8 @@ class CoulombComarator : public IColoumbCalculator
 public:
     CoulombComarator(std::unique_ptr<IColoumbCalculator> c1, std::unique_ptr<IColoumbCalculator> c2);
 
-    FieldPotential getFP(Vector<3> pos, CoulombNodeBase* exclude = nullptr) override;
-    void getClose(std::vector<CoulombNodeBase*>& container, const Vector<3>& pos, double distance) override;
+    FieldPotential getFP(StaticVector<3> pos, CoulombNodeBase* exclude = nullptr) override;
+    void getClose(std::vector<CoulombNodeBase*>& container, const StaticVector<3>& pos, double distance) override;
 
     void rebuildOptimization() override;
     void addCN(CoulombNodeBase& cn) override;

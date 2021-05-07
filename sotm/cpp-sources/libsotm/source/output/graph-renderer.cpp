@@ -19,12 +19,12 @@ SphereDrawer::SphereDrawer()
 {
 }
 
-SphereDrawer::SphereDrawer(Vector<3> pos, double radius, double color[3], const std::string& follower)
+SphereDrawer::SphereDrawer(StaticVector<3> pos, double radius, double color[3], const std::string& follower)
 {
 	create(pos, radius, color, follower);
 }
 
-void SphereDrawer::create(Vector<3> pos, double radius, double color[3], const std::string& follower)
+void SphereDrawer::create(StaticVector<3> pos, double radius, double color[3], const std::string& follower)
 {
 	vtkSmartPointer<vtkSphereSource> m_source = vtkSmartPointer<vtkSphereSource>::New();
 	m_source->SetCenter(pos.x);
@@ -174,7 +174,7 @@ void GraphRenderer::linkVisitor(sotm::Link* link, WireframeBuffer* buffer)
 {
 	auto& p1 = link->getNode1()->pos;
 	auto& p2 = link->getNode2()->pos;
-	Vector<3> center = (p1 + p2) / 2.0;
+	StaticVector<3> center = (p1 + p2) / 2.0;
 	if (m_renderPreferences->lineWidth)
 	{
 		// Line-by-line rendering

@@ -9,7 +9,7 @@ class CoulombBruteForce : public IColoumbCalculator
 {
 public:
     CoulombBruteForce(GraphRegister& graph);
-    FieldPotential getFP(Vector<3> pos, CoulombNodeBase* exclude = nullptr) override;
+    FieldPotential getFP(StaticVector<3> pos, CoulombNodeBase* exclude = nullptr) override;
 
     /**
      * @brief build positive and negative octree
@@ -17,7 +17,7 @@ public:
     void rebuildOptimization() override;
 
     CoulombNodeBase* makeNode(double& charge, Node& thisNode) override;
-    void getClose(std::vector<CoulombNodeBase*>& container, const Vector<3>& pos, double distace) override;
+    void getClose(std::vector<CoulombNodeBase*>& container, const StaticVector<3>& pos, double distace) override;
 
 private:
     void addCN(CoulombNodeBase& cn) override;
@@ -46,7 +46,7 @@ public:
 private:
     IColoumbCalculator &m_co;
     double m_isolatedPotential = 0;
-    Vector<3> m_isolatedField{0.0, 0.0, 0.0};
+    StaticVector<3> m_isolatedField{0.0, 0.0, 0.0};
 };
 
 }

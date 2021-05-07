@@ -24,12 +24,12 @@ int main(int argc, char** argv)
 	{ // Scope to remove pointers
 
 		/// Building initial tree
-		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, Vector<3>(0.0, 0.0, 0.0));
-		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, Vector<3>(1.0, 1.0, 1.0));
+		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, StaticVector<3>(0.0, 0.0, 0.0));
+		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, StaticVector<3>(1.0, 1.0, 1.0));
 
-		PtrWrap<Node> n3 = PtrWrap<Node>::make(&c, Vector<3>(2.0, 1.0, 1.0));
-		PtrWrap<Node> n4 = PtrWrap<Node>::make(&c, Vector<3>(1.0, 2.0, 1.0));
-		PtrWrap<Node> n5 = PtrWrap<Node>::make(&c, Vector<3>(1.0, 1.0, 2.0));
+		PtrWrap<Node> n3 = PtrWrap<Node>::make(&c, StaticVector<3>(2.0, 1.0, 1.0));
+		PtrWrap<Node> n4 = PtrWrap<Node>::make(&c, StaticVector<3>(1.0, 2.0, 1.0));
+		PtrWrap<Node> n5 = PtrWrap<Node>::make(&c, StaticVector<3>(1.0, 1.0, 2.0));
 
 		PtrWrap<Link> l = PtrWrap<Link>::make(&c);
 		PtrWrap<Link> l1 = PtrWrap<Link>::make(&c);

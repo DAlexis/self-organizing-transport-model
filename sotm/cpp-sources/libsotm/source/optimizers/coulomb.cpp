@@ -16,7 +16,7 @@ FieldPotential::FieldPotential(double Ex, double Ey, double Ez, double potential
 
 }
 
-FieldPotential::FieldPotential(const Vector<3>& E, double p) :
+FieldPotential::FieldPotential(const StaticVector<3>& E, double p) :
     field(E),
     potential(p)
 {
@@ -57,7 +57,7 @@ CoulombComarator::CoulombComarator(std::unique_ptr<IColoumbCalculator> c1, std::
 
 }
 
-FieldPotential CoulombComarator::getFP(Vector<3> pos, CoulombNodeBase* exclude)
+FieldPotential CoulombComarator::getFP(StaticVector<3> pos, CoulombNodeBase* exclude)
 {
     FieldPotential r1 = m_c1->getFP(pos, static_cast<CoulombComaratorNode*>(exclude)->m_n1.get());
     FieldPotential r2 = m_c2->getFP(pos, static_cast<CoulombComaratorNode*>(exclude)->m_n2.get());
@@ -65,7 +65,7 @@ FieldPotential CoulombComarator::getFP(Vector<3> pos, CoulombNodeBase* exclude)
     return r1;
 }
 
-void CoulombComarator::getClose(std::vector<CoulombNodeBase*>& container, const Vector<3>& pos, double distance)
+void CoulombComarator::getClose(std::vector<CoulombNodeBase*>& container, const StaticVector<3>& pos, double distance)
 {
     m_c1->getClose(container, pos, distance);
 }

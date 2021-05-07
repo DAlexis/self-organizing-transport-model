@@ -112,13 +112,13 @@ void GraphRegister::applyLinkVisitorWithoutGraphChganges(LinkVisitor v, bool opt
     }
 }
 
-Node* GraphRegister::getNearestNode(const Vector<3>& point, bool searchOverReceintlyAdded)
+Node* GraphRegister::getNearestNode(const StaticVector<3>& point, bool searchOverReceintlyAdded)
 {
 	Node* result = nullptr;
 	double minDist = 0.0;
 
 	auto visitor = [&point, &minDist, &result] (Node* node) {
-		double d = (node->pos - point).len();
+        double d = (node->pos - point).norm();
 		if (d < minDist || result == nullptr)
 		{
 			result = node;
@@ -223,9 +223,15 @@ IPhysicalContext* ModelContextDependent::physicalContext()
 	return m_context->physicalContext();
 }
 
+const IPhysicalContext* ModelContextDependent::physicalContext() const
+{
+    return m_context->physicalContext();
+}
+
+
 ////////////////////////////
 // Node
-Node::Node(ModelContext* context, Vector<3> pos) :
+Node::Node(ModelContext* context, StaticVector<3> pos) :
 	ModelContextDependent(context),
 	pos(pos)
 {
@@ -292,7 +298,7 @@ Link::Link(ModelContext* context) :
 	m_context->graphRegister.addLink(this);
 }
 
-Link::Link(ModelContext* context, Node* nodeFrom, Vector<3> pointTo) :
+Link::Link(ModelContext* context, Node* nodeFrom, StaticVector<3> pointTo) :
 	ModelContextDependent(context)
 {
 	ASSERT(nodeFrom != nullptr, "Cannot create link with nullptr node");
@@ -339,7 +345,7 @@ Node* Link::getNode(unsigned int index)
 
 double Link::length()
 {
-	return (m_n1->pos - m_n2->pos).len();
+    return (m_n1->pos - m_n2->pos).norm();
 }
 
 double Link::lengthCached()

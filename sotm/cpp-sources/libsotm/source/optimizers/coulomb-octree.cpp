@@ -17,7 +17,7 @@ CoulombOctree::CoulombOctree(GraphRegister& graph, std::unique_ptr<const octree:
 
 }
 
-FieldPotential CoulombOctree::getFP(Vector<3> pos, CoulombNodeBase* exclude)
+FieldPotential CoulombOctree::getFP(StaticVector<3> pos, CoulombNodeBase* exclude)
 {
     // No-octree variant
     if (m_octreeNegative.empty() && m_octreePositive.empty())
@@ -40,7 +40,7 @@ CoulombNodeBase* CoulombOctree::makeNode(double& charge, Node& thisNode)
     return new CoulombNodeOctree(*this, charge, thisNode);
 }
 
-void CoulombOctree::getClose(std::vector<CoulombNodeBase*>& container, const Vector<3>& pos, double distace)
+void CoulombOctree::getClose(std::vector<CoulombNodeBase*>& container, const StaticVector<3>& pos, double distace)
 {
     std::vector<octree::Element*> octreeElements;
     m_octreeNegative.getClose(octreeElements, pos.x, distace);

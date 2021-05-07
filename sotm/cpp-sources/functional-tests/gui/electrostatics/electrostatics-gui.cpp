@@ -55,7 +55,7 @@ int main(int argc, char** argv)
     physCont->linkEtaDefault = 1e-5; // 1e-4; // 1e-5;
 
 	//Vector<3> externalField{0.0, 0.0, 0.6e6};
-	Vector<3> externalField{0.0, 0.0, 0.2e6};
+	StaticVector<3> externalField{0.0, 0.0, 0.2e6};
 	//physCont->externalConstField = externalField;
 	FieldLinearScalar<3> externalPotential(-0.2e6, {0.0, 0.0, 1.0});
 	physCont->externalPotential = &externalPotential;
@@ -65,8 +65,8 @@ int main(int argc, char** argv)
 	{ // Scope to remove pointers
 
 		/// Building initial tree
-		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, Vector<3>(0.0, 0.0, -0.2));
-		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, Vector<3>(0.0, 0.0, 0.2));
+		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, StaticVector<3>(0.0, 0.0, -0.2));
+		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, StaticVector<3>(0.0, 0.0, 0.2));
 
 		PtrWrap<Link> l = PtrWrap<Link>::make(&c);
 

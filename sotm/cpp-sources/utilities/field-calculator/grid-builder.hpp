@@ -22,7 +22,7 @@ class GridBuilder
 {
 public:
 	struct ValuePoint {
-		sotm::Vector<3> point;
+		sotm::StaticVector<3> point;
 		double value = 0;
 	};
 
