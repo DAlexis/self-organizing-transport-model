@@ -8,7 +8,8 @@
 #include "sotm/math/distrib-gen.hpp"
 #include "sotm/math/generic.hpp"
 #include "sotm/math/random.hpp"
-#include "sotm/utils/const.hpp"
+
+#include <cmath>
 
 using namespace sotm;
 
@@ -32,11 +33,11 @@ DistributionResult<SphericalPoint> sotm::generateDischargeDirection(
 
 	if (fabs(E0 / E1) < externalMin) {
 		// We have small external field so we can generate uniform distribution by Omega
-		double val = Random::uniform(0.0, 1.0) / (2*Const::pi * r * r * dt * distribution(E1));
+        double val = Random::uniform(0.0, 1.0) / (2*M_PI * r * r * dt * distribution(E1));
 		if (val <= 2.0)
 		{
 			double cosTheta = 1.0-val;
-			result.phi = Random::uniform(0.0, 2*Const::pi);
+            result.phi = Random::uniform(0.0, 2*M_PI);
 			result.theta = acos(cosTheta);
 			return DistributionResult<SphericalPoint>(result);
 		} else {
@@ -44,16 +45,16 @@ DistributionResult<SphericalPoint> sotm::generateDischargeDirection(
 		}
 	}
 
-	double val = Random::uniform(0.0, 1.0) * E0 / (2*Const::pi * r * r * dt);
+    double val = Random::uniform(0.0, 1.0) * E0 / (2*M_PI * r * r * dt);
 	double tmp = integralDistribution(E0+E1) - val;
 	if (tmp < 0)
 	{
 		return DistributionResult<SphericalPoint>();
 	}
 
-	result.phi = Random::uniform(0.0, 2*Const::pi);
+    result.phi = Random::uniform(0.0, 2*M_PI);
 
-	MonotonicFunctionSolver solver(integralDistribution, E1-1.5*E0, E1+1.5*E0, Const::pi / 1000.0);
+    MonotonicFunctionSolver solver(integralDistribution, E1-1.5*E0, E1+1.5*E0, M_PI / 1000.0);
 
 	if (!solver.inRange(tmp))
 		return DistributionResult<SphericalPoint>();

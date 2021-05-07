@@ -6,7 +6,6 @@
  */
 
 #include "sotm/math/generic.hpp"
-#include "sotm/utils/const.hpp"
 
 #include <cmath>
 
@@ -88,7 +87,7 @@ double SmoothedLocalStepFunction::get(double arg)
 	if (arg >= m_stepPoint + m_radius)
 			return 1.0;
 
-	return 0.5 + sin((arg-m_stepPoint) / m_radius * Const::pi / 2) / 2.0;
+    return 0.5 + sin((arg-m_stepPoint) / m_radius * M_PI / 2) / 2.0;
 }
 
 double SmoothedLocalStepFunction::operator()(double arg)
