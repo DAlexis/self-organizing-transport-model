@@ -11,17 +11,17 @@
 #include "sotm/base/model-context.hpp"
 #include "sotm/output/render-preferences.hpp"
 
-#include <vtk/vtkDataSet.h>
-#include <vtk/vtkPolyDataMapper.h>
-#include <vtk/vtkRenderer.h>
-#include <vtk/vtkRenderWindow.h>
-#include <vtk/vtkSphereSource.h>
-#include <vtk/vtkLineSource.h>
-#include <vtk/vtkCellArray.h>
-#include <vtk/vtkLine.h>
-#include <vtk/vtkActor.h>
-#include <vtk/vtkSmartPointer.h>
-#include <vtk/vtkFollower.h>
+#include <vtkDataSet.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkSphereSource.h>
+#include <vtkLineSource.h>
+#include <vtkCellArray.h>
+#include <vtkLine.h>
+#include <vtkActor.h>
+#include <vtkSmartPointer.h>
+#include <vtkFollower.h>
 
 #include <vector>
 

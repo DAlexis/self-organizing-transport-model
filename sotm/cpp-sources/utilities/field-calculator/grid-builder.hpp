@@ -10,9 +10,9 @@
 
 #include "sotm/math/geometry.hpp"
 
-#include <vtk/vtkPoints.h>
-#include <vtk/vtkSmartPointer.h>
-#include <vtk/vtkDoubleArray.h>
+#include <vtkPoints.h>
+#include <vtkSmartPointer.h>
+#include <vtkDoubleArray.h>
 
 #include <vector>
 #include <string>

@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 project(lightmod)
 
 find_package (Boost COMPONENTS date_time program_options REQUIRED)
+find_package(VTK REQUIRED)
 
 set(EXE_SOURCES
     main.cpp
@@ -18,11 +19,13 @@ set(EXE_SOURCES
 
 add_executable(${PROJECT_NAME} ${EXE_SOURCES})
 
-target_link_libraries (${PROJECT_NAME} PUBLIC cic)
+include(${VTK_USE_FILE})
 
-target_link_libraries (${PROJECT_NAME} PUBLIC
-    sotm
+target_link_libraries (${PROJECT_NAME} PRIVATE
+    cic
     sotm-gui
+    sotm
+    ${VTK_LIBRARIES} # For unknown reason VTK include paths are not picked up as sotm dependency
     ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 

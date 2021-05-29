@@ -1,4 +1,4 @@
-#include "libsotm-ut/complex/branching-trivial-physics.hpp"
+#include "../../../unit-tests/libsotm-ut/complex/branching-trivial-physics.hpp"
 #include "sotm/time-iter/euler-explicit.hpp"
 
 #include <iostream>

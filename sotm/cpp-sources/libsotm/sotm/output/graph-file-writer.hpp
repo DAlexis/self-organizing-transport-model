@@ -12,13 +12,13 @@
 #include "sotm/base/time-iter.hpp"
 #include "sotm/output/render-preferences.hpp"
 
-#include <vtk/vtkDataSet.h>
-#include <vtk/vtkPolyDataMapper.h>
-#include <vtk/vtkLineSource.h>
-#include <vtk/vtkCellArray.h>
-#include <vtk/vtkLine.h>
-#include <vtk/vtkSmartPointer.h>
-#include <vtk/vtkDoubleArray.h>
+#include <vtkDataSet.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkLineSource.h>
+#include <vtkCellArray.h>
+#include <vtkLine.h>
+#include <vtkSmartPointer.h>
+#include <vtkDoubleArray.h>
 
 #include <sstream>
 

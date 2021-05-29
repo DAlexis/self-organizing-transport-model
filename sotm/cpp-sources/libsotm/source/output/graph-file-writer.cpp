@@ -1,7 +1,7 @@
 #include "sotm/output/graph-file-writer.hpp"
 
-#include <vtk/vtkCellData.h>
-#include <vtk/vtkXMLPolyDataWriter.h>
+#include <vtkCellData.h>
+#include <vtkXMLPolyDataWriter.h>
 
 #include <iostream>
 #include <sstream>

@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 
 project(sotm)
 
-find_package(VTK REQUIRED)
-#include(${VTK_USE_FILE})
+find_package(VTK
+    REQUIRED
+)
 
 
 set(LIB_SOURCE
@@ -64,8 +65,11 @@ set(LIB_HPP
 )
 
 
-add_library(${PROJECT_NAME} STATIC ${LIB_SOURCE} ${LIB_HPP})
-target_link_libraries(${PROJECT_NAME} PUBLIC tbb octree)
+add_library(${PROJECT_NAME} ${LIB_SOURCE} ${LIB_HPP})
+
+include(${VTK_USE_FILE})
+
+target_link_libraries(${PROJECT_NAME} PUBLIC ${VTK_LIBRARIES} tbb octree)
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR})
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)

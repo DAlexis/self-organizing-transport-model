@@ -6,10 +6,10 @@
  */
 
 #include <sotm/output/graph-renderer.hpp>
-#include <vtk/vtkCellData.h>
-#include <vtk/vtkProperty.h>
-#include <vtk/vtkVectorText.h>
-#include <vtk/vtkXMLPolyDataWriter.h>
+#include <vtkCellData.h>
+#include <vtkProperty.h>
+#include <vtkVectorText.h>
+#include <vtkXMLPolyDataWriter.h>
 
 #include <cmath>
 

@@ -1,11 +1,11 @@
 #include "grid-builder.hpp"
 
-#include <vtk/vtkVersion.h>
-#include <vtk/vtkCellArray.h>
-#include <vtk/vtkXMLStructuredGridWriter.h>
-#include <vtk/vtkStructuredGrid.h>
-#include <vtk/vtkCellData.h>
-#include <vtk/vtkPointData.h>
+#include <vtkVersion.h>
+#include <vtkCellArray.h>
+#include <vtkXMLStructuredGridWriter.h>
+#include <vtkStructuredGrid.h>
+#include <vtkCellData.h>
+#include <vtkPointData.h>
 
 GridBuilder::GridBuilder(
 	size_t nx,
