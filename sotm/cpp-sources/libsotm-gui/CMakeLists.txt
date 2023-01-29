@@ -5,19 +5,16 @@
 
 PROJECT(sotm-gui)
 
-set(EXE_NAME ${PROJECT_NAME})
-set(LIB_NAME ${PROJECT_NAME})
-
 find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 
-if(${VTK_VERSION} VERSION_GREATER "6" AND VTK_QT_VERSION VERSION_GREATER "4")
+if(${VTK_VERSION} VERSION_GREATER "6" AND ${VTK_QT_VERSION} VERSION_GREATER "4")
   # Instruct CMake to run moc automatically when needed.
   set(CMAKE_AUTOMOC ON)
   SET(CMAKE_AUTOUIC ON)
   find_package(Qt5Widgets REQUIRED QUIET)
 else()
-  message(WARNING "Yor VTK_VERSION < 6 or VTK_QT_VERSION < 4, build system was not tested for this configuration")
+  message(FATAL_ERROR "Yor VTK_VERSION < 6 or VTK_QT_VERSION < 4, build system was not tested for this configuration")
   find_package(Qt4 REQUIRED)
   include(${QT_USE_FILE})
 endif()
@@ -45,38 +42,25 @@ set(EXE_SOURCE
     ${PROJECT_SOURCE_DIR}/source/async-iteration.cpp
 )
 
-if(${VTK_VERSION} VERSION_GREATER "6" AND VTK_QT_VERSION VERSION_GREATER "4")
+if(${VTK_VERSION} VERSION_GREATER "6" AND ${VTK_QT_VERSION} VERSION_GREATER "4")
   # Create headers from .ui files with moc
   #qt5_wrap_ui(AUTOGEN_UI_SOURCE ${UI_FILES} )
   
   # CMAKE_AUTOMOC in ON so the MOC headers will be automatically wrapped.  
-  add_library(${LIB_NAME} ${EXE_SOURCE} ${AUTOGEN_UI_SOURCE} ${EXE_HPP} ${EXE_QT_HPP})
+  add_library(${PROJECT_NAME} ${EXE_SOURCE} ${AUTOGEN_UI_SOURCE} ${EXE_HPP} ${EXE_QT_HPP})
 
-  target_include_directories(${LIB_NAME} PUBLIC
+  target_include_directories(${PROJECT_NAME} PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}
       ${CMAKE_CURRENT_BINARY_DIR}
       ${sotm_INCLUDE_DIRS}
+      ${PROJECT_SOURCE_DIR}
       ${Qt5Widgets_INCLUDE_DIRS}
       ${Qt5Core_INCLUDE_DIRS}
   )
   
-  target_link_libraries(${LIB_NAME} PUBLIC ${VTK_LIBRARIES} sotm)
+  target_link_libraries(${PROJECT_NAME} PUBLIC ${VTK_LIBRARIES} sotm)
   
 else()
     message(FATAL_ERROR "Yor VTK_VERSION < 6 or VTK_QT_VERSION < 4, cannot build")
-
-#  QT4_WRAP_UI(AUTOGEN_UI_SOURCE ${UI_FILES})
-#  QT4_WRAP_CPP(MOCSrcs ${EXE_QT_HPP})
-#  add_executable(${EXE_NAME} MACOSX_BUNDLE ${EXE_SOURCE} ${AUTOGEN_UI_SOURCE} ${MOCSrcs})
-#
-#  if(VTK_LIBRARIES)
-#    if(${VTK_VERSION} VERSION_LESS "6")
-#      target_link_libraries(${EXE_NAME} ${VTK_LIBRARIES} QVTK)
-#    else()
-#      target_link_libraries(${EXE_NAME} ${VTK_LIBRARIES})
-#    endif()
-#  else()
-#    target_link_libraries(${EXE_NAME} vtkHybrid QVTK vtkViews ${QT_LIBRARIES})
-#  endif()
 endif()
 

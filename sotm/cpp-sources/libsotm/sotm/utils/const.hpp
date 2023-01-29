@@ -18,6 +18,7 @@ namespace sotm
 
 		namespace Si
 		{
+            constexpr static double c = 299792458.0;
 			constexpr static double epsilon_0 = 8.85418781762039e-12;
 			constexpr static double k = 1 / (4*pi*epsilon_0);
 
