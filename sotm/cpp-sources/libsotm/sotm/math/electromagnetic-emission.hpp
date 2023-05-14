@@ -27,6 +27,29 @@ private:
     StaticVector<3> m_current_sum;
 };
 
+
+class EmissionCounterWithoutLag
+{
+public:
+    EmissionCounterWithoutLag(StaticVector<3> destination);
+
+    void add_charge(double time, double dt, StaticVector<3> source, double charge, double charge_dot);
+    void add_current(double time, double dt, StaticVector<3> source, StaticVector<3> dl, double current_dot);
+
+    std::vector<StaticVector<3>> get_samples(double from, double to, double dt);
+
+private:
+    void update_time(double new_time);
+
+    std::vector<double> m_time_points;
+    std::vector<StaticVector<3>> m_field_at_time;
+    StaticVector<3> m_destination;
+    double m_sample_dt;
+    double m_last_sample_time = 0.0;
+    StaticVector<3> m_current_sum;
+};
+
+
 }
 
 #endif // ELECTRICEMISSION_HPP

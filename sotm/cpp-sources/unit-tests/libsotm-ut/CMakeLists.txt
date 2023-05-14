@@ -1,6 +1,7 @@
 project(sotm-unit-tests)
 
 set(EXE_SOURCES
+    math/electromagnetic-emission-ut.cpp
     math/generic-ut.cpp
     math/geometry-ut.cpp
     math/integration-ut.cpp

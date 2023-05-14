@@ -99,10 +99,26 @@ TEST(angle, SomeCases)
 	}
 }
 
+TEST(VectorProduct, SomeCases)
+{
+    {
+        StaticVector<3> v1{0.002279797838314907, 0.4103636108966833, 0.9119191353259629};
+        StaticVector<3> v2{1.0, 0.0, 0.0};
+
+        StaticVector<3> product = v1 % v2;
+        double ang1 = angle(product, v1);
+        double ang2 = angle(product, v2);
+
+        EXPECT_NEAR(ang1, M_PI_2, 0.00001);
+        EXPECT_NEAR(ang2, M_PI_2, 0.00001);
+    }
+
+}
+
 TEST(PlaceVectorRelatively, GeneralCase)
 {
 	{
-		StaticVector<3> base{1.0, 2.0, -0.01}; // Near plane XY
+        StaticVector<3> base{1.0, 2.0, -0.01}; // low Z normal component
 		double len = 1.0;
 		double theta = 0.2;
 		double phi = 0.4;
@@ -110,12 +126,12 @@ TEST(PlaceVectorRelatively, GeneralCase)
 
 		StaticVector<3> result = p.place(len, theta, phi);
 		double a = angle(result, base);
-		ASSERT_NEAR(a, theta, 0.00000001);
-        ASSERT_NEAR(result.norm(), len, 0.00000001);
+        EXPECT_NEAR(a, theta, 0.00000001);
+        EXPECT_NEAR(result.norm(), len, 0.00000001);
 
 	}
 	{
-		StaticVector<3> base{4.0, 0.01, 3.0}; // Near plane XY
+        StaticVector<3> base{4.0, 0.01, 3.0}; // low Y normal component
 		double len = 1.0;
 		double theta = 0.1;
 		double phi = 0.8;
@@ -123,10 +139,10 @@ TEST(PlaceVectorRelatively, GeneralCase)
 
 		StaticVector<3> result = p.place(len, theta, phi);
 		double a = angle(result, base);
-		ASSERT_NEAR(a, theta, 0.00000001);
+        EXPECT_NEAR(a, theta, 0.00000001);
 	}
 	{
-		StaticVector<3> base{0.01, 1.8, 4.0}; // Near plane YZ
+        StaticVector<3> base{0.01, 1.8, 4.0}; // low X normal component
 		double len = 1.0;
 		double theta = 0.1;
 		double phi = 0.8;
@@ -134,7 +150,7 @@ TEST(PlaceVectorRelatively, GeneralCase)
 
 		StaticVector<3> result = p.place(len, theta, phi);
 		double a = angle(result, base);
-		ASSERT_NEAR(a, theta, 0.00000001);
+        EXPECT_NEAR(a, theta, 0.00000001);
 	}
 	{
 		StaticVector<3> base{1.0, 0.0, 0.0}; // axis X
@@ -145,7 +161,7 @@ TEST(PlaceVectorRelatively, GeneralCase)
 
 		StaticVector<3> result = p.place(len, theta, phi);
 		double a = angle(result, base);
-		ASSERT_NEAR(a, theta, 0.00000001);
+        EXPECT_NEAR(a, theta, 0.00000001);
 	}
 	{
 		StaticVector<3> base{0.0, 1.0, 0.0}; // axis Y
@@ -156,7 +172,7 @@ TEST(PlaceVectorRelatively, GeneralCase)
 
 		StaticVector<3> result = p.place(len, theta, phi);
 		double a = angle(result, base);
-		ASSERT_NEAR(a, theta, 0.00000001);
+        EXPECT_NEAR(a, theta, 0.00000001);
 	}
 	{
 		StaticVector<3> base{0.0, 0.0, -1.0}; // - axis Z
@@ -167,6 +183,6 @@ TEST(PlaceVectorRelatively, GeneralCase)
 
 		StaticVector<3> result = p.place(len, theta, phi);
 		double a = angle(result, base);
-		ASSERT_NEAR(a, theta, 0.00000001);
+        EXPECT_NEAR(a, theta, 0.00000001);
 	}
 }

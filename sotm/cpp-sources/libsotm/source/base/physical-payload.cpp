@@ -141,8 +141,9 @@ double PhysicalPayloadsRegister::getMinimalStepsCount()
 
 void PhysicalPayloadsRegister::destroyAll()
 {
-    for (auto &it: m_payloads)
-        it->onDeletePayload();
+    std::set<AnyPhysicalPayloadBase*> copy_to_iterate = m_payloads;
+    for (auto p_payload : copy_to_iterate)
+        p_payload->onDeletePayload();
 }
 
 AnyPhysicalPayloadBase::AnyPhysicalPayloadBase(PhysicalPayloadsRegister* reg) :

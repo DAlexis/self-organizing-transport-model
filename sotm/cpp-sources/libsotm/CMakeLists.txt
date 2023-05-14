@@ -14,7 +14,7 @@ set(LIB_SOURCE
     source/math/integration.cpp
     source/math/distrib-gen.cpp
     source/math/functions.cpp
-    sotm/math/electric-emission.hpp
+    sotm/math/electromagnetic-emission.hpp
     source/base/transport-graph.cpp
     source/base/physical-payload.cpp
     source/base/model-context.cpp
@@ -48,7 +48,7 @@ set(LIB_HPP
     sotm/math/geometry.hpp
     sotm/math/distrib-gen.hpp
     sotm/math/functions.hpp
-    source/math/electric-emission.cpp
+    source/math/electromagnetic-emission.cpp
     sotm/output/graph-renderer.hpp
     sotm/output/graph-file-writer.hpp
     sotm/utils/memory.hpp

@@ -187,9 +187,9 @@ public:
     {
         static_assert(dim == 3, "Vector product works only for dimension = 3!");
         VectorType result;
-        result[0] =   (*this)[1] * right[2] - (*this)[2] * right[1];
-        result[1] = - (*this)[0] * right[2] - (*this)[2] * right[0];
-        result[2] =   (*this)[0] * right[1] - (*this)[1] * right[0];
+        result[0] =    (*this)[1] * right[2] - (*this)[2] * right[1];
+        result[1] = - ((*this)[0] * right[2] - (*this)[2] * right[0]);
+        result[2] =    (*this)[0] * right[1] - (*this)[1] * right[0];
         return result;
     }
 
@@ -264,7 +264,7 @@ double angle(StaticVector<dim> v1, StaticVector<dim> v2)
 {
     double c = (v1*v2)/v1.norm()/v2.norm();
 	if (c > 1.0) c = 1.0;
-	if (c <-1.0) c =-1.0;
+    if (c <-1.0) c =-1.0;
 	return acos(c);
 }
 
