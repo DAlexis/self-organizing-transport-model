@@ -2,6 +2,7 @@
 
 #include "gtest/gtest.h"
 #include <cmath>
+#include <fstream>
 
 using namespace sotm;
 
@@ -51,8 +52,9 @@ public:
 
     double get_dt(double time)
     {
-        double in_period_time = time - round(time / m_period) * m_period;
-        return m_min + in_period_time / m_period * m_ampl;
+        double in_period_time = time - floor(time / m_period) * m_period;
+        double dt = m_min + in_period_time / m_period * m_ampl;
+        return dt;
     }
 
 private:
@@ -61,8 +63,11 @@ private:
 
 TEST(ElectromagneticEmission, DipoleEmission)
 {
-/*
     double freq = 10;
+    const double samples_from = 0.0;
+    const double samples_to = 10.0;
+    const double sample_dt = 0.01;
+
     TimeStepGenerator tsg(0.001, 0.01, 0.1234);
     DipoleSource dipole(M_2_PI * freq, 1.0, 1.0);
 
@@ -77,7 +82,7 @@ TEST(ElectromagneticEmission, DipoleEmission)
 
     EmissionCounterWithoutLag emission_counter(receiver1);
 
-    for (double t = 0; t < 10.0; t += tsg.get_dt(t))
+    for (double t = samples_from; t < samples_to; t += tsg.get_dt(t))
     {
         double dt = tsg.get_dt(t);
         double charge_top = dipole.get_charge(t);
@@ -90,5 +95,15 @@ TEST(ElectromagneticEmission, DipoleEmission)
         emission_counter.add_current(t, dt, center, dl, current_dot);
     }
 
-*/
+
+    auto samples = emission_counter.get_samples(samples_from, samples_to, sample_dt);
+
+    std::ofstream file("dipole_samples.csv", std::ios::out);
+    file << "t,Ex,Ey,Ez" << std::endl;
+    for (size_t i = 0; i < samples.size(); i++)
+    {
+        file << samples_from + i * sample_dt << "," << samples[i][0] << "," << samples[i][1] << "," << samples[i][2] << std::endl;
+    }
+    file.close();
+
 }

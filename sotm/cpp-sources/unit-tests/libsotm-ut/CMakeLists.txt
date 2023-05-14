@@ -39,3 +39,4 @@ target_link_libraries (${PROJECT_NAME} PUBLIC
 
 
 add_test(NAME Library_testing COMMAND ${PROJECT_NAME})
+configure_file(math/plot-emission.py plot-emission.py COPYONLY)

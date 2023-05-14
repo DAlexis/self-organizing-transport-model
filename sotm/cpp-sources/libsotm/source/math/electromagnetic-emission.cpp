@@ -2,7 +2,6 @@
 #include "sotm/math/generic.hpp"
 #include "sotm/utils/const.hpp"
 
-
 using namespace sotm;
 
 EmissionCounter::EmissionCounter(StaticVector<3> destination, double sample_dt) :
@@ -93,14 +92,15 @@ std::vector<StaticVector<3>> EmissionCounterWithoutLag::get_samples(double from,
         return result;
 
     size_t internal_i = 0;
-    size_t result_i = 0;
-    for (double t = from; t <= to; t += dt, result_i++)
+
+    for (size_t result_i = 0; result_i < result.size(); result_i++)
     {
+        double t = from + dt * result_i;
         // if t is out of current internal bar, lets increment internal index while t is not on bar
         while (m_time_points.size() > internal_i+1 && m_time_points[internal_i+1] < t)
             internal_i++;
 
-        result.push_back(m_field_at_time[internal_i]);
+        result[result_i] = m_field_at_time[internal_i];
 
         if (m_time_points.size() == internal_i+1)
             break;
