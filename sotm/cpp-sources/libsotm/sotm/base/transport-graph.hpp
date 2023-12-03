@@ -136,10 +136,9 @@ private:
 class Link : public ModelContextDependent, public SelfMemMgr
 {
 public:
-	Link(ModelContext* context);
-	Link(ModelContext* context, Node* nodeFrom, StaticVector<3> pointTo);
+    Link(ModelContext* context, Node* n1, Node* n2);
+    Link(ModelContext* context, Node* nodeFrom, StaticVector<3> pointTo);
 	~Link();
-	void connect(Node* n1, Node* n2);
 
 	Node* getNode1();
 	Node* getNode2();
@@ -148,7 +147,10 @@ public:
 	double lengthCached();
 
 	std::unique_ptr<LinkPayloadBase> payload;
+
 private:
+    void connect(Node* n1, Node* n2);
+
 	PtrWrap<Node> m_n1, m_n2;
 	double m_lengthCached = -1.0;
 };

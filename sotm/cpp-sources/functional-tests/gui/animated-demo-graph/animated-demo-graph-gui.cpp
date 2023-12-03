@@ -31,15 +31,10 @@ int main(int argc, char** argv)
 		PtrWrap<Node> n4 = PtrWrap<Node>::make(&c, StaticVector<3>(1.0, 2.0, 1.0));
 		PtrWrap<Node> n5 = PtrWrap<Node>::make(&c, StaticVector<3>(1.0, 1.0, 2.0));
 
-		PtrWrap<Link> l = PtrWrap<Link>::make(&c);
-		PtrWrap<Link> l1 = PtrWrap<Link>::make(&c);
-		PtrWrap<Link> l2 = PtrWrap<Link>::make(&c);
-		PtrWrap<Link> l3 = PtrWrap<Link>::make(&c);
-
-		l->connect(n1, n2);
-		l1->connect(n2, n3);
-		l2->connect(n2, n4);
-		l3->connect(n2, n5);
+        PtrWrap<Link> l = PtrWrap<Link>::make(&c, n1, n2);
+        PtrWrap<Link> l1 = PtrWrap<Link>::make(&c, n2, n3);
+        PtrWrap<Link> l2 = PtrWrap<Link>::make(&c, n2, n4);
+        PtrWrap<Link> l3 = PtrWrap<Link>::make(&c, n2, n5);
 	}
 
 	// Time iteration

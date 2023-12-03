@@ -44,7 +44,7 @@ set(EXE_SOURCE
 
 if(${VTK_VERSION} VERSION_GREATER "6" AND ${VTK_QT_VERSION} VERSION_GREATER "4")
   # Create headers from .ui files with moc
-  #qt5_wrap_ui(AUTOGEN_UI_SOURCE ${UI_FILES} )
+  qt5_wrap_ui(AUTOGEN_UI_SOURCE ${UI_FILES} )
   
   # CMAKE_AUTOMOC in ON so the MOC headers will be automatically wrapped.  
   add_library(${PROJECT_NAME} ${EXE_SOURCE} ${AUTOGEN_UI_SOURCE} ${EXE_HPP} ${EXE_QT_HPP})

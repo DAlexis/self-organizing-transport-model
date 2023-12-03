@@ -68,9 +68,7 @@ int main(int argc, char** argv)
 		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, StaticVector<3>(0.0, 0.0, -0.2));
 		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, StaticVector<3>(0.0, 0.0, 0.2));
 
-		PtrWrap<Link> l = PtrWrap<Link>::make(&c);
-
-		l->connect(n1, n2);
+        PtrWrap<Link> l = PtrWrap<Link>::make(&c, n1, n2);
 
 		//static_cast<ElectrostaticNodePayload*>(n1->payload.get())->setCharge(4e-6);
 		//static_cast<ElectrostaticNodePayload*>(n2->payload.get())->setCharge(4e-6);

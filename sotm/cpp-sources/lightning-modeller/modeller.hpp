@@ -10,6 +10,7 @@
 
 #include "seeds-generator.hpp"
 #include "coulomb-selector.hpp"
+#include "emission-writer.hpp"
 
 #include "sotm/base/transport-graph.hpp"
 #include "sotm/base/model-context.hpp"
@@ -41,6 +42,7 @@ private:
 	void initTimeIterator();
 	void generateCondEvoParams();
     void initSeeds();
+    void writeEmission();
 
 	static std::string getTimeStr();
 
@@ -113,7 +115,14 @@ private:
 		    cic::Parameter<double>("field",             "External field", 0.3e6),
 		    cic::Parameter<double>("field-z-size",      "Field vertical size", 1000),
 		    cic::Parameter<double>("field-z-recession", "Field recession zone size", 1000)
-		)
+        ),
+        cic::ParametersGroup(
+            "Emission",
+            "Emission calculation options",
+            cic::Parameter<double>("receiver-x", "Electromagnetic wave receiver x", 500),
+            cic::Parameter<double>("receiver-y", "Electromagnetic wave receiver y", 0),
+            cic::Parameter<double>("receiver-z", "Electromagnetic wave receiver z", -500)
+        )
 	};
 
     SeedsGenerator m_sg{m_p["Seeds"], c};

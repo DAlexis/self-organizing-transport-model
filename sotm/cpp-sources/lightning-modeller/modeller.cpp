@@ -94,6 +94,9 @@ void Modeller::run()
 		m_timeIter->run();
 	}
 
+    cout << "Writing emission to file" << std::endl;
+    writeEmission();
+
 	cout << "Destroying graph" << endl;
     c.destroyAll();
 	cout << "Exiting" << endl;
@@ -190,6 +193,13 @@ void Modeller::initParameters()
 
 	StaticVector<3> externalField{0.0, 0.0, m_p["Field"].get<double>("field")};
 	m_physCont->externalPotential = m_externalPotential.get();
+    m_physCont->emission_counter = std::make_unique<EmissionCounterWithoutLag>(
+        StaticVector<3>(
+            m_p["Emission"].get<double>("receiver-x"),
+            m_p["Emission"].get<double>("receiver-y"),
+            m_p["Emission"].get<double>("receiver-z")
+        )
+    );
 
 	generateCondEvoParams();
 
@@ -221,6 +231,23 @@ void Modeller::initSeeds()
     if (m_p["Seeds"].get<bool>("seeds-dynamic"))
     {
         m_timeIter->addHook(&m_sg.hook());
+    }
+}
+
+void Modeller::writeEmission()
+{
+    const double dt = 1e-8;
+    const double t_begin = 0;
+    const double t_end = m_timeIter->getTime();
+    std::vector<StaticVector<3>> samples = m_physCont->emission_counter->get_samples(0, m_timeIter->getTime(), dt);
+    cout << "Emiision samples count: " << samples.size() << std::endl;
+    ofstream emissionFile("emission.csv", ios::out | ios::binary);
+    emissionFile << "time,Ex,Ey,Ez\n";
+    double t = t_begin;
+    for (const auto& e : samples)
+    {
+        emissionFile << t << "," << e[0] << "," << e[1] << "," << e[2] << "\n";
+        t += dt;
     }
 }
 

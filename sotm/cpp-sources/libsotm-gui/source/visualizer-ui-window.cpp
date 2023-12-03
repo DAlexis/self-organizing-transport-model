@@ -22,7 +22,7 @@ VisualizerUIWindow::VisualizerUIWindow(sotm::QtGUI *gui) :
 {
     this->setupUi(this);
 
-    this->qvtkWidget->GetRenderWindow()->AddRenderer(m_renderer);
+    this->qvtkWidget->renderWindow()->AddRenderer(m_renderer);
 
     m_frameTimer = new QTimer(this);
     connect(m_frameTimer, SIGNAL(timeout()), this, SLOT(onFrameTimerTimeout()));

@@ -21,8 +21,7 @@ TEST(ComplexBranchingGraph, GraphCreationAndDestruction)
 		ASSERT_EQ(EmptyLinkPayloadWithBranching::count, 0);
 		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, StaticVector<3>({0.0, 0.0, 0.0}));
 		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, StaticVector<3>({1.0, 0.0, 0.0}));
-		PtrWrap<Link> l = PtrWrap<Link>::make(&c);
-		l->connect(n1, n2);
+        PtrWrap<Link> l = PtrWrap<Link>::make(&c, n1, n2);
 		ASSERT_EQ(EmptyNodePayloadWithBranching::count, 2);
 		ASSERT_EQ(EmptyLinkPayloadWithBranching::count, 1);
 
@@ -50,8 +49,7 @@ TEST(ComplexBranchingGraph, Branching)
 		ASSERT_EQ(EmptyLinkPayloadWithBranching::count, 0);
 		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c, StaticVector<3>({0,0,0}));
 		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c, StaticVector<3>({1,0,0}));
-		PtrWrap<Link> l = PtrWrap<Link>::make(&c);
-		l->connect(n1, n2);
+        PtrWrap<Link> l = PtrWrap<Link>::make(&c, n1, n2);
 		ASSERT_EQ(EmptyNodePayloadWithBranching::count, 2);
 		ASSERT_EQ(EmptyLinkPayloadWithBranching::count, 1);
 	}

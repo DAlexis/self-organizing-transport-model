@@ -20,14 +20,13 @@ TEST(EmptyPayload, ModelContextInitialization)
 	ASSERT_NO_THROW(
 		PtrWrap<Node> n1 = PtrWrap<Node>::make(&c);
 		PtrWrap<Node> n2 = PtrWrap<Node>::make(&c);
-		PtrWrap<Link> l = PtrWrap<Link>::make(&c);
+        PtrWrap<Link> l = PtrWrap<Link>::make(&c, n1, n2);
 	) << "Building simplest graph";
 
 	// We had no assertion so we can create nodes and link without ASSERT_NO_THROW environment
 	PtrWrap<Node> n1 = PtrWrap<Node>::make(&c);
 	PtrWrap<Node> n2 = PtrWrap<Node>::make(&c);
-	PtrWrap<Link> l = PtrWrap<Link>::make(&c);
-	ASSERT_NO_THROW(l->connect(n1, n2));
+    PtrWrap<Link> l = PtrWrap<Link>::make(&c, n1, n2);
 	ASSERT_NO_THROW(EmptyPhysicalContext::cast(c.physicalContext())->destroyGraph());
 	ASSERT_NO_THROW(c.doBifurcation(0.0, 1.0));
 

@@ -288,10 +288,10 @@ bool Node::hasNeighbour(const Node* node) const
 	return false;
 }
 
-Link::Link(ModelContext* context) :
+Link::Link(ModelContext* context, Node* n1, Node* n2) :
 	ModelContextDependent(context)
 {
-	/// @todo Should we do this before connecting link to nodes?
+    connect(n1, n2);
 	payload.reset(
 		m_context->createLinkPayload(this)
 	);

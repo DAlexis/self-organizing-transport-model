@@ -10,10 +10,12 @@ set(EXE_SOURCES
     modeller.cpp
     seeds-generator.cpp
     coulomb-selector.cpp
+    emission-writer.cpp
     
     modeller.hpp
     seeds-generator.hpp
     coulomb-selector.hpp
+    emission-writer.hpp
 )
 
 

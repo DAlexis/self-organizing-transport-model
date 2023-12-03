@@ -43,10 +43,8 @@ void SeedsGenerator::generateInitial()
         PtrWrap<Node> n2 = PtrWrap<Node>::make(&m_c, StaticVector<3>(0, 0, +seedSize/2.0));
         setNodeParameters(n1);
         setNodeParameters(n2);
-        PtrWrap<Link> l = PtrWrap<Link>::make(&m_c);
+        PtrWrap<Link> l = PtrWrap<Link>::make(&m_c, n1, n2);
         setLinkParameters(l);
-
-        l->connect(n1, n2);
     } else {
         for (unsigned int i=0; i<seedsCount; i++)
         {
@@ -121,8 +119,7 @@ void SeedsGenerator::addSeed()
     /// Building initial tree
     PtrWrap<Node> n1 = PtrWrap<Node>::make(&m_c, StaticVector<3>(p[0], p[1], p[2]-seedSize/2.0));
     PtrWrap<Node> n2 = PtrWrap<Node>::make(&m_c, StaticVector<3>(p[0], p[1], p[2]+seedSize/2.0));
-    PtrWrap<Link> l = PtrWrap<Link>::make(&m_c);
-    l->connect(n1, n2);
+    PtrWrap<Link> l = PtrWrap<Link>::make(&m_c, n1, n2);
 
     n1->payload->init();
     n2->payload->init();

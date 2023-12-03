@@ -13,6 +13,7 @@
 #include "sotm/base/model-context.hpp"
 #include "sotm/math/integration.hpp"
 #include "sotm/math/field.hpp"
+#include "sotm/math/electromagnetic-emission.hpp"
 #include "sotm/output/variables.hpp"
 #include "sotm/optimizers/coulomb-brute-force.hpp"
 #include <memory>
@@ -86,6 +87,8 @@ public:
     std::unique_ptr<IColoumbCalculator> optimizer{
         new CoulombBruteForce(m_model->graphRegister)
     };
+
+    std::unique_ptr<EmissionCounterWithoutLag> emission_counter;
 
 private:
 	Function1D m_dischargeProb{zero};
@@ -204,8 +207,12 @@ public:
 	Variable conductivity; // Simens
 	Variable temperature;
 
+    double lastCurrent = 0;
+    double currentDerivative = 0;
 	// Secondary
 	//double current = 0;
+    StaticVector<3> center;
+    StaticVector<3> direction;
 };
 
 class ElectrostaticNodePayloadFactory : public INodePayloadFactory

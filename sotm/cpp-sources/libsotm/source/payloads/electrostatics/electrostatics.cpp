@@ -185,8 +185,8 @@ void ElectrostaticNodePayload::connectToTarget(Node* connectTo)
 {
 	if (connectTo != nullptr)
 	{
-		PtrWrap<Link> newLink = PtrWrap<Link>::make(context()->m_model);
-		newLink->connect(this->node, connectTo);
+        PtrWrap<Link> newLink = PtrWrap<Link>::make(context()->m_model, this->node, connectTo);
+        // newLink->connect(this->node, connectTo);
 		newLink->payload->init();
 	}
 }
@@ -199,6 +199,7 @@ void ElectrostaticNodePayload::prepareBifurcation(double time, double dt)
 void ElectrostaticNodePayload::doBifurcation(double time, double dt)
 {
 	//findTargetToConnect();
+    context()->emission_counter->add_charge(time, dt, node->pos, charge.current, charge.rhs);
 	connectToTarget(findTargetToConnectByMeanField());
 }
 
@@ -341,6 +342,10 @@ ElectrostaticLinkPayload::ElectrostaticLinkPayload(PhysicalPayloadsRegister* reg
         linkEta(linkEta),
         linkBeta(linkBeta)
 {
+    Node* n1 = link->getNode1();
+    Node* n2 = link->getNode2();
+    center = (n1->pos + n2->pos) / 2;
+    direction = n2->pos - n1->pos; // TODO: check sign
 }
 
 
@@ -356,9 +361,10 @@ void ElectrostaticLinkPayload::calculateSecondaryValues(double time)
 
 void ElectrostaticLinkPayload::calculateRHS(double time)
 {
+    double current = getCurrent();
 	double U = getVoltage();
     conductivity.rhs = (linkEta * sqr(U / link->length()) - linkBeta) * conductivity.current;
-	temperature.rhs = getCurrent() * U / getHeatCapacity();
+    temperature.rhs = current * U / getHeatCapacity();
 }
 
 void ElectrostaticLinkPayload::addRHSToDelta(double m)
@@ -387,6 +393,11 @@ double ElectrostaticLinkPayload::getMinimalStepsCount()
 void ElectrostaticLinkPayload::doBifurcation(double time, double dt)
 {
 	double current = getCurrent();
+    double currentDerivative = (current - lastCurrent) / dt;
+    if (dt == 0.0)
+        currentDerivative = 0.0;
+    lastCurrent = current;
+    context()->emission_counter->add_current(time, dt, center, direction, currentDerivative);
 	if (current != 0.0 && getIOIEffectiveCondictivity() < context()->minimalConductivity)
 	{
 		onDeletePayload();
