@@ -40,6 +40,7 @@ private:
 	void initScalersAndColors();
 	void initParameters();
 	void initTimeIterator();
+    void initEmissionWriter();
 	void generateCondEvoParams();
     void initSeeds();
     void writeEmission();
@@ -55,6 +56,8 @@ private:
 	std::unique_ptr<sotm::TrapezoidFunc> m_trapezoid;
 
 	sotm::ContiniousIteratorParameters m_timeIterParams;
+
+    std::unique_ptr<sotm::EmissionWriter> m_emission_writer;
 
     /// @todo: Each module should add its own group here by himself
 	cic::Parameters m_p{
@@ -121,7 +124,9 @@ private:
             "Emission calculation options",
             cic::Parameter<double>("receiver-x", "Electromagnetic wave receiver x", 500),
             cic::Parameter<double>("receiver-y", "Electromagnetic wave receiver y", 0),
-            cic::Parameter<double>("receiver-z", "Electromagnetic wave receiver z", -500)
+            cic::Parameter<double>("receiver-z", "Electromagnetic wave receiver z", -500),
+            cic::Parameter<double>("dt", "Field discretization on csv file", 1e-8),
+            cic::Parameter<double>("save-period", "Real time period of dumps, seconds", 1)
         )
 	};
 

@@ -85,7 +85,7 @@ void EmissionCounterWithoutLag::add_current(double time, double dt, StaticVector
 }
 
 
-std::vector<StaticVector<3>> EmissionCounterWithoutLag::get_samples(double from, double to, double dt)
+std::vector<StaticVector<3>> EmissionCounterWithoutLag::get_samples(double from, double to, double dt) const
 {
     std::vector<StaticVector<3>> result(size_t((to-from) / dt));  // init with zeros
     if (m_field_at_time.empty())

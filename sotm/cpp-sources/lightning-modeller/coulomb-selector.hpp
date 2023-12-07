@@ -27,9 +27,9 @@ private:
     cic::ParametersGroup m_pg{
         "Coulomb",
         "Coulomb calculation optimization options",
-        cic::Parameter<std::string>("method",        "Method used by default: bruteforce, octree", "bruteforce"),
+        cic::Parameter<std::string>("method",        "Method used by default: bruteforce, octree", "octree"),
         cic::Parameter<std::string>("compare-with",  "Method used to be compared with default: none, bruteforce, octree", "none"),
-        cic::Parameter<std::string>("octree-scales", "Scales for octree method. Format: \"(1.0, 1.0); (3.0, 4.0); (100.0, 200.0)\"", "")
+        cic::Parameter<std::string>("octree-scales", "Scales for octree method. Format: \"(1.0, 1.0); (3.0, 4.0); (100.0, 200.0)\"", "linear:0.2")
     };
 };
 

@@ -36,7 +36,7 @@ public:
     void add_charge(double time, double dt, StaticVector<3> source, double charge, double charge_dot);
     void add_current(double time, double dt, StaticVector<3> source, StaticVector<3> dl, double current_dot);
 
-    std::vector<StaticVector<3>> get_samples(double from, double to, double dt);
+    std::vector<StaticVector<3>> get_samples(double from, double to, double dt) const;
 
 private:
     void update_time(double new_time);

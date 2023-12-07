@@ -9,10 +9,12 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
+#include <chrono>
 #include <fenv.h>
 
 using namespace sotm;
 using namespace std;
+using namespace std::chrono_literals;
 
 Modeller::Modeller()
 {
@@ -74,6 +76,7 @@ void Modeller::run()
 
 	std::string filenamePrefix = std::string("lightmod_") + getTimeStr();
 	initFileOutput(filenamePrefix);
+    initEmissionWriter();
 	createParametersFile(filenamePrefix);
 	createProgramCofigurationFile(filenamePrefix);
 
@@ -93,9 +96,6 @@ void Modeller::run()
 	} else {
 		m_timeIter->run();
 	}
-
-    cout << "Writing emission to file" << std::endl;
-    writeEmission();
 
 	cout << "Destroying graph" << endl;
     c.destroyAll();
@@ -218,6 +218,12 @@ void Modeller::initTimeIterator()
 	m_timeIter->continiousIterParameters().outputVerboseLevel = ContiniousIteratorParameters::VerboseLevel::more;
 }
 
+void Modeller::initEmissionWriter()
+{
+    m_emission_writer.reset(new EmissionWriter("emission.csv", *m_physCont->emission_counter, m_p["Emission"].get<double>("dt"), std::chrono::duration<double>(m_p["Emission"].get<double>("dt")) ));
+    m_timeIter->addHook(m_emission_writer.get());
+}
+
 void Modeller::generateCondEvoParams()
 {
     m_physCont->linkBetaDefault = m_p["Discharge"].get<double>("beta");
@@ -239,7 +245,7 @@ void Modeller::writeEmission()
     const double dt = 1e-8;
     const double t_begin = 0;
     const double t_end = m_timeIter->getTime();
-    std::vector<StaticVector<3>> samples = m_physCont->emission_counter->get_samples(0, m_timeIter->getTime(), dt);
+    std::vector<StaticVector<3>> samples = m_physCont->emission_counter->get_samples(0, t_end, dt);
     cout << "Emiision samples count: " << samples.size() << std::endl;
     ofstream emissionFile("emission.csv", ios::out | ios::binary);
     emissionFile << "time,Ex,Ey,Ez\n";
